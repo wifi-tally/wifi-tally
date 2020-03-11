@@ -1,0 +1,10 @@
+.*
+*~
+!.git*
+
+*.lc
+out/
+tally-settings.ini*
+!tally-settings.ini.example
+
+

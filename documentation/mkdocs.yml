@@ -1,0 +1,19 @@
+site_name: WiFi Tally Light
+site_url: https://wifi-tally.github.io/
+repo_url: https://github.com/wifi-tally/documentation
+site_description: A low-cost, high-reliable Open Source WiFi Tally Light
+lang:
+  - en
+#nav:
+#  - Home: index.md
+#  - Getting Started: getting-started.md
+#  - About: about.md
+theme:
+  name: material
+  font: false
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.mark

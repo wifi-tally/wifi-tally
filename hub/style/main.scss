@@ -1,0 +1,86 @@
+$web-font-path: "/lato/lato-font.css";
+
+@import "~bootswatch/dist/darkly/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootswatch/dist/darkly/bootswatch";
+
+
+#content {
+    margin-top:1rem;
+}
+.navbar-nav {
+    flex-direction: row;
+}
+
+.navbar-nav .nav-link {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.page.card {
+    display:block!important;
+    width: auto!important;
+    max-width: 400px!important;
+    margin: 1.25rem auto!important;
+}
+
+.tally.card {
+    width: 250px;
+    display: inline-block;
+    margin: 0 0.5rem 0.5rem 0;
+
+    .card-header {
+        background-color: inherit;
+        display: table;
+        width: 100%;
+        padding:0;
+    
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 0;
+        }
+    }
+    
+    .card-title {
+        display:table-cell;
+        padding: 0.75rem 1.25rem;
+    }
+    .card-bubble {
+        display: table-cell;
+        padding: 0.75rem;
+        width: calc(2.5rem + 2px);
+        text-align: center;
+        font-weight: bold;
+        background-color: $blue;
+        line-height: 1.2;
+        border-radius: 0.25rem 0.25rem 0 0.25rem;
+    }
+    
+    .card-body {
+        background-color: $gray-700;
+    }
+    .card.bg-dark .card-body {
+        background-color: $gray-800;
+    }
+    
+    .card-footer {
+        display: table;
+        width: 100%;
+        padding: 0.25rem 1.25rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        text-align: center;
+        font-weight: bold;
+    }
+    .card-footer-left,
+    .card-footer-right {
+        display: table-cell;
+        width: 50%;
+        text-align: center;
+    }
+}
+
+
+
+.bg-warning .text-muted {
+    color: $white!important;
+}

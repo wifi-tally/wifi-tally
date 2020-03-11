@@ -1,0 +1,7 @@
+station.ssid=MyWifi
+station.password=topsecret
+hub.ip=10.10.1.1
+; default is 7411
+hub.port=7411
+; How you want your Tally to be known
+tally.name=Doe
