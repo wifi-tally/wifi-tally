@@ -48,6 +48,9 @@ Tally.fromValueObject = function(valueObject) {
     const tally = new Tally(
         valueObject.name,
         valueObject.channelId,
+        valueObject.address,
+        valueObject.port,
+        valueObject.state
     )
     return tally
 }
