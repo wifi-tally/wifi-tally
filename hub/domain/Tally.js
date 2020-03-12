@@ -1,3 +1,5 @@
+const Log = require('./Log')
+
 class Tally {
     constructor(name, channelId = -1, address = null, port = null, state = Tally.DISCONNECTED) {
         this.name = name
@@ -6,6 +8,7 @@ class Tally {
         this.port = port
         this.state = state
         this.highlight = false
+        this.logs = []
     }
     isPatched() {
         return this.channelId >= 0
@@ -18,6 +21,14 @@ class Tally {
     }
     isHighlighted() {
         return this.highlight
+    }
+    addLog(dateTime, severity, message) {
+        const log = Log(dateTime, severity, message)
+        this.logs.push(log)
+        return log
+    }
+    getLogs() {
+        return this.logs
     }
     toValueObject() {
         return {

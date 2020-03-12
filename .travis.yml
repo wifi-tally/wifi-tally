@@ -2,61 +2,55 @@ os: linux
 dist: bionic
 language: python
 
-stages:
-  - name: build-and-test
+env:
+  # nodemcu uses an old lua version
+  - LUA="5.1.4"
 
-jobs:
-  include:
-    ########################
-    #                      #
-    # build the tally code #
-    #                      #
-    ########################
-    - language: python
-      stage: build-and-test
-      env:
-        # nodemcu uses an old lua version
-        - LUA="5.1.4"
+before_install:
+  # lua toolchain for running tests
+  - pip install hererocks
+  - hererocks lua_install -rlatest -l${LUA}
+  - export PATH=$PATH:$PWD/lua_install/bin # Add directory with all installed binaries to PATH
 
-      before_install:
-        # lua toolchain for running tests
-        - pip install hererocks
-        - hererocks lua_install -rlatest -l${LUA}
-        - export PATH=$PATH:$PWD/lua_install/bin # Add directory with all installed binaries to PATH
-        # nodemcu toolchain to cross compile
-        - git clone --depth 1 https://github.com/nodemcu/nodemcu-firmware.git $HOME/nodemcu-firmware
-        - make -C $HOME/nodemcu-firmware/app/lua/luac_cross/
-        - export PATH=$PATH:$HOME/nodemcu-firmware
+  # nodemcu toolchain to cross compile
+  - git clone --depth 1 https://github.com/nodemcu/nodemcu-firmware.git $HOME/nodemcu-firmware
+  - make -C $HOME/nodemcu-firmware/app/lua/luac_cross/
+  - export PATH=$PATH:$HOME/nodemcu-firmware
 
-      install:
-        - luarocks install busted
+  # tools for building docs
+  - pip install mkdocs
+  - pip install mkdocs-material
 
-      script:
-        - cd $TRAVIS_BUILD_DIR/tally
-        - make test
-    ############################
-    #                          #
-    # render the documentation #
-    #                          #
-    ############################
-    - language: python
-      stage: build-and-test
-      before_install:
-        - pip install mkdocs
-        - pip install mkdocs-material
-      script:
-        - cd $TRAVIS_BUILD_DIR/documentation
-        - mkdocs build
-      deploy:
-        - provider: pages
-          skip_cleanup: true
-          local_dir: $TRAVIS_BUILD_DIR/documentation/site/
-          repo: wifi-tally/wifi-tally.github.io
-          target_branch: master
-          keep_history: false
-          github_token: $GITHUB_TOKEN
-          on:
-            branch: master
+  # tools for building the hub
+
+install:
+  - luarocks install busted
+
+script:
+  - cd $TRAVIS_BUILD_DIR/tally
+  - make test
+
+  - cd $TRAVIS_BUILD_DIR/documentation
+  - mkdocs build
+
+  - cd $TRAVIS_BUILD_DIR/hub
+  - npm install --dev
+  - npm run test:ci
+  - rm -rf node_modules package-log.json
+  - npm install
+  - npm build
+
+deploy:
+  - provider: pages
+    edge: true
+    cleanup: false
+    local_dir: $TRAVIS_BUILD_DIR/documentation/site/
+    repo: wifi-tally/wifi-tally.github.io
+    target_branch: master
+    keep_history: false
+    token: $GITHUB_TOKEN
+    on:
+      branch: master
 
 notifications:
   email:

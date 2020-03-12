@@ -46,7 +46,7 @@ class TallyDriver {
         this.io.on('message', (msg, rinfo) => {
             msg = msg.toString().trim()
             if (msg.startsWith("tally-ho")) {
-                var tallyName = msg.substring(9)
+                var tallyName = TallyDriver.parseTallyHo(msg)
                 if (!this.tallies.has(tallyName)) {
                     const tally = new Tally(tallyName, -1)
                     this.tallies.set(tallyName, tally)
@@ -65,9 +65,8 @@ class TallyDriver {
                 }
                 this.emitter.emit('tally.reported', this.tallies.get(tallyName))
             } else if (msg.startsWith("log")) {
-                // @TODO
-                var logMessage = msg.substring(4)
-                console.log(logMessage)
+                const [name, severity, message] = TallyDriver.parseLog(msg)
+                console.log(name, severity, message)
             } else {
                 console.log("Received unknown package " + msg)
             }
@@ -167,6 +166,40 @@ class TallyDriver {
             return tally
         })
     }
+}
+
+TallyDriver.parseTallyHo = function(cmd) {
+    const idx = cmd.indexOf(" ")
+    const command = cmd.substring(0, idx)
+    if (command !== "tally-ho") {
+        throw "Invalid command " + command
+    }
+    const name = cmd.substring(idx+1)
+
+    return name
+}
+TallyDriver.parseLog = function(cmd) {
+    var startIdx = 0
+    var endIdx = cmd.indexOf(" ")
+    const command = cmd.substring(startIdx, endIdx)
+
+    if (command !== "log") {
+        throw "Invalid command " + command
+    }
+
+    startIdx = endIdx+1
+    endIdx = cmd.indexOf(" ", startIdx)
+
+    const name = cmd.substring(startIdx, endIdx)
+    startIdx = endIdx+1
+    endIdx = cmd.indexOf(" ", startIdx)
+
+    const severity = cmd.substring(startIdx, endIdx)
+    startIdx = endIdx+1
+
+    const message = cmd.substring(startIdx)
+
+    return [name, severity, message]
 }
 
 module.exports = TallyDriver;
