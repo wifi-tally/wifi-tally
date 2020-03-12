@@ -36,9 +36,9 @@ script:
   - cd $TRAVIS_BUILD_DIR/hub
   - npm install --dev
   - npm run test:ci
-  - rm -rf node_modules package-log.json
+  - rm -rf node_modules package-lock.json
   - npm install
-  - npm build
+  - npm run build
 
 deploy:
   - provider: pages
