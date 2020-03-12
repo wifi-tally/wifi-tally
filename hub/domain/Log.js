@@ -16,19 +16,38 @@ class Log {
         this.severity = severity
         this.message = message
     }
-    getDateTime() {
-        return this.dateTime
+    isError() {
+        return this.severity == Log.ERROR
     }
-    getSeverity() {
-        return this.severity
+    isWarning() {
+        return this.severity == Log.WARNING
     }
-    getMessage() {
-        return this.message
+    isInfo() {
+        return this.severity == Log.INFO
     }
+    isStatus() {
+        return this.severity == Log.STATUS
+    }
+    toValueObject() {
+        return {
+            date: this.dateTime.toISOString(),
+            severity: this.severity,
+            message: this.message
+        }
+    }
+}
+
+Log.fromValueObject = function(valueObject) {
+    return new Log(
+        valueObject.date,
+        valueObject.severity,
+        valueObject.message
+    )
 }
 
 Log.INFO = 0
 Log.WARNING = 1
 Log.ERROR = 2
+Log.STATUS = 3
 
 module.exports = Log;

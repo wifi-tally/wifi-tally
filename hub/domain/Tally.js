@@ -23,7 +23,7 @@ class Tally {
         return this.highlight
     }
     addLog(dateTime, severity, message) {
-        const log = Log(dateTime, severity, message)
+        const log = new Log(dateTime, severity, message)
         this.logs.push(log)
         return log
     }

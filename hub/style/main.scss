@@ -84,3 +84,13 @@ $web-font-path: "/lato/lato-font.css";
 .bg-warning .text-muted {
     color: $white!important;
 }
+
+.log {
+    margin: 0 calc(-1.25rem + 1px);
+    padding: 0.25rem 1.25rem;
+    font-family: monospace;
+}
+.log-date {
+    opacity: 0.5;
+    font-size: 0.8em;
+}

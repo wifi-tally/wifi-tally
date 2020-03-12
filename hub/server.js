@@ -6,6 +6,7 @@ const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const next = require('next')
+const Log = require('./domain/Log')
 
 const EventEmitter = require('events')
 
@@ -16,6 +17,7 @@ const EventEmitter = require('events')
 // - tally.missing
 // - tally.timedout
 // - tally.removed
+// - tally.logged
 // - atem.connected
 // - atem.disconnected
 // - config.changed.mixer
@@ -42,13 +44,28 @@ myEmitter.on('program.changed', (programs, previews) => {
   io.emit('program.changed', {programs, previews})
 })
 
+const sendLogToTally = (tally, log) => {
+  io.emit('tally.logged.' + tally.name, log)
+}
 const sendTalliesToBrowser = function() {
   io.emit('tallies', myTallyDriver.toValueObjects())
 }
 myEmitter.on('tally.connected', sendTalliesToBrowser)
 myEmitter.on('tally.changed', sendTalliesToBrowser)
+myEmitter.on('tally.logged', sendLogToTally)
+myEmitter.on('tally.changed', (tally) => {
+  io.emit('tally.changed.' + tally.name, myTallyDriver.toValueObjects())
+})
 myEmitter.on('tally.missing', sendTalliesToBrowser)
+myEmitter.on('tally.missing', (tally, diff) => {
+  const log = tally.addLog(new Date(), Log.STATUS, "Tally got missing. It has not reported for " + diff + "ms")
+  sendLogToTally(tally, log)
+})
 myEmitter.on('tally.timedout', sendTalliesToBrowser)
+myEmitter.on('tally.timedout', (tally, diff) => {
+  const log = tally.addLog(new Date(), Log.STATUS, "Tally got disconnected after not reporting for " + diff + "ms")
+  sendLogToTally(tally, log)
+})
 myEmitter.on('tally.removed', sendTalliesToBrowser)
 
 const sendConfigurationToBrowser = function() {
@@ -80,6 +97,15 @@ myEmitter.on('tally.timedout', tally => {
 })
 myEmitter.on('tally.removed', tally => {
     console.debug("Tally " + tally.name + " removed from configuration")
+})
+myEmitter.on('tally.logged', (tally, log) => {
+    var fn = console.info
+    if(log.isError()) { 
+      fn = console.error 
+    } else if(log.isWarning()) {
+      fn = console.warn
+    }
+    fn(tally.name + ': "' + log.message + '"')
 })
 myEmitter.on('config.changed.mixer', mixerSelection => {
     console.info("configured mixer was changed to \"" + mixerSelection + "\"")
@@ -120,6 +146,13 @@ nextApp.prepare().then(() => {
       programs: myMixerDriver.currentPrograms,
       previews: myMixerDriver.currentPreviews,
       tallies: myTallyDriver.toValueObjects(),
+    })
+  })
+  app.get('/tally', (req, res) => {
+    const tally = myTallyDriver.getTally(req.query.tallyName)
+    res.json({
+      tally: tally.toValueObject(),
+      logs: tally.getLogs().map(log => log.toValueObject()),
     })
   })
   app.get('/atem', (req, res) => {

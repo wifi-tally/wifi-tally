@@ -46,27 +46,13 @@ class TallyDriver {
         this.io.on('message', (msg, rinfo) => {
             msg = msg.toString().trim()
             if (msg.startsWith("tally-ho")) {
-                var tallyName = TallyDriver.parseTallyHo(msg)
-                if (!this.tallies.has(tallyName)) {
-                    const tally = new Tally(tallyName, -1)
-                    this.tallies.set(tallyName, tally)
-                }
-                const tally = this.tallies.get(tallyName)
-                if(tally.state != Tally.CONNECTED) {
-                    tally.state = Tally.CONNECTED
-                    tally.address = rinfo.address;
-                    tally.port = rinfo.port;
-                    this.emitter.emit('tally.connected', tally)
-                }
-                if (tally.address !== rinfo.address || tally.port !== rinfo.port) {
-                    tally.address = rinfo.address;
-                    tally.port = rinfo.port;
-                    this.emitter.emit('tally.changed', tally)
-                }
-                this.emitter.emit('tally.reported', this.tallies.get(tallyName))
+                const tallyName = TallyDriver.parseTallyHo(msg)
+                this._tallyReported(tallyName, rinfo)
             } else if (msg.startsWith("log")) {
-                const [name, severity, message] = TallyDriver.parseLog(msg)
-                console.log(name, severity, message)
+                const [tallyName, severity, message] = TallyDriver.parseLog(msg)
+                const tally = this._tallyReported(tallyName, rinfo)
+                const log = tally.addLog(new Date(), severity, message)
+                this.emitter.emit('tally.logged', tally, log)
             } else {
                 console.log("Received unknown package " + msg)
             }
@@ -96,12 +82,12 @@ class TallyDriver {
                     if(diff > 30000) {
                         if(tally.state != Tally.DISCONNECTED) {
                             tally.state = Tally.DISCONNECTED
-                            this.emitter.emit('tally.timedout', tally)
+                            this.emitter.emit('tally.timedout', tally, diff)
                         }
                     } else if(diff > 3000) {
                         if(tally.state != Tally.MISSING) {
                             tally.state = Tally.MISSING
-                            this.emitter.emit('tally.missing', tally)
+                            this.emitter.emit('tally.missing', tally, diff)
                         }
                     }
                 }
@@ -114,6 +100,26 @@ class TallyDriver {
         setInterval(function() {
             this.updateTallies()
         }.bind(this), 1000 / keepAlivesPerSecond)
+    }
+    _tallyReported(tallyName, rinfo) {
+        if (!this.tallies.has(tallyName)) {
+            const tally = new Tally(tallyName, -1)
+            this.tallies.set(tallyName, tally)
+        }
+        const tally = this.tallies.get(tallyName)
+        if(tally.state != Tally.CONNECTED) {
+            tally.state = Tally.CONNECTED
+            tally.address = rinfo.address;
+            tally.port = rinfo.port;
+            this.emitter.emit('tally.connected', tally)
+        }
+        if (tally.address !== rinfo.address || tally.port !== rinfo.port) {
+            tally.address = rinfo.address;
+            tally.port = rinfo.port;
+            this.emitter.emit('tally.changed', tally)
+        }
+        this.emitter.emit('tally.reported', this.tallies.get(tallyName))
+        return tally
     }
     highlight(tallyName) {
         console.log("highlight", tallyName)
@@ -166,38 +172,27 @@ class TallyDriver {
             return tally
         })
     }
+    getTally(tallyName) {
+        if(this.tallies.has(tallyName)) {
+            const tally = this.tallies.get(tallyName)
+            return tally
+        }
+    }
 }
 
 TallyDriver.parseTallyHo = function(cmd) {
-    const idx = cmd.indexOf(" ")
-    const command = cmd.substring(0, idx)
+    const [_, command, name] = cmd.match(/^([^ ]+) "(.+)"/)
     if (command !== "tally-ho") {
         throw "Invalid command " + command
     }
-    const name = cmd.substring(idx+1)
-
     return name
 }
 TallyDriver.parseLog = function(cmd) {
-    var startIdx = 0
-    var endIdx = cmd.indexOf(" ")
-    const command = cmd.substring(startIdx, endIdx)
+    const [_, command, name, severity, message] = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
 
     if (command !== "log") {
         throw "Invalid command " + command
     }
-
-    startIdx = endIdx+1
-    endIdx = cmd.indexOf(" ", startIdx)
-
-    const name = cmd.substring(startIdx, endIdx)
-    startIdx = endIdx+1
-    endIdx = cmd.indexOf(" ", startIdx)
-
-    const severity = cmd.substring(startIdx, endIdx)
-    startIdx = endIdx+1
-
-    const message = cmd.substring(startIdx)
 
     return [name, severity, message]
 }

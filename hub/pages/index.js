@@ -2,6 +2,7 @@ import { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
 import {useSocket, socketEventEmitter} from '../hooks/useSocket'
 import Layout from '../components/Layout'
+import Link from 'next/link'
 
 const Tally = require('../domain/Tally')
 
@@ -123,6 +124,9 @@ socketEventEmitter.on("disconnected", function() {
           {tally.state != Tally.CONNECTED ? (
             <a href="#" className="card-link" onClick={e => handleRemoveTally(e, tally)}>Remove</a>
           ) : ""}
+          <Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
+            <a className="card-link">Logs</a>
+          </Link>
         </div>
         {tally.state == Tally.DISCONNECTED ? (
           <div className="card-footer">disconnected</div>

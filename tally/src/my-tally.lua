@@ -57,10 +57,10 @@ _G.MyTally = {
         listenSocket:send(MySettings:hubPort(), MySettings:hubIp(), data .. "\n")
     end,
     sendInfo = function(self)
-        self:send(string.format("tally-ho %s", MySettings:name()))
+        self:send(string.format('tally-ho "%s"', MySettings:name()))
     end,
     sendLog = function(self, severity, msg)
-        self:send(string.format("log %s %s %s", MySettings:name(), severity, msg))
+        self:send(string.format('log "%s" %s "%s"', MySettings:name(), severity, msg))
     end,
 }
 
@@ -72,6 +72,6 @@ tmr.create():alarm(1000, tmr.ALARM_AUTO, function()
         end
 
         -- send probes to show the base station that we are still there
-        MyTally:sendInfo()
+        if MyTally:isReady() then MyTally:sendInfo() end
     end
 end)
