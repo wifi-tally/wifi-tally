@@ -21,8 +21,6 @@ before_install:
   - pip install mkdocs
   - pip install mkdocs-material
 
-  # tools for building the hub
-
 install:
   - luarocks install busted
 
@@ -49,8 +47,13 @@ script:
   - cp $TRAVIS_BUILD_DIR/Readme.md $TRAVIS_BUILD_DIR/release
   - cp $TRAVIS_BUILD_DIR/LICENSE $TRAVIS_BUILD_DIR/release
   - echo "${TRAVIS_BRANCH}" > $TRAVIS_BUILD_DIR/release/VERSION.txt
+
   - cp -r $TRAVIS_BUILD_DIR/firmware $TRAVIS_BUILD_DIR/release/firmware
+
   - cp -r $TRAVIS_BUILD_DIR/tally/out $TRAVIS_BUILD_DIR/release/tally
+  - cp $TRAVIS_BUILD_DIR/tally/tally-settings.ini.example $TRAVIS_BUILD_DIR/release/tally
+  - cp $TRAVIS_BUILD_DIR/tally/src/init.lua $TRAVIS_BUILD_DIR/release/tally
+
   - mkdir -p $TRAVIS_BUILD_DIR/release/docs
   - cp -r $TRAVIS_BUILD_DIR/documentation/docs $TRAVIS_BUILD_DIR/release/docs/markdown
   - cp -r $TRAVIS_BUILD_DIR/documentation/site $TRAVIS_BUILD_DIR/release/docs/html
