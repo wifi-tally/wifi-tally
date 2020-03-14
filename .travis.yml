@@ -58,9 +58,9 @@ script:
   - find $TRAVIS_BUILD_DIR/release -name ".gitignore" -delete
 
   - cd $TRAVIS_BUILD_DIR/release
-  - zip -Jr "wifi-tally-${TRAVIS_BRANCH}.zip" *
-  - tar -czf "wifi-tally-${TRAVIS_BRANCH}.tar.gz" *
-  - tar -cjf "wifi-tally-${TRAVIS_BRANCH}.tar.xz" *
+  - zip -Jrq "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.zip" *
+  - tar -czf "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.tar.gz" *
+  - tar -cjf "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.tar.xz" *
 
 deploy:
   - provider: pages
@@ -77,7 +77,7 @@ deploy:
     edge: true
     token: $GITHUB_TOKEN
     file_glob: true
-    file: "$TRAVIS_BUILD_DIR/release/wifi-tally-*"
+    file: "$TRAVIS_BUILD_DIR/wifi-tally-*"
     cleanup: false
     draft: true
     on:
