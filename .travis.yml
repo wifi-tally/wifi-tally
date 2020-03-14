@@ -27,18 +27,40 @@ install:
   - luarocks install busted
 
 script:
+  # building and testing the tally
   - cd $TRAVIS_BUILD_DIR/tally
+  - make build
   - make test
 
+  # rendering documentation
   - cd $TRAVIS_BUILD_DIR/documentation
   - mkdocs build
 
+  # building and testing the hub
   - cd $TRAVIS_BUILD_DIR/hub
   - npm install --dev
   - npm run test:ci
   - rm -rf node_modules package-lock.json
   - npm install
   - npm run build
+
+  # building the release
+  - mkdir -p $TRAVIS_BUILD_DIR/release
+  - cp $TRAVIS_BUILD_DIR/Readme.md $TRAVIS_BUILD_DIR/release
+  - cp $TRAVIS_BUILD_DIR/LICENSE $TRAVIS_BUILD_DIR/release
+  - echo "${TRAVIS_BRANCH}" > $TRAVIS_BUILD_DIR/release/VERSION.txt
+  - cp -r $TRAVIS_BUILD_DIR/firmware $TRAVIS_BUILD_DIR/release/firmware
+  - cp -r $TRAVIS_BUILD_DIR/tally/out $TRAVIS_BUILD_DIR/release/tally
+  - mkdir -p $TRAVIS_BUILD_DIR/release/docs
+  - cp -r $TRAVIS_BUILD_DIR/documentation/docs $TRAVIS_BUILD_DIR/release/docs/markdown
+  - cp -r $TRAVIS_BUILD_DIR/documentation/site $TRAVIS_BUILD_DIR/release/docs/html
+  - cp -r $TRAVIS_BUILD_DIR/hub $TRAVIS_BUILD_DIR/release/hub
+  - find $TRAVIS_BUILD_DIR/release -name ".gitignore" -delete
+
+  - cd $TRAVIS_BUILD_DIR/release
+  - zip -Jr "wifi-tally-${TRAVIS_BRANCH}.zip" *
+  - tar -czf "wifi-tally-${TRAVIS_BRANCH}.tar.gz" *
+  - tar -cjf "wifi-tally-${TRAVIS_BRANCH}.tar.xz" *
 
 deploy:
   - provider: pages
@@ -51,6 +73,15 @@ deploy:
     token: $GITHUB_TOKEN
     on:
       branch: master
+  - provider: releases
+    edge: true
+    token: $GITHUB_TOKEN
+    file_glob: true
+    file: "$TRAVIS_BUILD_DIR/release/wifi-tally-*"
+    cleanup: false
+    draft: true
+    on:
+      tags: true
 
 notifications:
   email:
