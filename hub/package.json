@@ -1,6 +1,8 @@
 {
-  "name": "with-socket.io",
-  "version": "1.0.0",
+  "name": "wifi-tally-hub",
+  "license": "MIT",
+  "version": "0.1.0",
+  "homepage": "https://wifi-tally.github.io/",
   "dependencies": {
     "@zeit/next-sass": "^1.0.1",
     "atem-connection": "^2.0.0-nightly-20200117-174823-3f8cfe7.0",
