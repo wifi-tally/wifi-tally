@@ -38,7 +38,7 @@ script:
 
   # building and testing the hub
   - cd $TRAVIS_BUILD_DIR/hub
-  - npm install --only=dev
+  - npm install --dev
   - npm run test:ci
   - rm -rf node_modules package-lock.json
   - npm install
