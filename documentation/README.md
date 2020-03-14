@@ -11,7 +11,7 @@ locally:
 pip install mkdocs --user
 pip install mkdocs-material --user
 
-mkdocs server
+mkdocs serve
 ````
 
 Point your browser to http://127.0.0.1:8000 to see the live preview of the documentation.

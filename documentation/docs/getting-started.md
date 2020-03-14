@@ -5,53 +5,65 @@ and the Hub that connects your video mixer and the Tallies.
 
 !TODO: graphic here! 
 
-What you need is:
+## Things you need
 
-* a **trusted network** that allows access via WiFi
+### a trusted network that allows access via WiFi
   
-  Your video mixer, the Hub and the Tallies need to be able to connect to each other.
-  You should take care that there is a close and stable WiFi hotspot near your Tallies
-  for obvious reasons. The network you are using should be trusted as all communication
-  is unencrypted.
-* a **computer** to install the Hub on
+Your video mixer, the Hub and the Tallies need to be able to connect to each other.
+You should take care that there is a close and stable WiFi hotspot near your Tallies
+for obvious reasons. The network you are using should be trusted as all communication
+is unencrypted.
+
+The WiFi Chip supports `IEEE 802.11 b/g/n` and operates in the `2.4GHz` frequency band.
+The Wifi network should support that as well.
+
+### a computer to run the Hub on
   
-  The application is rather light weight, so there are no special requirements here
-  and it could run other applications in parallel. The Hub has a web interface for
-  monitoring and configuration that can be shown on any browser that can connect to
-  the computer.
+The application is rather light weight, so there are no special requirements here
+and it could run other applications in parallel. The Hub has a web interface for
+monitoring and configuration that can be shown on any browser that can connect to
+the computer.
+
+To keep latency to a minimum it would be perfect if this computer uses a wired
+connection.
   
-* a **NodeMcu ESP8266**
+### a NodeMcu ESP8266
   
-  This is an ESP8266 wifi chip on a development board that is typically used for IoT
-  applications. As it is an Open Hardware project there are lots of differen boards
-  available. They mostly differ in price and form factor and are all fit for the project.
-  But they all look similar to this:
+This is an ESP8266 wifi chip on a development board that is typically used for IoT
+applications. As it is an Open Hardware project there are lots of different boards
+available. They mostly differ in price and form factor and are all fit for the project.
+But they all look similar to this:
+
+![Photography of a NodeMCU](images/Nodemcu_amica_bot_02.jpg)
+
+["NodeMCU Amica"](https://commons.wikimedia.org/wiki/File:Nodemcu_amica_bot_02.png) 
+by "Make Magazin DE", [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
+
+!TODO: elaborate on different NodeMCUs!
   
-  ![Photography of a NodeMCU](images/Nodemcu_amica_bot_02.jpg)
+### a piece of RGB LED strip
   
-  ["NodeMCU Amica"](https://commons.wikimedia.org/wiki/File:Nodemcu_amica_bot_02.png) 
-  by "Make Magazin DE", [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
-  
-* a piece of **RGB LED** strip
-  
-  It needs to be specified for 5V and have a common anode.
-  Most LED strips that can be separated after _every_ LED should fulfill that requirement. 
-  
-  I recommend taking one with 120LEDs per meter.
+It needs to be specified for 5V and have a common anode.
+Most LED strips that can be separated after _every_ LED should fulfill that requirement. 
+
+I recommend taking one with 120LEDs per meter.
+
+## Setup
 
 Running the tally lights consists of two steps:
 
-* **Setup the Tally Light**
-  
-  This means connecting the hardware and flashing the software onto it.
-* **Setup the Hub**
-  
-  This is the piece of software that communicates with your video mixer and all
+* **Setup the Tally Light** This means connecting the hardware and flashing the software onto it.
+
+* **Setup the Hub** This is the piece of software that communicates with your video mixer and all
   connected Tallies and runs on any computer you provide.
 
-## Setting up the Tally
+### Download sources
 
-### Connect the hardware
+The latest releases can be found on [github.com/wifi-tally](https://github.com/wifi-tally/wifi-tally/releases).
+
+### Setting up the Tally
+
+#### Connect the hardware
 
 All you need to do is connecting the LED strip to the NodeMCU board.
 
@@ -71,9 +83,16 @@ All you need to do is connecting the LED strip to the NodeMCU board.
 
 !!! info
     It is possible to connect the `+5V` pin of the LED strip to `Vin` on the board. But not all NodeMCU boards connect
-    the PIN to the USB power supply and your LEDs would stay dark. Have in mind that this is a potential error source.
+    the PIN to the USB power supply and your LEDs would stay dark.
+    
+    It might also happen that you LED Strip does not work with a lower voltage of the 3.3V output. Typically this does
+    not happen, but it could if you have an older strips.
 
-### Prepare the NodeMCU Toolchain
+This is how the setup could look like on a breadboard.
+
+![WiFi Tally on a breaboard](images/on-breadboard.jpg)
+
+#### Prepare the NodeMCU Toolchain
 
 The NodeMCU documentation very nicely explains all the steps necessary to [start a NodeMCU project](https://nodemcu.readthedocs.io/en/master/getting-started/#getting-started-aka-nodemcu-quick-start).
 The documentation might seem overwhelming at first, but you only need to care of the two steps
@@ -90,16 +109,15 @@ and follow their installation instruction. Similarly select [ESPlorer](https://n
 or [NodeMCU Tool](https://nodemcu.readthedocs.io/en/master/getting-started/#nodemcu-tool) to upload code and follow
 their installation instruction.
 
-### Flash the firmware
+#### Flash the firmware
 
-When everything is set up flash the firmware.
+When everything is set up flash the firmware with the tool selected in the previous step.
 
+The firmware is the `.bin` file in the `firmware` folder.
 
-!TODO: tell where we ship the firmware or how to build it yourself
+#### Upload Code
 
-### Upload Code
-
-Use the tool you have selected to upload the following files to the NodeMCU board:
+Use the tool you have selected to upload the following files from the `tally` folder to the NodeMCU board:
 
 * every file ending in `.lc`
 * `init.lua`
@@ -124,8 +142,45 @@ Reboot the NodeMCU board by pressing the `RST` button on the board or disconnect
     
     **Well done!** 
 
-!TODO: elaborate on different NodeMCUs! 
+### Setting up the hub
 
-## Setting up the hub
+The hub requires [node.js](https://nodejs.org/en/) to run. Packages for Linux, MacOS and even Windows
+are offered on the [Download page](https://nodejs.org/en/download/). Get a fitting version.
 
-!TODO: where to download from
+Enter the `hub` directory and run
+
+````bash
+npm run prod
+````
+
+!TODO: explain environment variables!
+
+Point your browser to the IP of your computer on port 3000, for instance http://127.0.0.1:3000 if
+you are on the same machine. You should see a screen similar to this
+
+![alt text](images/tally-hub.png "Tally Hub")
+
+Your Tallies should also start popping up there. If not see the [Troubleshooting Guide](troubleshooting.md). 
+
+Select `Configuration` in the navigation and configure the settings for your Video Mixer.
+
+!!! info
+    Currently only ATEM video mixers are supported, but please [open an issue](https://github.com/wifi-tally/wifi-tally/issues)
+    if you want others to be supported too. It is really simple to integrate them
+    and the only reason they have not been integrated yet, is that nobody has needed it already. :D
+
+!!! info
+    If you want to try this at home and don't have a Video Mixer at hand you can run
+    `npm run dev` instead. It features a `Mock` Video Mixer that randomly switches channels.
+
+Switch back to `Tallies` in the navigation and assign the video channels of the Video Mixer to the according
+tallies.
+
+!!! info
+    The Tallies and their assigned channels are automatically saved in the `config.json` file.
+    So the configuration is restored when the Hub is restarted. 
+
+!!! success
+    Your Tallies should start showing green, when they are in Preview and red when they are in Program.
+    
+    Congratulations, you made it.
