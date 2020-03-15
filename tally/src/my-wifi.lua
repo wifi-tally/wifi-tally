@@ -1,11 +1,12 @@
+local isConnected = false
+
 _G.MyWifi = {
     connect = function()
         MyLed.waitForWifiConnection()
-        MyLog.info("Trying to connect to " .. MySettings:staSsid())
+        MyLog.info("Connect to WiFi " .. MySettings:staSsid())
         wifi.setmode(wifi.STATION)
         wifi.sta.config({
             ssid = MySettings:staSsid(),
-            --ssid = "error",
             pwd = MySettings:staPw(),
             auto = false,
             save = false,

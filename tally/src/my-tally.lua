@@ -23,7 +23,7 @@ local handleReceive = function(data)
     elseif data == "unknown" then
         MyLed.onUnknown()
     else
-        MyLog.info("ignoring unknown package: " .. data)
+        MyLog.warning("ignoring unknown package: " .. data)
     end
 end
 
@@ -37,7 +37,7 @@ _G.MyTally = {
             listenSocket:listen(listenPort)
         end
         MyLog.info(string.format("Listening for hub on port %d", listenPort))
-        MyLog.info(string.format("Trying to contact hub on %s:%d", MySettings:hubIp(), MySettings:hubPort()))
+        MyLog.info(string.format("Contacting hub on %s:%d", MySettings:hubIp(), MySettings:hubPort()))
         self:sendInfo()
     end,
     isReady = function()
