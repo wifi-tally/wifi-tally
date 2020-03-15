@@ -17,11 +17,8 @@ _G.MyWifi = {
         wifi.sta.disconnect()
     end,
     isConnected = function()
-        if wifi.getmode() == wifi.STATION then
-            return wifi.sta.status() == wifi.STA_GOTIP
-        elseif wifi.getmode() == wifi.SOFTAP then
-            return true
-        end
+        -- wifi.sta.status() returns wifi.STA_GOTIP even when the tally was thrown out of wifi -> so it's no good choice
+        return isConnected
     end,
     getIp = function()
         return wifi.sta.getip()
@@ -34,25 +31,45 @@ _G.MyWifi = {
 wifi.setmaxtxpower(82)
 
 wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function(T)
+    isConnected = false
     MyLog.info("Connected to " .. T.SSID .. ". Waiting for IP.")
+
     MyLed.waitForWifiIp()
 end)
 
 wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED, function(T)
-    MyLog.info("Got disconnected from " ..T.SSID .. ". Reason " .. T.reason)
-    tmr.create():alarm(2000, tmr.ALARM_SINGLE, MyWifi.connect)
+    isConnected = false
+
+    local humanReadable = T.reason
+    for key, val in pairs(wifi.eventmon.reason) do
+        if val == T.reason then
+            humanReadable = key
+            break
+        end
+    end
+
+    MyLog.error("Got disconnected from " ..T.SSID .. ". Reason " .. humanReadable)
+
+    MyLed.initial()
+    local delay = 2000
+    if T.reason == wifi.eventmon.reason.AUTH_EXPIRE then delay = 200 end
+    tmr.create():alarm(delay, tmr.ALARM_SINGLE, MyWifi.connect)
 end)
 
 wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function(T)
     MyLog.info("Got IP " .. T.IP)
 
+    isConnected = true
     MyLed.waitForServerConnection()
     MyTally:connect()
 end)
 
 wifi.eventmon.register(wifi.eventmon.STA_DHCP_TIMEOUT, function()
+
+    isConnected = false
     MyLog.error("DHCP timeout")
 
+    MyLed.initial()
     MyWifi.disconnect()
-    tmr.create():alarm(2000, tmr.ALARM_SINGLE, MyWifi.connect)
+    tmr.create():alarm(200, tmr.ALARM_SINGLE, MyWifi.connect)
 end)

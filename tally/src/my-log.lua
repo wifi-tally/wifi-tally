@@ -5,7 +5,7 @@ local buffer = {}
 local createLog = function(severity)
     return function(msg)
         print(string.format("%-7s %s", "[" .. severity .. "]", msg))
-        if MyTally and MyTally.isConnected() and MyWifi and MyWifi.isConnected() then
+        if MyTally and MyTally.isReady() then
             MyTally:sendLog(severity, msg)
         else
             if #buffer >= maxBufferLength then
