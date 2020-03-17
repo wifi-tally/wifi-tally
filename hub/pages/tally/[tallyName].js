@@ -47,7 +47,8 @@ const TallyDetails = props => {
 
 TallyDetails.getInitialProps = async (context) => {
   const { tallyName } = context.query;
-  const response = await fetch('http://localhost:3000/tally?tallyName=' + tallyName)
+  const baseUrl = context && context.req ? `${context.req.protocol}://${context.req.get('Host')}` : '';
+  const response = await fetch(baseUrl + '/tally?tallyName=' + tallyName)
   const data = await response.json()
 
   return data

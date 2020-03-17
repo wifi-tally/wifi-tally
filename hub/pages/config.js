@@ -92,8 +92,9 @@ const Config = props => {
   )
 }
 
-Config.getInitialProps = async () => {
-  const response = await fetch('http://localhost:3000/atem')
+Config.getInitialProps = async (context) => {
+  const baseUrl = context && context.req ? `${context.req.protocol}://${context.req.get('Host')}` : '';
+  const response = await fetch(baseUrl + '/atem')
   const info = await response.json()
 
   return info

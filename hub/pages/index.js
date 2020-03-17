@@ -155,8 +155,9 @@ socketEventEmitter.on("disconnected", function() {
   )
 }
 
-ChatOne.getInitialProps = async () => {
-  const response = await fetch('http://localhost:3000/tallies')
+ChatOne.getInitialProps = async (context) => {
+  const baseUrl = context && context.req ? `${context.req.protocol}://${context.req.get('Host')}` : '';
+  const response = await fetch(baseUrl + '/tallies')
   const info = await response.json()
 
   return info

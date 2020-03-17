@@ -3,6 +3,7 @@
   "license": "MIT",
   "version": "0.1.0",
   "homepage": "https://wifi-tally.github.io/",
+  "bin": "server.js",
   "dependencies": {
     "@zeit/next-sass": "^1.0.1",
     "atem-connection": "^2.0.0-nightly-20200117-174823-3f8cfe7.0",
@@ -19,9 +20,9 @@
     "socket.io-client": "^2.2.0"
   },
   "scripts": {
-    "dev": "node server.js",
+    "dev": "NODE_ENV=dev node server.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js",
+    "start": "node server.js",
     "test": "jest --watch",
     "test:ci": "jest --ci"
   },
