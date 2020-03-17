@@ -51,7 +51,7 @@ wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED, function(T)
 
     MyLog.error("Got disconnected from " ..T.SSID .. ". Reason " .. humanReadable)
 
-    MyLed.initial()
+    MyLed.waitForWifiConnection()
     local delay = 2000
     if T.reason == wifi.eventmon.reason.AUTH_EXPIRE then delay = 200 end
     tmr.create():alarm(delay, tmr.ALARM_SINGLE, MyWifi.connect)
@@ -70,7 +70,7 @@ wifi.eventmon.register(wifi.eventmon.STA_DHCP_TIMEOUT, function()
     isConnected = false
     MyLog.error("DHCP timeout")
 
-    MyLed.initial()
+    MyLed.waitForWifiConnection()
     MyWifi.disconnect()
     tmr.create():alarm(200, tmr.ALARM_SINGLE, MyWifi.connect)
 end)
