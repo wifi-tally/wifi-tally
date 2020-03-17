@@ -26,3 +26,7 @@ common video mixers.
 
 Refer to [Getting Started](getting-started.md) to start running your own Wifi Tally.
 
+## Download
+
+The latest version is [{{ latest_version }}]({{ github_link }}/releases/tag/{{ latest_version }}).
+

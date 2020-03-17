@@ -55,7 +55,7 @@ This very likely points to an issue with your WiFi configuration.
 * Is the hub running? 
 * Is the hubs IP correctly configured in `tally-settings.ini`? Did the IP address of the computer
   running the hub change?
-* Could there be a firewall blocking traffic between the Tally and the hub? Communication runs on port `7411` by default.
+* Could there be a firewall blocking traffic between the Tally and the hub? Communication runs on port `{{ tally_default_port }}` by default.
 
 ## The Tally blinks blue occasionally
 

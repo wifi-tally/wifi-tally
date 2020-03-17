@@ -59,7 +59,7 @@ Running the tally lights consists of two steps:
 
 ### Download sources
 
-The latest releases can be found on [github.com/wifi-tally](https://github.com/wifi-tally/wifi-tally/releases).
+The latest releases can be found on [github.com/wifi-tally]({{ github_link }}/releases).
 
 ### Setting up the Tally
 
@@ -131,7 +131,7 @@ Use the tool you have selected to upload the following files from the `tally` fo
     | `station.ssid` | The name of the WiFi that the Tally should connect to |
     | `station.password` | The password to connect to the WiFi. If the WiFi has no password, leave it empty. |
     | `hub.ip` | The IP address the hub is running on |
-    | `hub.port` | The port where the hub listens. Leave it empty if you use defaults. |
+    | `hub.port` | The port where the hub listens. Leave it empty if you use default `{{ tally_default_port }}`. |
     | `tally.name` | How you want _this_ tally to be labeled in the hub. This name needs to be unique amongst all tallies in your network |
 
 Reboot the NodeMCU board by pressing the `RST` button on the board or disconnecting it from power briefly.
@@ -150,12 +150,12 @@ are offered on the [Download page](https://nodejs.org/en/download/). Get a fitti
 Enter the `hub` directory and run
 
 ````bash
-npm run prod
+npm run start
 ````
 
 !TODO: explain environment variables!
 
-Point your browser to the IP of your computer on port 3000, for instance http://127.0.0.1:3000 if
+Point your browser to the IP of your computer on port {{ hub_default_port }}, for instance http://127.0.0.1:{{ hub_default_port }} if
 you are on the same machine. You should see a screen similar to this
 
 ![alt text](images/tally-hub.png "Tally Hub")
