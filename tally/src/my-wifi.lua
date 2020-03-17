@@ -11,7 +11,7 @@ _G.MyWifi = {
             auto = false,
             save = false,
         })
-        wifi.sta.sethostname("Tally-" .. MySettings:name())
+        wifi.sta.sethostname(MySettings:hostName())
         wifi.sta.connect()
     end,
     disconnect = function()

@@ -11,6 +11,10 @@ local trim = function(s)
     return s:match("^%s*(.-)%s*$")
 end
 
+local makeHostName = function(s)
+    return "Tally-" .. s:gsub("[^%w]+", "-"):gsub("^\-+", ""):gsub("\-+$", "")
+end
+
 _G.MySettings = {
     staSsid = function()
         return staSsid
@@ -26,6 +30,9 @@ _G.MySettings = {
     end,
     name = function()
         return name
+    end,
+    hostName = function()
+        return makeHostName(name)
     end,
 }
 
@@ -50,7 +57,7 @@ if file.exists(fileName) then
                     elseif k == "hub.port" then
                         hubPort = tonumber(v)
                     elseif k == "tally.name" then
-                        name = v
+                        name = v:sub(0, 26)
                     else
                         MyLog.warning("Unknown key " .. k .. " in configuration file. Did you mistype it?")
                     end

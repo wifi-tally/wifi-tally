@@ -36,6 +36,7 @@ insulate("Settings parser", function()
             assert.is_same("10.10.1.1", MySettings.hubIp())
             assert.is_same(4242, MySettings.hubPort())
             assert.is_same("Doe", MySettings.name())
+            assert.is_same("Tally-Doe", MySettings.hostName())
         end)
     end)
 
@@ -49,6 +50,7 @@ insulate("Settings parser", function()
             assert.is_same("10.10.1.1", MySettings.hubIp())
             assert.is_same(4242, MySettings.hubPort())
             assert.is_same("Doe", MySettings.name())
+            assert.is_same("Tally-Doe", MySettings.hostName())
         end)
     end)
 
@@ -59,6 +61,7 @@ insulate("Settings parser", function()
 
             assert.is_same(7411, MySettings.hubPort())
             assert.is_same("bc614e", MySettings.name())
+            assert.is_same("Tally-bc614e", MySettings.hostName())
         end)
     end)
 
@@ -68,6 +71,18 @@ insulate("Settings parser", function()
             require "src.my-settings"
 
             assert.is_same("John Doe", MySettings.name())
+            assert.is_same("Tally-John-Doe", MySettings.hostName())
+        end)
+    end)
+
+    insulate("should accept tally name with weired ascii chars", function()
+        mockSettings("settings-tallyname2.ini")
+        it(function()
+            require "src.my-settings"
+
+            assert.is_true(MySettings.name():len() <= 32)
+            assert.is_true(MySettings.hostName():len() <= 32)
+            assert.is_same("Tally-this-is-a-really-messe", MySettings.hostName())
         end)
     end)
 
