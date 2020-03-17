@@ -38,6 +38,7 @@ flash-dev: build out/init.lua out/tally-settings.ini
 	$(NODEMCU_TOOL) terminal --run _init.lua
 
 flash-prod: build out/init.lua out/tally-settings.ini
+	$(NODEMCU_TOOL) remove _init.lua
 	$(NODEMCU_TOOL) upload $(TARGETS) out/tally-settings.ini out/init.lua
 	$(NODEMCU_TOOL) reset
 
