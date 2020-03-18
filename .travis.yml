@@ -1,6 +1,9 @@
 os: linux
 dist: bionic
 language: python
+python:
+  # mkdocs-macros-plugin does not run on Python 3.6
+  - "3.7"
 
 env:
   # nodemcu uses an old lua version
@@ -18,10 +21,7 @@ before_install:
   - export PATH=$PATH:$HOME/nodemcu-firmware
 
   # tools for building docs
-  - pip install mkdocs
-  - pip install mkdocs-material
-  - pip install pygments
-  - pip install mkdocs-macros-plugin
+  - pip install mkdocs mkdocs-material pygments mkdocs-macros-plugin
 
 install:
   - luarocks install busted
