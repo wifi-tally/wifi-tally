@@ -11,7 +11,7 @@ site_description: A low-cost, high-reliable Open Source WiFi Tally Light
 strict: true
 extra:
   social:
-    - type: github
+    - icon: fontawesome/brands/github-alt
       link: https://github.com/wifi-tally
   github_link: https://github.com/wifi-tally/wifi-tally
   latest_version: v0.1-alpha2
