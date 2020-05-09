@@ -44,9 +44,9 @@ by "Make Magazin DE", [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/
 ### a piece of RGB LED strip
   
 It needs to be specified for 5V and have a common anode.
-Most LED strips that can be separated after _every_ LED should fulfill that requirement. 
+Most LED strips that can be separated after _every_ LED and have 4 pins should fulfill that requirement. 
 
-I recommend taking one with 120LEDs per meter.
+I recommend taking one with 120LEDs per meter to not have the LEDS be spaced too much.
 
 ## Setup
 
@@ -72,7 +72,7 @@ All you need to do is connecting the LED strip to the NodeMCU board.
     
     This will drain too much current through the board and potentially damaging it.
 
-![connection of the parts](images/tally-schematics.png)
+![connection of the parts](images/tally-schematics-simple.png)
 
 | board PIN | strip PIN |
 | --- | --- |
@@ -92,6 +92,23 @@ This is how the setup could look like on a breadboard.
 
 ![WiFi Tally on a breaboard](images/on-breadboard.jpg)
 
+##### Separate Operator and Stage Light
+
+You can connect a second strip to use as an indicator for the speaker on stage.
+Connect the first LED as above and direct it in the direction of the camera operator.
+Then connect a second strip and let it face to the front of the camera. 
+
+![connection of the parts](images/tally-schematics-operator.png)
+
+| board PIN | strip PIN |
+| --- | --- |
+| D2 | B |
+| D3 | R |
+| D4 | G |
+| 3V3 | + or +5V |
+
+This light will only show preview and live states, but not any error states.
+ 
 #### Prepare the NodeMCU Toolchain
 
 The NodeMCU documentation very nicely explains all the steps necessary to [start a NodeMCU project](https://nodemcu.readthedocs.io/en/master/getting-started/#getting-started-aka-nodemcu-quick-start).

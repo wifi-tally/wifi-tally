@@ -16,6 +16,7 @@ pwm2.setup_pin_hz(pinMainB, 1000, 100, 100)
 pwm2.start()
 
 local colors = {
+    -- R, G, B
     RED = {true, false, false},
     GREEN = {false, true, false},
     BLUE = {false, false, true},
