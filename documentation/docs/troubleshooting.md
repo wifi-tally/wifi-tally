@@ -17,10 +17,10 @@ If the LED strip started flashing blue before turning black, see [below](#the-le
 
 ## The LED strip started flashing blue for a while but then turned black
 
-* This could be totally normal. If the Tally is not patched in the Hub or not currently on
-  Preview or Program on the Video Mixer it is off.
 * The Tally should usually recover from any errors and reboot automatically. But you could
   try reconnecting it to its power source to reboot it
+* The Stage Light stays black when the Tally is not patched in the Hub or not currently on
+Preview or Program on the Video Mixer. So this could be totally normal.
 
 ## The Tally slowly blinks blue for an extended amount of time
 

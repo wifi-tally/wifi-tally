@@ -27,9 +27,9 @@ local colors = {
 local nextId = 0
 local currentId = nil
 
-local flashPattern = function(pattern, color, seconds)
+local flashPattern = function(pattern, color, seconds, showOnMain)
     local colorR, colorG, colorB = color[1], color[2], color[3]
-    local showOnMain = color ~= colors.BLUE
+    if showOnMain == nil then showOnMain = color ~= colors.BLUE end
 
     seconds = seconds or 1
     local id = nextId
@@ -49,12 +49,12 @@ local flashPattern = function(pattern, color, seconds)
             pwm2.set_duty(pinMainG, colorG and showOnMain and 0 or 100)
             pwm2.set_duty(pinMainB, colorB and showOnMain and 0 or 100)
         else
-            pwm2.set_duty(pinOpR, colorR and 70 or 100)
-            pwm2.set_duty(pinOpG, colorG and 70 or 100)
-            pwm2.set_duty(pinOpB, colorB and 70 or 100)
-            pwm2.set_duty(pinMainR, colorR and showOnMain and 70 or 100)
-            pwm2.set_duty(pinMainG, colorG and showOnMain and 70 or 100)
-            pwm2.set_duty(pinMainB, colorB and showOnMain and 70 or 100)
+            pwm2.set_duty(pinOpR, colorR and 99 or 100)
+            pwm2.set_duty(pinOpG, colorG and 99 or 100)
+            pwm2.set_duty(pinOpB, colorB and 99 or 100)
+            pwm2.set_duty(pinMainR, colorR and showOnMain and 99 or 100)
+            pwm2.set_duty(pinMainG, colorG and showOnMain and 99 or 100)
+            pwm2.set_duty(pinMainB, colorB and showOnMain and 99 or 100)
         end
     end
 
@@ -76,7 +76,7 @@ _G.MyLed = {
     waitForServerConnection = flashPattern("O O   ", colors.BLUE),
     onPreview = flashPattern("O", colors.GREEN),
     onAir = flashPattern("O", colors.RED),
-    onRelease = flashPattern("O", colors.BLACK),
+    onRelease = flashPattern(" ", colors.GREEN, nil, false),
     onUnknown = flashPattern("O       ", colors.BLUE, 2),
     onHighlight = flashPattern("O O O O ", colors.WHITE),
 }
