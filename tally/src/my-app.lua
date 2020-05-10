@@ -6,6 +6,10 @@ require('my-led')
 require('my-tally')
 require('my-wifi')
 
+local pin = 0
+gpio.mode(pin, gpio.OUTPUT)
+gpio.write(pin, gpio.LOW)
+
 local bootreasons = {
     POWER_ON = 0,
     HW_WATCHDOG_RESET = 1,
