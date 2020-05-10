@@ -1,8 +1,8 @@
 -- pins used for the operators light
-local pinOpG, pinOpR, pinOpB = 7, 6, 5
+local pinOpG, pinOpR, pinOpB = 2, 3, 4
 
 -- pins used for the main light
-local pinMainG, pinMainR, pinMainB = 4, 3, 2
+local pinMainG, pinMainR, pinMainB = 5, 6, 7
 
 -- the timer used for the status LED that signalizes network errors
 local timer = tmr.create()

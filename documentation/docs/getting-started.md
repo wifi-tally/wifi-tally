@@ -76,9 +76,9 @@ All you need to do is connecting the LED strip to the NodeMCU board.
 
 | board PIN | strip PIN |
 | --- | --- |
-| D5 | B |
-| D6 | R |
-| D7 | G |
+| D4 | B |
+| D3 | R |
+| D2 | G |
 | 3V3 | + or +5V |
 
 !!! info
@@ -102,9 +102,9 @@ Then connect a second strip and let it face to the front of the camera.
 
 | board PIN | strip PIN |
 | --- | --- |
-| D2 | B |
-| D3 | R |
-| D4 | G |
+| D7 | B |
+| D6 | R |
+| D5 | G |
 | 3V3 | + or +5V |
 
 This light will only show preview and live states, but not any error states.
