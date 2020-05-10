@@ -34,6 +34,9 @@ _G.MySettings = {
     hostName = function()
         return makeHostName(name)
     end,
+    isValid = function()
+        return staSsid ~= nil and hubIp ~= nil
+    end,
 }
 
 if file.exists(fileName) then

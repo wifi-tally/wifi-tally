@@ -57,6 +57,17 @@ This very likely points to an issue with your WiFi configuration.
   running the hub change?
 * Could there be a firewall blocking traffic between the Tally and the hub? Communication runs on port `{{ tally_default_port }}` by default.
 
+## The Tally blinks blue three times
+
+![](images/blink-invalid-settings-file.gif)
+
+**This happens when the `tally-settings.ini` file does not exist or is invalid.
+
+* Did you flash the `tally-settings.ini` on the Tally?
+* Does the `tally-settings.ini` include all mandatory settings?
+* Try configuring "wrong" settings that won't work. But this way, you should get a different error and rule out
+  that keys where mistyped.
+
 ## The Tally blinks blue occasionally
 
 ![quick blue blinking](images/blink-unknown.gif)

@@ -42,5 +42,9 @@ for _, thing in pairs({exccause, epc1, epc2, epc3, excvaddr, depc}) do
     end
 end
 
-MyLed.initial()
-MyWifi.connect()
+if not MySettings.isValid() then
+    MyLed.invalidSettingsFile()
+else
+    MyLed.initial()
+    MyWifi.connect()
+end

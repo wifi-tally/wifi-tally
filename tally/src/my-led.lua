@@ -72,6 +72,7 @@ _G.MyLed = {
     -- signal that nothing is being done
     initial = flashPattern("O", colors.BLUE),
     waitForWifiConnection = flashPattern("O ", colors.BLUE),
+    invalidSettingsFile = flashPattern("O O O       ", colors.BLUE, 2),
     waitForWifiIp = flashPattern("O O ", colors.BLUE),
     waitForServerConnection = flashPattern("O O   ", colors.BLUE),
     onPreview = flashPattern("O", colors.GREEN),
