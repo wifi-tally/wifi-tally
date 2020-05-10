@@ -39,23 +39,24 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
     local idx = -1
     local next = function()
         idx = (idx + 1) % len
-        local isOn = pattern:sub(idx+1, idx+1) ~= " "
-
-        if isOn then
-            pwm2.set_duty(pinOpR, colorR and 0 or 100)
-            pwm2.set_duty(pinOpG, colorG and 0 or 100)
-            pwm2.set_duty(pinOpB, colorB and 0 or 100)
-            pwm2.set_duty(pinMainR, colorR and showOnMain and 0 or 100)
-            pwm2.set_duty(pinMainG, colorG and showOnMain and 0 or 100)
-            pwm2.set_duty(pinMainB, colorB and showOnMain and 0 or 100)
-        else
-            pwm2.set_duty(pinOpR, colorR and 99 or 100)
-            pwm2.set_duty(pinOpG, colorG and 99 or 100)
-            pwm2.set_duty(pinOpB, colorB and 99 or 100)
-            pwm2.set_duty(pinMainR, colorR and showOnMain and 99 or 100)
-            pwm2.set_duty(pinMainG, colorG and showOnMain and 99 or 100)
-            pwm2.set_duty(pinMainB, colorB and showOnMain and 99 or 100)
+        local state = pattern:sub(idx+1, idx+1)
+        local darkness
+        if state == " " then
+            darkness = 100
+        elseif state == "." then
+            darkness = 99
+        elseif state == "o" then
+            darkness = 70
+        elseif state == "O" then
+            darkness = 0
         end
+
+        pwm2.set_duty(pinOpR, colorR and darkness or 100)
+        pwm2.set_duty(pinOpG, colorG and darkness or 100)
+        pwm2.set_duty(pinOpB, colorB and darkness or 100)
+        pwm2.set_duty(pinMainR, colorR and showOnMain and darkness or 100)
+        pwm2.set_duty(pinMainG, colorG and showOnMain and darkness or 100)
+        pwm2.set_duty(pinMainB, colorB and showOnMain and darkness or 100)
     end
 
     return function()
@@ -71,13 +72,13 @@ end
 _G.MyLed = {
     -- signal that nothing is being done
     initial = flashPattern("O", colors.BLUE),
-    waitForWifiConnection = flashPattern("O ", colors.BLUE),
-    invalidSettingsFile = flashPattern("O O O       ", colors.BLUE, 2),
-    waitForWifiIp = flashPattern("O O ", colors.BLUE),
-    waitForServerConnection = flashPattern("O O   ", colors.BLUE),
+    waitForWifiConnection = flashPattern("Oo", colors.BLUE),
+    invalidSettingsFile = flashPattern("OoOoOooooooo", colors.BLUE, 2),
+    waitForWifiIp = flashPattern("OoOo", colors.BLUE),
+    waitForServerConnection = flashPattern("OoOooo", colors.BLUE),
     onPreview = flashPattern("O", colors.GREEN),
     onAir = flashPattern("O", colors.RED),
-    onRelease = flashPattern(" ", colors.GREEN, nil, false),
-    onUnknown = flashPattern("O       ", colors.BLUE, 2),
-    onHighlight = flashPattern("O O O O ", colors.WHITE),
+    onRelease = flashPattern(".", colors.GREEN, nil, false),
+    onUnknown = flashPattern("Oooooooo", colors.BLUE, 2),
+    onHighlight = flashPattern("OoOoOoOo", colors.WHITE),
 }
