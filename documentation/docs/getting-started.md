@@ -149,7 +149,7 @@ Use the tool you have selected to upload the following files from the `tally` fo
     | `station.password` | The password to connect to the WiFi. If the WiFi has no password, leave it empty. |
     | `hub.ip` | The IP address the hub is running on |
     | `hub.port` | The port where the hub listens. Leave it empty if you use default `{{ tally_default_port }}`. |
-    | `tally.name` | How you want _this_ tally to be labeled in the hub. This name needs to be unique amongst all tallies in your network |
+    | `tally.name` | How you want _this_ tally to be labeled in the hub. This name needs to be unique amongst all tallies in your network. It must not be longer than `26` characters. Use of ASCII characters is recommended. |
 
 Reboot the NodeMCU board by pressing the `RST` button on the board or disconnecting it from power briefly.
 
