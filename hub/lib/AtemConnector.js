@@ -16,10 +16,10 @@ class AtemConnector {
         this.emitter = emitter
         this.currentPrograms = null
         this.currentPreviews = null
+        this.isAtemConnected = false
         this.connect()
     }
     connect() {
-        var wasConnected = false
         this.myAtem = new Atem({
             // debug: true,
         })
@@ -30,9 +30,9 @@ class AtemConnector {
 
         this.myAtem.connect(this.ip, this.port)
         this.myAtem.on('connected', () => {
-            wasConnected = true
+            this.isAtemConnected = true
             console.log("Connected to ATEM")
-            this.emitter.emit('atem.connected')
+            this.emitter.emit('mixer.connected')
 
             this.currentPrograms = this.myAtem.listVisibleInputs("program").sort()
             this.currentPreviews = this.myAtem.listVisibleInputs("preview").sort()
@@ -41,10 +41,11 @@ class AtemConnector {
         })
         
         this.myAtem.on('disconnected', () => {
-            this.emitter.emit('atem.disconnected')
             console.log(
-                wasConnected ? "Lost connection to ATEM" : "Could not connect to ATEM"
+                this.isAtemConnected ? "Lost connection to ATEM" : "Could not connect to ATEM"
             )
+            this.isAtemConnected = false
+            this.emitter.emit('mixer.disconnected')
         })
 
         this.myAtem.on('stateChanged', (state, pathToChange) => {
@@ -63,6 +64,7 @@ class AtemConnector {
     }
     disconnect() {
         console.log("Cutting connection to Atem mixer.")
+        this.isAtemConnected = false
         if(this.myAtem) {
             this.myAtem.removeAllListeners("info")
             this.myAtem.removeAllListeners("error")
@@ -71,6 +73,10 @@ class AtemConnector {
             this.myAtem.removeAllListeners("stateChanged")
             this.myAtem.destroy()
         }
+    }
+    isConnected() {
+        // @TODO: is there an API function so that we do not need to track state?
+        return this.isAtemConnected
     }
 }
 

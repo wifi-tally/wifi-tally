@@ -50,6 +50,9 @@ const sendLogToTally = (tally, log) => {
 const sendTalliesToBrowser = function() {
   io.emit('tallies', myTallyDriver.toValueObjects())
 }
+const sendMixerStateToBrowser = function(isConnected) {
+  return () => io.emit('mixer', {isConnected})
+}
 myEmitter.on('tally.connected', sendTalliesToBrowser)
 myEmitter.on('tally.changed', sendTalliesToBrowser)
 myEmitter.on('tally.logged', sendLogToTally)
@@ -74,6 +77,9 @@ const sendConfigurationToBrowser = function() {
 myEmitter.on('config.changed.mixer', sendConfigurationToBrowser)
 myEmitter.on('config.changed.atem', sendConfigurationToBrowser)
 myEmitter.on('config.changed.mock', sendConfigurationToBrowser)
+
+myEmitter.on('mixer.connected', sendMixerStateToBrowser(true))
+myEmitter.on('mixer.disconnected', sendMixerStateToBrowser(false))
 
 // send events to tallies
 myEmitter.on('program.changed', (programs, previews) => {
@@ -143,8 +149,9 @@ io.on('connection', socket => {
 nextApp.prepare().then(() => {
   app.get('/tallies', (req, res) => {
     res.json({
-      programs: myMixerDriver.currentPrograms,
-      previews: myMixerDriver.currentPreviews,
+      programs: myMixerDriver.getCurrentPrograms(),
+      previews: myMixerDriver.getCurrentPreviews(),
+      isMixerConnected: myMixerDriver.isConnected(),
       tallies: myTallyDriver.toValueObjects(),
     })
   })

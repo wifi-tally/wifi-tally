@@ -3,8 +3,13 @@ import fetch from 'isomorphic-unfetch'
 import {useSocket, socketEventEmitter} from '../hooks/useSocket'
 import Layout from '../components/Layout'
 import Link from 'next/link'
+import {BroadcastIcon, ServerIcon} from '@primer/octicons-react'
+
 
 const Tally = require('../domain/Tally')
+
+const countConnectedTallies = tallies =>
+  tallies.reduce((count, tally) => count + (Tally.fromValueObject(tally).isConnected() ? 1 : 0), 0)
 
 const createTallyList = (tallies, showDisconnected, showUnpatched) => {
   return tallies.map(
@@ -26,6 +31,7 @@ const ChatOne = props => {
   const [talliesData, setTallies] = useState(props.tallies || new Map())
   const [programs, setPrograms] = useState(props.programs || [])
   const [previews, setPreviews] = useState(props.previews || [])
+  const [isMixerConnected, setIsMixerConnected] = useState(props.isMixerConnected || false)
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
 
@@ -38,6 +44,9 @@ const ChatOne = props => {
 
   useSocket('tallies', tallies => {
     setTallies(tallies)
+  })
+  useSocket('mixer', mixer => {
+    setIsMixerConnected(mixer.isConnected)
   })
 
 
@@ -140,12 +149,16 @@ socketEventEmitter.on("disconnected", function() {
     )
   }
 
+  const nrConnectedTallies = countConnectedTallies(tallies)
+
   return (
     <Layout>
       <div>
         <div className="btn-group mb-2" role="group">
           <button type="button" className={"btn btn-sm " + (showDisconnected ? "btn-primary" : "btn-dark")} onClick={toggleDisconnected}>Show Disconnected</button>
           <button type="button" className={"btn btn-sm " + (showUnpatched ? "btn-primary" : "btn-dark")} onClick={toggleUnpatched}>Show Unpatched</button>
+          <button type="button" className={"btn btn-secondary disabled"} title={"Video Mixer " + (isMixerConnected ? "connected" : "disconnected")}><ServerIcon /> {isMixerConnected ? 1 : 0}</button>
+          <button type="button" className={"btn btn-secondary disabled"} title={nrConnectedTallies + " connected tallies"}><BroadcastIcon /> {nrConnectedTallies}</button>
         </div>
         <div id="tallies">
           {tallies.map(format)}

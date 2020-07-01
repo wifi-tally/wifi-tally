@@ -4,10 +4,13 @@ class MockConnector {
     constructor(tickTime, emitter) {
         this.emitter = emitter
         this.tickTime = tickTime
+        this.isActive = false
         this.connect()
     }
     connect() {
         console.log("Simulating a mock video mixer that changes programs every " + this.tickTime + "ms")
+        this.isActive = true
+        this.emitter.emit('mixer.connected')
         const fn = function() {
             const mockCurrentPrograms = [Math.floor(Math.random() * 6)]
             const mockCurrentPreviews = [Math.floor(Math.random() * 6)]
@@ -18,10 +21,15 @@ class MockConnector {
     }
     disconnect() {
         console.log("Stopping mock video mixer")
+        this.isActive = false
+        this.emitter.emit('mixer.disconnected')
         if(this.intervalHandle) {
             clearInterval(this.intervalHandle);
             this.intervalHandle = undefined;
         }
+    }
+    isConnected() {
+        return this.isActive
     }
 }
 

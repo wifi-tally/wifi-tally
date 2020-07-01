@@ -13,6 +13,9 @@ class Tally {
     isPatched() {
         return this.channelId >= 0
     }
+    isConnected() {
+        return this.address !== null && this.port !== null && this.state == Tally.CONNECTED
+    }
     isActive() {
         return this.address !== null && this.port !== null && this.state != Tally.DISCONNECTED
     }
@@ -40,6 +43,8 @@ class Tally {
         }
     }
     isIn(channels = []) {
+        if (channels == null) return false
+
         return channels.indexOf(this.channelId) != -1
     }
 }

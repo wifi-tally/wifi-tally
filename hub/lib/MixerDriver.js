@@ -70,6 +70,9 @@ class MixerDriver {
     getCurrentPreviews() {
         return this.currentPreviews
     }
+    isConnected() {
+        return this.currentMixerInstance && this.currentMixerInstance.isConnected()
+    }
 }
 
 MixerDriver.getAllowedMixers = function(isDev) {

@@ -9,6 +9,11 @@ class NullConnector {
         this.emitter.emit("program.changed", null, null)
     }
     disconnect() {}
+
+    isConnected() {
+        // it is never supposed to be connected
+        return false
+    }
 }
 
 NullConnector.ID = "null"
