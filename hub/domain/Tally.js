@@ -13,7 +13,7 @@ class Tally {
     isPatched() {
         return this.channelId >= 0
     }
-    isConnected() {
+    isActive() {
         return this.address !== null && this.port !== null && this.state != Tally.DISCONNECTED
     }
     setHighlight(highlight) {

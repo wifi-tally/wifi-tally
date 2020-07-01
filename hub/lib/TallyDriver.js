@@ -8,7 +8,7 @@ const tallyHighlightTime = 1000 // ms
 const keepAlivesPerSecond = 10
 
 const updateTally = function(tally, io, programs, previews) {
-    if(tally.isConnected()) {
+    if(tally.isActive()) {
         var command = "release"
         if(tally.isHighlighted()) {
             command = "highlight"

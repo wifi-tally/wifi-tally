@@ -10,11 +10,11 @@ const createTallyList = (tallies, showDisconnected, showUnpatched) => {
   return tallies.map(
     tally => Tally.fromValueObject(tally)
   ).filter(
-    tally => (tally.isConnected() || showDisconnected) && (tally.isPatched() || showUnpatched)
+    tally => (tally.isActive() || showDisconnected) && (tally.isPatched() || showUnpatched)
   ).sort(
     (one, two) => {
-      if (one.isConnected() != two.isConnected()) {
-        return one.isConnected() ? -1 : 1
+      if (one.isActive() != two.isActive()) {
+        return one.isActive() ? -1 : 1
       } else {
         return one.name.localeCompare(two.name)
       }
