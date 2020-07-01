@@ -28,7 +28,7 @@ const createTallyList = (tallies, showDisconnected, showUnpatched) => {
 }
 
 const ChatOne = props => {
-  const [talliesData, setTallies] = useState(props.tallies || new Map())
+  const [talliesData, setTallies] = useState(props.tallies || new Array())
   const [programs, setPrograms] = useState(props.programs || [])
   const [previews, setPreviews] = useState(props.previews || [])
   const [isMixerConnected, setIsMixerConnected] = useState(props.isMixerConnected || false)
