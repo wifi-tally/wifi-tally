@@ -26,6 +26,14 @@ const updateTally = function(tally, io, programs, previews) {
 
 // - handles connections with Tallies.
 // - emits signals when tallies connect, go missing or disconnect
+class InvalidCommandError extends Error {
+    constructor(...args) {
+        super(...args)
+
+        this.message = 'Received an invalid command: "' + this.message + '"'
+    }
+}
+
 class TallyDriver {
     constructor(tallies, emitter) {
         this.tallies = new Map();
@@ -44,17 +52,25 @@ class TallyDriver {
         });
         
         this.io.on('message', (msg, rinfo) => {
-            msg = msg.toString().trim()
-            if (msg.startsWith("tally-ho")) {
-                const tallyName = TallyDriver.parseTallyHo(msg)
-                this._tallyReported(tallyName, rinfo)
-            } else if (msg.startsWith("log")) {
-                const [tallyName, severity, message] = TallyDriver.parseLog(msg)
-                const tally = this._tallyReported(tallyName, rinfo)
-                const log = tally.addLog(new Date(), severity, message)
-                this.emitter.emit('tally.logged', tally, log)
-            } else {
-                console.log("Received unknown package " + msg)
+            try {
+                msg = msg.toString().trim()
+                if (msg.startsWith("tally-ho")) {
+                    const tallyName = TallyDriver.parseTallyHo(msg)
+                    this._tallyReported(tallyName, rinfo)
+                } else if (msg.startsWith("log")) {
+                    const [tallyName, severity, message] = TallyDriver.parseLog(msg)
+                    const tally = this._tallyReported(tallyName, rinfo)
+                    const log = tally.addLog(new Date(), severity, message)
+                    this.emitter.emit('tally.logged', tally, log)
+                } else {
+                    throw new InvalidCommandError(msg)
+                }
+            } catch (e) {
+                if (e instanceof InvalidCommandError) {
+                    console.warn(e.message)
+                } else {
+                    throw e
+                }
             }
         });
         
@@ -181,20 +197,29 @@ class TallyDriver {
 }
 
 TallyDriver.parseTallyHo = function(cmd) {
-    const [_, command, name] = cmd.match(/^([^ ]+) "(.+)"/)
-    if (command !== "tally-ho") {
-        throw "Invalid command " + command
+    const result = cmd.match(/^([^ ]+) "(.+)"/)
+    if (result == null) {
+        throw new InvalidCommandError(cmd)
+    } else {
+        const [_, command, name] = result
+        if (command !== "tally-ho") {
+            throw new InvalidCommandError(command)
+        }
+        return name
     }
-    return name
 }
 TallyDriver.parseLog = function(cmd) {
-    const [_, command, name, severity, message] = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
+    const result = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
 
-    if (command !== "log") {
-        throw "Invalid command " + command
+    if (result == null) {
+        throw new InvalidCommandError(cmd)
+    } else {
+        const [_, command, name, severity, message] = result
+        if (command !== "log") {
+            throw  new InvalidCommandError(command)
+        }
+        return [name, severity, message]
     }
-
-    return [name, severity, message]
 }
 
 module.exports = TallyDriver;

@@ -6,10 +6,15 @@ describe('TallyDriver', () => {
             const name = TallyDriver.parseTallyHo('tally-ho "Tally Name"')
             expect(name).toBe("Tally Name")
         })
-        test('fails if command is invalid', () => {
+        test('fails if command is invalid #1', () => {
             expect(() => {
                 TallyDriver.parseTallyHo("this is an invalid command")
-            }).toThrowError()
+            }).toThrowError("Received an invalid command: \"this is an invalid command\"")
+        })
+        test('fails if command is invalid #2', () => {
+            expect(() => {
+                TallyDriver.parseTallyHo("tally-ho Tally")
+            }).toThrowError("Received an invalid command: \"tally-ho Tally\"")
         })
     })
     describe('parseLog', () => {
@@ -19,10 +24,15 @@ describe('TallyDriver', () => {
             expect(severity).toBe("INFO")
             expect(message).toBe("Hello World")
         })
-        test('fails if command is invalid', () => {
+        test('fails if command is invalid #1', () => {
             expect(() => {
                 TallyDriver.parseLog("this is an invalid command")
-            }).toThrowError()
+            }).toThrowError("Received an invalid command: \"this is an invalid command\"")
+        })
+        test('fails if command is invalid #2', () => {
+            expect(() => {
+                TallyDriver.parseLog("log this invalid log")
+            }).toThrowError("Received an invalid command: \"log this invalid log\"")
         })
     })
     
