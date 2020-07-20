@@ -28,8 +28,8 @@ install:
 script:
   # building and testing the tally
   - cd $TRAVIS_BUILD_DIR/tally
-  - make build
   - make test
+  - make build
 
   # rendering documentation
   - cd $TRAVIS_BUILD_DIR/documentation
