@@ -61,7 +61,7 @@ This very likely points to an issue with your WiFi configuration.
 
 ![](images/blink-invalid-settings-file.gif)
 
-**This happens when the `tally-settings.ini` file does not exist or is invalid.
+**This happens when the `tally-settings.ini` file does not exist or is invalid.**
 
 * Did you flash the `tally-settings.ini` on the Tally?
 * Does the `tally-settings.ini` include all mandatory settings?
@@ -76,3 +76,17 @@ This very likely points to an issue with your WiFi configuration.
 which signal the tally should show.**
 
 * Did the hub connect to your Video Mixer?
+
+## The Hub can not connect to ATEM video mixer
+
+**Are you really sure the settings are correct? If yes read further.**
+
+Every ATEM mixer has a [maximum of connections](https://forum.blackmagicdesign.com/viewtopic.php?f=4&t=101841)
+that it allows at the same time – the Internet talks of 3-5 connections depending on the model.
+You might be running into this issue.
+
+To verify this as the cause identify all other software / hardware that connects to the Video Mixer,
+restart it and make sure the Tally Hub is the first thing to connect.
+
+The way to fix it is very dependent on your setup. See if you can dispense of any
+software / hardware connecting to ATEM.
