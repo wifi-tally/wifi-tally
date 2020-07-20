@@ -1,3 +1,8 @@
+# v0.1-alpha4
+
+* [FIXED] Compiled `lc` files in the release are working again. #24
+* [ADDED] The hub shows indications if the video mixer is connected. #15
+
 # v0.1-alpha3
 
 * [BREAKING] The tallies name is trimmed to `26` characters.
