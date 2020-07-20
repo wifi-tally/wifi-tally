@@ -5,6 +5,7 @@ language: python
 env:
   # nodemcu uses an old lua version
   - LUA="5.1.4"
+    NODEMCU_FIRMWARE="3.0-master_20190907"
 
 before_install:
   # lua toolchain for running tests
@@ -13,7 +14,7 @@ before_install:
   - export PATH=$PATH:$PWD/lua_install/bin # Add directory with all installed binaries to PATH
 
   # nodemcu toolchain to cross compile
-  - git clone --depth 1 https://github.com/nodemcu/nodemcu-firmware.git $HOME/nodemcu-firmware
+  - git clone --depth 1 --branch "${NODEMCU_FIRMWARE}" https://github.com/nodemcu/nodemcu-firmware.git $HOME/nodemcu-firmware
   - make -C $HOME/nodemcu-firmware/app/lua/luac_cross/
   - export PATH=$PATH:$HOME/nodemcu-firmware
 
