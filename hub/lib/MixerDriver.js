@@ -1,4 +1,5 @@
 const AtemConnector = require('./AtemConnector.js')
+const VmixConnector = require('./VmixConnector.js')
 const MockConnector = require('./MockConnector.js')
 const NullConnector = require('./NullConnector.js')
 
@@ -24,6 +25,12 @@ class MixerDriver {
             console.log("Atem changed")
             if(this.currentMixerId == AtemConnector.ID) {
                 this.changeMixer(AtemConnector.ID)
+            }
+        })
+        this.emitter.on('config.changed.vmix', () => {
+            console.log("Vmix changed")
+            if(this.currentMixerId == VmixConnector.ID) {
+                this.changeMixer(VmixConnector.ID)
             }
         })
         this.emitter.on('config.changed.mock', () => {
@@ -53,6 +60,8 @@ class MixerDriver {
         this.currentMixerId = newMixerId
         if(newMixerId == AtemConnector.ID) {
             this.currentMixerInstance = new AtemConnector(this.configuration.getAtemIp(), this.configuration.getAtemPort(), this.emitter)
+        } else if(newMixerId == VmixConnector.ID) {
+            this.currentMixerInstance = new VmixConnector(this.configuration.getVmixIp(), this.configuration.getVmixPort(), this.emitter)
         } else if(newMixerId == MockConnector.ID) {
             this.currentMixerInstance = new MockConnector(this.configuration.getMockTickTime(), this.emitter)
         } else if(newMixerId == NullConnector.ID) {
@@ -79,6 +88,7 @@ MixerDriver.getAllowedMixers = function(isDev) {
     const mixers = [
         NullConnector.ID,
         AtemConnector.ID,
+        VmixConnector.ID,
     ]
 
     if (isDev) {

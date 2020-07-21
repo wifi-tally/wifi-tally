@@ -6,6 +6,7 @@ import Layout from '../components/Layout'
 const mixerLabels = {
   mock: "Built-In Mock for testing",
   atem: "ATEM by Blackmagic Design",
+  vmix: "vMix",
   "null": "Off",
 }
 
@@ -14,17 +15,21 @@ const Config = props => {
   const [currentMixerId, setCurrentMixerId] = useState(props.currentMixerId)
   const [atemIp, setAtemIp] = useState(props.atem.ip)
   const [atemPort, setAtemPort] = useState(props.atem.port)
+  const [vmixIp, setVmixIp] = useState(props.vmix.ip)
+  const [vmixPort, setVmixPort] = useState(props.vmix.port)
   const [mockTickTime, setMockTickTime] = useState(props.mock.tickTime)
 
   const socket = useSocket('config', config => {
     setCurrentMixerId(config.currentMixerId)
     setAtemIp(config.atem.ip)
     setAtemPort(config.atem.port)
+    setVmixIp(config.vmix.ip)
+    setVmixPort(config.vmix.port)
     setMockTickTime(config.mock.tickTime)
   })
 
   const handleSubmit = e => {
-    socket.emit('config.changeRequest', currentMixerId, atemIp, atemPort, mockTickTime)
+    socket.emit('config.changeRequest', currentMixerId, atemIp, atemPort, vmixIp, vmixPort, mockTickTime)
     e.preventDefault()
   }
 
@@ -76,6 +81,22 @@ const Config = props => {
                 <div className="form-group">
                   <label htmlFor="atem-port">ATEM Port</label>
                   <input className="form-control" id="atem-port" type="text" value={atemPort} onChange={e => setAtemPort(e.target.value)} />
+                </div>
+              </fieldset>
+            ) : ""}
+            {currentMixerId == "vmix" ? (
+              <fieldset>
+                <legend>vMix Configuration</legend>
+                <p className="text-muted">
+                  Connects to any vMix over network.
+                </p>
+                <div className="form-group">
+                  <label htmlFor="vmix-ip">vMix IP</label>
+                  <input className="form-control" id="vmix-ip" type="text" value={vmixIp} onChange={e => setVmixIp(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vmix-port">vMix Port</label>
+                  <input className="form-control" id="vmix-port" type="text" value={vmixPort} onChange={e => setVmixPort(e.target.value)} />
                 </div>
               </fieldset>
             ) : ""}

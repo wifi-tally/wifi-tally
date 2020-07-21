@@ -137,8 +137,9 @@ io.on('connection', socket => {
   socket.on('tally.remove', tallyName => {
     myTallyDriver.removeTally(tallyName)
   })
-  socket.on('config.changeRequest', (selectedMixer, atemIp, atemPort, mockTickTime) => {
+  socket.on('config.changeRequest', (selectedMixer, atemIp, atemPort, vmixIp, vmixPort, mockTickTime) => {
     myConfiguration.updateAtemConfig(atemIp, atemPort)
+    myConfiguration.updateVmixConfig(vmixIp, vmixPort)
     myConfiguration.updateMockConfig(mockTickTime)
     myConfiguration.updateMixerSelection(selectedMixer)
 

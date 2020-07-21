@@ -1,6 +1,7 @@
 const fs = require('fs');
 const MixerDriver = require('./MixerDriver')
 const AtemConnector = require('./AtemConnector')
+const VmixConnector = require('./VmixConnector')
 const MockConnector = require('./MockConnector')
 
 class Configuration {
@@ -8,6 +9,8 @@ class Configuration {
         this.emitter = emitter
         this.atemIp
         this.atemPort
+        this.vmixIp
+        this.vmixPort
         this.mockTickTime
         this.tallies = []
         this.mixerSelection = null
@@ -23,6 +26,12 @@ class Configuration {
             }
             if(config.atem && config.atem.port) {
                 this.atemPort = config.atem.port
+            }
+            if(config.vmix && config.vmix.ip) {
+                this.vmixIp = config.vmix.ip
+            }
+            if(config.vmix && config.vmix.port) {
+                this.vmixPort = config.vmix.port
             }
             if(config.mixer) {
                 this.mixerSelection = config.mixer
@@ -44,6 +53,10 @@ class Configuration {
               ip: this.atemIp,
               port: this.atemPort,
             },
+            vmix: {
+              ip: this.vmixIp,
+              port: this.vmixPort,
+            },
             mock: {
                 tickTime: this.mockTickTime,
             },
@@ -58,6 +71,15 @@ class Configuration {
         this.atemPort = atemPort
 
         this.emitter.emit("config.changed.atem")
+
+        this.save()
+    }
+
+    updateVmixConfig(vmixIp, vmixPort) {
+        this.vmixIp = vmixIp
+        this.vmixPort = vmixPort
+
+        this.emitter.emit("config.changed.vmix")
 
         this.save()
     }
@@ -104,6 +126,14 @@ class Configuration {
         return this.atemPort || AtemConnector.defaultPort
     }
 
+    getVmixIp() {
+        return this.vmixIp || VmixConnector.defaultIp
+    }
+
+    getVmixPort() {
+        return this.vmixPort || VmixConnector.defaultPort
+    }
+
     getMockTickTime() {
         return this.mockTickTime || MockConnector.defaultTickTime
     }
@@ -122,6 +152,10 @@ class Configuration {
             atem: {
                 ip: this.getAtemIp(),
                 port: this.getAtemPort(),
+            },
+            vmix: {
+                ip: this.getVmixIp(),
+                port: this.getVmixPort(),
             },
             mock: {
                 tickTime: this.getMockTickTime(),
