@@ -11,10 +11,10 @@ class MixerDriver {
         this.configuration = configuration
         this.emitter = emitter
 
-        this.changeMixer(configuration.getMixerSelection())
-
         this.currentPrograms = null
         this.currentPreviews = null
+
+        this.changeMixer(configuration.getMixerSelection())
 
         this.emitter.on('program.changed', (programs, previews) => {
             this.currentPrograms = programs
@@ -22,20 +22,20 @@ class MixerDriver {
         })
 
         this.emitter.on('config.changed.atem', () => {
-            console.log("Atem changed")
             if(this.currentMixerId == AtemConnector.ID) {
+                console.log("Atem changed")
                 this.changeMixer(AtemConnector.ID)
             }
         })
         this.emitter.on('config.changed.vmix', () => {
-            console.log("Vmix changed")
             if(this.currentMixerId == VmixConnector.ID) {
+                console.log("Vmix changed")
                 this.changeMixer(VmixConnector.ID)
             }
         })
         this.emitter.on('config.changed.mock', () => {
-            console.log("Mock changed")
             if(this.currentMixerId == MockConnector.ID) {
+                console.log("Mock changed")
                 this.changeMixer(MockConnector.ID)
             }
         })
@@ -45,14 +45,15 @@ class MixerDriver {
         })
     }
 
-    changeMixer(newMixerId) {
+    async changeMixer(newMixerId) {
         if(!MixerDriver.getAllowedMixers(this.configuration.isDev()).includes(newMixerId)) {
             console.error("Can not switch to unknown mixer with id " + newMixerId)
             return
         }
         if(this.currentMixerInstance) {
             this.emitter.emit("program.changed", null, null)
-            this.currentMixerInstance.disconnect()
+            const ret = this.currentMixerInstance.disconnect()
+            await Promise.resolve(ret)
         }
 
         console.log("Using mixer configuration \"" + newMixerId + "\"")

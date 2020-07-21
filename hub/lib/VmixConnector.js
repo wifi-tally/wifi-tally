@@ -13,7 +13,7 @@ class VmixConnector {
     connect() {
         const client = new net.Socket()
         this.client = client
-        client.connect(this.port, this.ip, function() {
+        client.connect(this.port, this.ip, () => {
             console.log('Connected')
             client.write("SUBSCRIBE TALLY\r\n")
         })
@@ -66,11 +66,15 @@ class VmixConnector {
         }
     }
     disconnect() {
-        if (this.client) {
-            this.wasHelloReceived = false
-            this.wasSubcribeOkReceived = false
-            this.client.end()
-        }
+        this.wasHelloReceived = false
+        this.wasSubcribeOkReceived = false
+        const promise = new Promise(resolve => 
+            this.client.end(() => {
+                console.log("Disconnected from vMix")
+                resolve()
+            }))
+        this.client = null
+        return promise
     }
     isConnected() {
         return this.client && !this.client.destroyed && this.wasHelloReceived && this.wasSubcribeOkReceived
