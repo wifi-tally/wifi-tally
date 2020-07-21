@@ -7,6 +7,8 @@ class MixerDriver {
     constructor(configuration, emitter) {
         this.currentMixerId
         this.currentMixerInstance
+        this.currentMixerSettings
+        this.getCurrentMixerSettings
 
         this.configuration = configuration
         this.emitter = emitter
@@ -21,27 +23,33 @@ class MixerDriver {
             this.currentPreviews = previews
         })
 
-        this.emitter.on('config.changed.atem', () => {
-            if(this.currentMixerId == AtemConnector.ID) {
-                console.log("Atem changed")
-                this.changeMixer(AtemConnector.ID)
+        this.emitter.on('config.changed', () => {
+            var needsRefresh = false
+            if(configuration.getMixerSelection() !== this.currentMixerId) {
+                // a different mixer was selected
+                console.debug("A different mixer was selected")
+                needsRefresh = true
+            } else if (this.getCurrentMixerSettings) {
+                const mixerSettings = this.getCurrentMixerSettings()
+                if (this.currentMixerSettings.length != mixerSettings.length) {
+                    // a new setting was added (not sure why this would happen, but definitely a reason to restart)
+                    console.debug("mixer connection is restarted, because number of settings were changed")
+                    needsRefresh = true
+                } else {
+                    const anyChanges = this.currentMixerSettings.some((value, idx) => {
+                        return value != mixerSettings[idx]
+                    })
+                    if (anyChanges) {
+                        console.debug("mixer connection is restarted, because settings were changed")
+                        needsRefresh = true
+                    }
+                }
             }
-        })
-        this.emitter.on('config.changed.vmix', () => {
-            if(this.currentMixerId == VmixConnector.ID) {
-                console.log("Vmix changed")
-                this.changeMixer(VmixConnector.ID)
+            if (needsRefresh) {
+                this.changeMixer(configuration.getMixerSelection())
+            } else {
+                console.debug("settings where changed, but no need to restart mixer")
             }
-        })
-        this.emitter.on('config.changed.mock', () => {
-            if(this.currentMixerId == MockConnector.ID) {
-                console.log("Mock changed")
-                this.changeMixer(MockConnector.ID)
-            }
-        })
-        this.emitter.on('config.changed.mixer', () => {
-            console.log("Mixer changed")
-            this.changeMixer(this.configuration.getMixerSelection())
         })
     }
 
@@ -58,19 +66,26 @@ class MixerDriver {
 
         console.log("Using mixer configuration \"" + newMixerId + "\"")
 
-        this.currentMixerId = newMixerId
+        var MixerClass
         if(newMixerId == AtemConnector.ID) {
-            this.currentMixerInstance = new AtemConnector(this.configuration.getAtemIp(), this.configuration.getAtemPort(), this.emitter)
+            this.getCurrentMixerSettings = () => [this.configuration.getAtemIp(), this.configuration.getAtemPort()]
+            MixerClass = AtemConnector
         } else if(newMixerId == VmixConnector.ID) {
-            this.currentMixerInstance = new VmixConnector(this.configuration.getVmixIp(), this.configuration.getVmixPort(), this.emitter)
+            this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
+            MixerClass = VmixConnector
         } else if(newMixerId == MockConnector.ID) {
-            this.currentMixerInstance = new MockConnector(this.configuration.getMockTickTime(), this.emitter)
+            this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime()]
+            MixerClass = MockConnector
         } else if(newMixerId == NullConnector.ID) {
-            this.currentMixerInstance = new NullConnector(this.emitter)
+            this.getCurrentMixerSettings = () => []
+            MixerClass = NullConnector
         } else {
             console.error("Someone(TM) forgot to implement the " + newMixerId + " mixer in MixerDriver.js.")
             return
         }
+        this.currentMixerId = newMixerId
+        this.currentMixerSettings = this.getCurrentMixerSettings()
+        this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.emitter)
         const ret = this.currentMixerInstance.connect()
         await Promise.resolve(ret)
     }

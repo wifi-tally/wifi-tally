@@ -69,41 +69,23 @@ class Configuration {
     updateAtemConfig(atemIp, atemPort) {
         this.atemIp = atemIp
         this.atemPort = atemPort
-
-        this.emitter.emit("config.changed.atem")
-
-        this.save()
     }
 
     updateVmixConfig(vmixIp, vmixPort) {
         this.vmixIp = vmixIp
         this.vmixPort = vmixPort
-
-        this.emitter.emit("config.changed.vmix")
-
-        this.save()
     }
 
     updateTallies(tallyDriver) {
         this.tallies = tallyDriver.toValueObjectsForSave()
-
-        this.save()
     }
 
     updateMixerSelection(mixerSelection) {
         this.mixerSelection = mixerSelection
-
-        this.emitter.emit("config.changed.mixer", mixerSelection)
-
-        this.save()
     }
 
     updateMockConfig(mockTickTime) {
         this.mockTickTime = mockTickTime
-
-        this.emitter.emit("config.changed.mock")
-
-        this.save()
     }
 
     isDev() {

@@ -34,6 +34,7 @@ const nextHandler = nextApp.getRequestHandler()
 // keep configruation up to date
 const updateTallies = function() {
   myConfiguration.updateTallies(myTallyDriver)
+  myConfiguration.save()
 }
 myEmitter.on('tally.connected', updateTallies)
 myEmitter.on('tally.changed', updateTallies)
@@ -142,8 +143,8 @@ io.on('connection', socket => {
     myConfiguration.updateVmixConfig(vmixIp, vmixPort)
     myConfiguration.updateMockConfig(mockTickTime)
     myConfiguration.updateMixerSelection(selectedMixer)
-
-    io.emit()
+    myConfiguration.save()
+    myEmitter.emit("config.changed")
   })
 })
 
