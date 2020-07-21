@@ -15,11 +15,12 @@ const waitUntil = (fn) => {
 describe('VmixConnector', () => {
     describe('onData', () => {
         test('recognizes VERSION OK', async () => {
+            const emitter = new EventEmitter()
             const server = net.Server((sck) => {
                 sck.write(Buffer.from("VERSION OK 0.1.2.3\r\n", "utf-8"))
             })
             server.listen(0)
-            const vmix = new VmixConnector('127.0.0.1', server.address().port, null)
+            const vmix = new VmixConnector('127.0.0.1', server.address().port, emitter)
             try {
                 expect(vmix.wasHelloReceived).toBe(false)
                 vmix.connect()
@@ -34,6 +35,7 @@ describe('VmixConnector', () => {
             }
         })
         test('recognizes SUBSCRIBE OK TALLY', async () => {
+            const emitter = new EventEmitter()
             const server = net.Server((sck) => {
                 sck.on('data', data => {
                     expect(data.toString()).toBe("SUBSCRIBE TALLY\r\n")
@@ -43,7 +45,7 @@ describe('VmixConnector', () => {
             })
             // @TODO: random free port
             server.listen(0)
-            const vmix = new VmixConnector('127.0.0.1', server.address().port, null)
+            const vmix = new VmixConnector('127.0.0.1', server.address().port, emitter)
             try {
                 expect(vmix.wasSubcribeOkReceived).toBe(false)
                 vmix.connect()
