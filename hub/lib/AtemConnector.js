@@ -17,7 +17,6 @@ class AtemConnector {
         this.currentPrograms = null
         this.currentPreviews = null
         this.isAtemConnected = false
-        this.connect()
     }
     connect() {
         this.myAtem = new Atem({

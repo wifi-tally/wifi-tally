@@ -70,6 +70,8 @@ class MixerDriver {
             console.error("Someone(TM) forgot to implement the " + newMixerId + " mixer in MixerDriver.js.")
             return
         }
+        const ret = this.currentMixerInstance.connect()
+        await Promise.resolve(ret)
     }
 
     getCurrentPrograms() {

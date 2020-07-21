@@ -5,7 +5,6 @@ class MockConnector {
         this.emitter = emitter
         this.tickTime = tickTime
         this.isActive = false
-        this.connect()
     }
     connect() {
         console.log("Simulating a mock video mixer that changes programs every " + this.tickTime + "ms")

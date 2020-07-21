@@ -9,7 +9,6 @@ class VmixConnector {
         this.client
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
-        this.connect()
     }
     connect() {
         const client = new net.Socket()
