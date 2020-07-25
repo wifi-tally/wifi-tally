@@ -10,10 +10,10 @@ const haveValuesChanged = (lastArray, newArray) => {
 }
 
 class AtemConnector {
-    constructor(ip, port, emitter) {
+    constructor(ip, port, communicator) {
         this.ip = ip
         this.port = port
-        this.emitter = emitter
+        this.communicator = communicator
         this.currentPrograms = null
         this.currentPreviews = null
         this.isAtemConnected = false
@@ -31,12 +31,12 @@ class AtemConnector {
         this.myAtem.on('connected', () => {
             this.isAtemConnected = true
             console.log("Connected to ATEM")
-            this.emitter.emit('mixer.connected')
+            this.communicator.notifyMixerIsConnected()
 
             this.currentPrograms = this.myAtem.listVisibleInputs("program").sort()
             this.currentPreviews = this.myAtem.listVisibleInputs("preview").sort()
         
-            this.emitter.emit("program.changed", this.currentPrograms, this.currentPreviews)
+            this.communicator.notifyProgramChanged(this.currentPrograms, this.currentPreviews)
         })
         
         this.myAtem.on('disconnected', () => {
@@ -44,7 +44,7 @@ class AtemConnector {
                 this.isAtemConnected ? "Lost connection to ATEM" : "Could not connect to ATEM"
             )
             this.isAtemConnected = false
-            this.emitter.emit('mixer.disconnected')
+            this.communicator.notifyMixerIsDisconnected()
         })
 
         this.myAtem.on('stateChanged', (state, pathToChange) => {
@@ -57,7 +57,7 @@ class AtemConnector {
                 this.currentPrograms = programs
                 this.currentPreviews = previews
 
-                this.emitter.emit("program.changed", programs, previews)
+                this.communicator.notifyProgramChanged(programs, previews)
             }
         })
     }

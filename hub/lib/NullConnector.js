@@ -1,12 +1,12 @@
 // a connector that does not do anything
 
 class NullConnector {
-    constructor(emitter) {
-        this.emitter = emitter
+    constructor(communicator) {
+        this.communicator = communicator
     }
     connect() {
         console.log("No video mixer connected.")
-        this.emitter.emit("program.changed", null, null)
+        this.communicator.notifyProgramChanged(null, null)
     }
     disconnect() {}
 

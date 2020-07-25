@@ -2,6 +2,7 @@ const AtemConnector = require('./AtemConnector.js')
 const VmixConnector = require('./VmixConnector.js')
 const MockConnector = require('./MockConnector.js')
 const NullConnector = require('./NullConnector.js')
+const MixerCommunicator = require('./MixerCommunicator.js')
 
 class MixerDriver {
     constructor(configuration, emitter) {
@@ -11,6 +12,7 @@ class MixerDriver {
         this.getCurrentMixerSettings
 
         this.configuration = configuration
+        this.communicator = new MixerCommunicator(configuration, emitter)
         this.emitter = emitter
 
         this.currentPrograms = null
@@ -59,7 +61,7 @@ class MixerDriver {
             return
         }
         if(this.currentMixerInstance) {
-            this.emitter.emit("program.changed", null, null)
+            this.communicator.notifyProgramChanged(null, null)
             const ret = this.currentMixerInstance.disconnect()
             await Promise.resolve(ret)
         }
@@ -85,7 +87,7 @@ class MixerDriver {
         }
         this.currentMixerId = newMixerId
         this.currentMixerSettings = this.getCurrentMixerSettings()
-        this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.emitter)
+        this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.communicator)
         const ret = this.currentMixerInstance.connect()
         await Promise.resolve(ret)
     }

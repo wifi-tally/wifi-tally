@@ -2,10 +2,10 @@ var net = require('net')
 
 // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
 class VmixConnector {
-    constructor(ip, port, emitter) {
+    constructor(ip, port, communicator) {
         this.ip = ip
         this.port = port
-        this.emitter = emitter
+        this.communicator = communicator
         this.client
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
@@ -24,7 +24,7 @@ class VmixConnector {
 
         client.on("connect", () => {
             console.log('Connected to vMix')
-            this.emitter.emit('mixer.connected')
+            this.communicator.notifyMixerIsConnected()
         })
 
         client.on("ready", () => {
@@ -42,7 +42,7 @@ class VmixConnector {
         client.on('data', this.onData.bind(this))
 
         client.on('close', (hadError) => {
-            this.emitter.emit('mixer.disconnected')
+            this.communicator.notifyMixerIsDisconnected()
             console.log("Connection to vMix closed")
 
             if (hadError) {
@@ -88,7 +88,7 @@ class VmixConnector {
                 }
             })
 
-            this.emitter.emit("program.changed", programs, previews)
+            this.communicator.notifyProgramChanged(programs, previews)
         }
     }
     disconnect() {
