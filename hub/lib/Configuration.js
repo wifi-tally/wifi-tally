@@ -12,7 +12,10 @@ class Configuration {
         this.vmixIp
         this.vmixPort
         this.mockTickTime
+        this.mockChannelCount
         this.tallies = []
+        this.channelCount = 8
+        this.channelNames = {}
         this.mixerSelection = null
         this.configFileName = configFileName
         if(fs.existsSync(this.configFileName)) {
@@ -39,6 +42,9 @@ class Configuration {
             if(config.mock && config.mock.tickTime) {
                 this.mockTickTime = config.mock.tickTime
             }
+            if(config.mock && config.mock.mockChannelCount) {
+                this.mockChannelCount = config.mock.mockChannelCount
+            }
         } else {
             console.log("Configuration File " + this.configFileName + " does not exist.")
         }
@@ -59,6 +65,7 @@ class Configuration {
             },
             mock: {
                 tickTime: this.mockTickTime,
+                mockChannelCount: this.mockChannelCount,
             },
             tallies: this.tallies,
           }, null, '\t'), err => {
@@ -73,7 +80,7 @@ class Configuration {
 
     updateVmixConfig(vmixIp, vmixPort) {
         this.vmixIp = vmixIp
-        this.vmixPort = vmixPort
+        this.vmixPort = parseInt(vmixPort, 10)
     }
 
     updateTallies(tallyDriver) {
@@ -84,8 +91,9 @@ class Configuration {
         this.mixerSelection = mixerSelection
     }
 
-    updateMockConfig(mockTickTime) {
-        this.mockTickTime = mockTickTime
+    updateMockConfig(mockTickTime, mockChannelCount) {
+        this.mockTickTime = parseInt(mockTickTime, 10)
+        this.mockChannelCount = parseInt(mockChannelCount, 10)
     }
 
     isDev() {
@@ -120,12 +128,32 @@ class Configuration {
         return this.mockTickTime || MockConnector.defaultTickTime
     }
 
+    getMockChannelCount() {
+        return this.mockChannelCount || MockConnector.defaultChannelCount
+    }
+
     getMixerSelection() {
         if (this.mixerSelection && MixerDriver.isValidMixerId(this.mixerSelection, this.isDev())) {
             return this.mixerSelection
         } else {
             return MixerDriver.getDefaultMixerId(this.isDev())
         }
+    }
+
+    getChannelCount() {
+        return this.channelCount
+    }
+
+    setChannelCount(count) {
+        this.channelCount = parseInt(count, 10)
+    }
+
+    getChannelNames() {
+        return this.channelNames
+    }
+
+    setChannelNames(names) {
+        this.channelNames = names
     }
 
     mixerConfigToObject() {
@@ -135,12 +163,17 @@ class Configuration {
                 ip: this.getAtemIp(),
                 port: this.getAtemPort(),
             },
+            channels: {
+                count: this.getChannelCount(),
+                names: this.getChannelNames(),
+            },
             vmix: {
                 ip: this.getVmixIp(),
                 port: this.getVmixPort(),
             },
             mock: {
                 tickTime: this.getMockTickTime(),
+                channelCount: this.getMockChannelCount(),
             },
         }
     }

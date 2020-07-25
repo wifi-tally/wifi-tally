@@ -76,7 +76,7 @@ class MixerDriver {
             this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
             MixerClass = VmixConnector
         } else if(newMixerId == MockConnector.ID) {
-            this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime()]
+            this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime(), this.configuration.getMockChannelCount()]
             MixerClass = MockConnector
         } else if(newMixerId == NullConnector.ID) {
             this.getCurrentMixerSettings = () => []

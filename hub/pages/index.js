@@ -34,6 +34,7 @@ const ChatOne = props => {
   const [isMixerConnected, setIsMixerConnected] = useState(props.isMixerConnected || false)
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
+  const [channels, setChannels] = useState(props.channels != undefined ? props.channels : {})
 
   const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
 
@@ -48,15 +49,17 @@ const ChatOne = props => {
   useSocket('mixer', mixer => {
     setIsMixerConnected(mixer.isConnected)
   })
+  useSocket('config', config => {
+    setChannels(config.channels)
+  })
 
+  socketEventEmitter.on("connected", function() {
+    console.log("connected")
+  })
 
-socketEventEmitter.on("connected", function() {
-  console.log("connected")
-})
-
-socketEventEmitter.on("disconnected", function() {
-  console.log("disconnected")
-})
+  socketEventEmitter.on("disconnected", function() {
+    console.log("disconnected")
+  })
 
   const patchTally = function(tally, channel) {
     socket.emit('tally.patch', tally.name, channel)
@@ -78,6 +81,14 @@ socketEventEmitter.on("disconnected", function() {
   const handleRemoveTally = (e, tally) => {
     socket.emit('tally.remove', tally.name)
     e.preventDefault()
+  }
+
+  const formatChannelOption = (idx, invalid) => {
+    var label = "Channel " + idx
+    if(invalid) {
+      label = "(" + label + ")"
+    }
+    return (<option value={idx} key={idx}>{label}</option>)
   }
 
   const format = tally => {
@@ -116,14 +127,9 @@ socketEventEmitter.on("disconnected", function() {
             <div className="form-group">
             <select className="form-control" value={tally.channelId} onChange={e => patchTally(tally, e.target.value)}>
               <option value="-1">(unpatched)</option>
-              <option value="1">Channel 1</option>
-              <option value="2">Channel 2</option>
-              <option value="3">Channel 3</option>
-              <option value="4">Channel 4</option>
-              <option value="5">Channel 5</option>
-              <option value="6">Channel 6</option>
-              <option value="7">Channel 7</option>
-              <option value="8">Channel 8</option>
+              {/* selection of all available channels */}
+              {Array.from(Array(channels.count).keys()).map(i => i+1).map(idx => formatChannelOption(idx, false))}
+              {tally.channelId > channels.count ? formatChannelOption(tally.channelId, true) : ""}
             </select>
             </div>
           </form>
@@ -172,6 +178,10 @@ ChatOne.getInitialProps = async (context) => {
   const baseUrl = context && context.req ? `${context.req.protocol}://${context.req.get('Host')}` : '';
   const response = await fetch(baseUrl + '/tallies')
   const info = await response.json()
+  // @TODO: use asynchronous calls
+  const config = await fetch(baseUrl + '/atem')
+  const configJson = await config.json()
+  info.channels = configJson.channels
 
   return info
 }

@@ -72,12 +72,9 @@ myEmitter.on('tally.timedout', (tally, diff) => {
 })
 myEmitter.on('tally.removed', sendTalliesToBrowser)
 
-const sendConfigurationToBrowser = function() {
+myEmitter.on('config.changed', function() {
   io.emit('config', myConfiguration.mixerConfigToObject())
-}
-myEmitter.on('config.changed.mixer', sendConfigurationToBrowser)
-myEmitter.on('config.changed.atem', sendConfigurationToBrowser)
-myEmitter.on('config.changed.mock', sendConfigurationToBrowser)
+})
 
 myEmitter.on('mixer.connected', sendMixerStateToBrowser(true))
 myEmitter.on('mixer.disconnected', sendMixerStateToBrowser(false))
@@ -138,10 +135,11 @@ io.on('connection', socket => {
   socket.on('tally.remove', tallyName => {
     myTallyDriver.removeTally(tallyName)
   })
-  socket.on('config.changeRequest', (selectedMixer, atemIp, atemPort, vmixIp, vmixPort, mockTickTime) => {
+  socket.on('config.changeRequest', (selectedMixer, atemIp, atemPort, vmixIp, vmixPort, mockTickTime, mockChannelCount) => {
+    console.log(mockChannelCount)
     myConfiguration.updateAtemConfig(atemIp, atemPort)
     myConfiguration.updateVmixConfig(vmixIp, vmixPort)
-    myConfiguration.updateMockConfig(mockTickTime)
+    myConfiguration.updateMockConfig(mockTickTime, mockChannelCount)
     myConfiguration.updateMixerSelection(selectedMixer)
     myConfiguration.save()
     myEmitter.emit("config.changed")

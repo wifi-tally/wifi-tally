@@ -10,6 +10,13 @@ class MixerCommunicator {
         this.emitter.emit('program.changed', programs, previews)
     }
 
+    notifyChannels(count) {
+        this.configuration.setChannelCount(count)
+        this.configuration.save()
+
+        this.emitter.emit("config.changed")
+    }
+
     notifyMixerIsConnected() {
         this.emitter.emit('mixer.connected')
     }

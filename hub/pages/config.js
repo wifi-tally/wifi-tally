@@ -18,6 +18,7 @@ const Config = props => {
   const [vmixIp, setVmixIp] = useState(props.vmix.ip)
   const [vmixPort, setVmixPort] = useState(props.vmix.port)
   const [mockTickTime, setMockTickTime] = useState(props.mock.tickTime)
+  const [mockChannelCount, setMockChannelCount] = useState(props.mock.channelCount)
 
   const socket = useSocket('config', config => {
     setCurrentMixerId(config.currentMixerId)
@@ -26,10 +27,11 @@ const Config = props => {
     setVmixIp(config.vmix.ip)
     setVmixPort(config.vmix.port)
     setMockTickTime(config.mock.tickTime)
+    setMockChannelCount(config.mock.channelCount)
   })
 
   const handleSubmit = e => {
-    socket.emit('config.changeRequest', currentMixerId, atemIp, atemPort, vmixIp, vmixPort, mockTickTime)
+    socket.emit('config.changeRequest', currentMixerId, atemIp, atemPort, vmixIp, vmixPort, mockTickTime, mockChannelCount)
     e.preventDefault()
   }
 
@@ -65,6 +67,10 @@ const Config = props => {
                 <div className="form-group">
                   <label htmlFor="mock-tickTime">Change program every ms</label>
                   <input className="form-control" id="mock-tickTime" type="text" value={mockTickTime} onChange={e => setMockTickTime(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="mock-channelCount">Number of Channels</label>
+                  <input className="form-control" id="mock-channelCount" type="text" value={mockChannelCount} onChange={e => setMockChannelCount(e.target.value)} />
                 </div>
               </fieldset>
             ): ""}

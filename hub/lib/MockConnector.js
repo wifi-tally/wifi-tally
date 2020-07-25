@@ -1,18 +1,20 @@
 // a mock connector that generates random programs and previews
 
 class MockConnector {
-    constructor(tickTime, communicator) {
+    constructor(tickTime, channelCount, communicator) {
         this.communicator = communicator
         this.tickTime = tickTime
+        this.channelCount = channelCount
         this.isActive = false
     }
     connect() {
-        console.log("Simulating a mock video mixer that changes programs every " + this.tickTime + "ms")
+        console.log("Simulating a mock video mixer with " + this.channelCount + " channels that changes programs every " + this.tickTime + "ms")
         this.isActive = true
         this.communicator.notifyMixerIsConnected()
+        this.communicator.notifyChannels(this.channelCount)
         const fn = function() {
-            const mockCurrentPrograms = [Math.floor(Math.random() * 6)]
-            const mockCurrentPreviews = [Math.floor(Math.random() * 6)]
+            const mockCurrentPrograms = [Math.floor(Math.random() * (this.channelCount + 1))]
+            const mockCurrentPreviews = [Math.floor(Math.random() * (this.channelCount + 1))]
             this.communicator.notifyProgramChanged(mockCurrentPrograms, mockCurrentPreviews)
         }.bind(this)
         this.intervalHandle = setInterval(fn, this.tickTime)
@@ -34,5 +36,6 @@ class MockConnector {
 
 MockConnector.ID = "mock"
 MockConnector.defaultTickTime = 3000
+MockConnector.defaultChannelCount = 8
 
 module.exports = MockConnector;
