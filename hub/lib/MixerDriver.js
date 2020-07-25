@@ -15,6 +15,8 @@ class MixerDriver {
         this.communicator = new MixerCommunicator(configuration, emitter)
         this.emitter = emitter
 
+        this.isChangingMixer = false
+
         this.currentPrograms = null
         this.currentPreviews = null
 
@@ -26,6 +28,9 @@ class MixerDriver {
         })
 
         this.emitter.on('config.changed', () => {
+            if (this.isChangingMixer) {
+                return
+            }
             var needsRefresh = false
             if(configuration.getMixerSelection() !== this.currentMixerId) {
                 // a different mixer was selected
@@ -60,36 +65,44 @@ class MixerDriver {
             console.error("Can not switch to unknown mixer with id " + newMixerId)
             return
         }
-        if(this.currentMixerInstance) {
-            this.communicator.notifyProgramChanged(null, null)
-            const ret = this.currentMixerInstance.disconnect()
+
+        this.isChangingMixer = true
+        try {
+            if(this.currentMixerInstance) {
+                const ret = this.currentMixerInstance.disconnect()
+                this.communicator.notifyProgramChanged(null, null)
+                this.communicator.notifyChannels(MixerDriver.defaultChannelCount, MixerDriver.defaultChannelNames)
+                await Promise.resolve(ret)
+            }
+
+            console.log("Using mixer configuration \"" + newMixerId + "\"")
+
+            var MixerClass
+            if(newMixerId == AtemConnector.ID) {
+                this.getCurrentMixerSettings = () => [this.configuration.getAtemIp(), this.configuration.getAtemPort()]
+                MixerClass = AtemConnector
+            } else if(newMixerId == VmixConnector.ID) {
+                this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
+                MixerClass = VmixConnector
+            } else if(newMixerId == MockConnector.ID) {
+                this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime(), this.configuration.getMockChannelCount(), this.configuration.getMockChannelNames()]
+                MixerClass = MockConnector
+            } else if(newMixerId == NullConnector.ID) {
+                this.getCurrentMixerSettings = () => []
+                MixerClass = NullConnector
+            } else {
+                console.error("Someone(TM) forgot to implement the " + newMixerId + " mixer in MixerDriver.js.")
+                return
+            }
+            this.currentMixerId = newMixerId
+            this.currentMixerSettings = this.getCurrentMixerSettings()
+            this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.communicator)
+            const ret = this.currentMixerInstance.connect()
             await Promise.resolve(ret)
         }
-
-        console.log("Using mixer configuration \"" + newMixerId + "\"")
-
-        var MixerClass
-        if(newMixerId == AtemConnector.ID) {
-            this.getCurrentMixerSettings = () => [this.configuration.getAtemIp(), this.configuration.getAtemPort()]
-            MixerClass = AtemConnector
-        } else if(newMixerId == VmixConnector.ID) {
-            this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
-            MixerClass = VmixConnector
-        } else if(newMixerId == MockConnector.ID) {
-            this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime(), this.configuration.getMockChannelCount()]
-            MixerClass = MockConnector
-        } else if(newMixerId == NullConnector.ID) {
-            this.getCurrentMixerSettings = () => []
-            MixerClass = NullConnector
-        } else {
-            console.error("Someone(TM) forgot to implement the " + newMixerId + " mixer in MixerDriver.js.")
-            return
+        finally {
+            this.isChangingMixer = false
         }
-        this.currentMixerId = newMixerId
-        this.currentMixerSettings = this.getCurrentMixerSettings()
-        this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.communicator)
-        const ret = this.currentMixerInstance.connect()
-        await Promise.resolve(ret)
     }
 
     getCurrentPrograms() {
@@ -125,5 +138,8 @@ MixerDriver.getDefaultMixerId = function(isDev) {
 MixerDriver.isValidMixerId = function(name, isDev) {
     return MixerDriver.getAllowedMixers(isDev).includes(name)
 }
+
+MixerDriver.defaultChannelCount = 8
+MixerDriver.defaultChannelNames = {}
 
 module.exports = MixerDriver

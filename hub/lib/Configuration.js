@@ -13,9 +13,10 @@ class Configuration {
         this.vmixPort
         this.mockTickTime
         this.mockChannelCount
+        this.mockChannelNames
         this.tallies = []
-        this.channelCount = 8
-        this.channelNames = {}
+        this.channelCount = MixerDriver.defaultChannelCount
+        this.channelNames = MixerDriver.defaultChannelNames
         this.mixerSelection = null
         this.configFileName = configFileName
         if(fs.existsSync(this.configFileName)) {
@@ -42,8 +43,11 @@ class Configuration {
             if(config.mock && config.mock.tickTime) {
                 this.mockTickTime = config.mock.tickTime
             }
-            if(config.mock && config.mock.mockChannelCount) {
-                this.mockChannelCount = config.mock.mockChannelCount
+            if(config.mock && config.mock.channelCount) {
+                this.mockChannelCount = config.mock.channelCount
+            }
+            if(config.mock && config.mock.channelNames) {
+                this.mockChannelNames = config.mock.channelNames
             }
         } else {
             console.log("Configuration File " + this.configFileName + " does not exist.")
@@ -65,7 +69,8 @@ class Configuration {
             },
             mock: {
                 tickTime: this.mockTickTime,
-                mockChannelCount: this.mockChannelCount,
+                channelCount: this.mockChannelCount,
+                channelNames: this.mockChannelNames,
             },
             tallies: this.tallies,
           }, null, '\t'), err => {
@@ -91,9 +96,10 @@ class Configuration {
         this.mixerSelection = mixerSelection
     }
 
-    updateMockConfig(mockTickTime, mockChannelCount) {
+    updateMockConfig(mockTickTime, mockChannelCount, mockChannelNames) {
         this.mockTickTime = parseInt(mockTickTime, 10)
         this.mockChannelCount = parseInt(mockChannelCount, 10)
+        this.mockChannelNames = mockChannelNames
     }
 
     isDev() {
@@ -130,6 +136,10 @@ class Configuration {
 
     getMockChannelCount() {
         return this.mockChannelCount || MockConnector.defaultChannelCount
+    }
+
+    getMockChannelNames() {
+        return this.mockChannelNames || MockConnector.defaultChannelNames
     }
 
     getMixerSelection() {
@@ -174,6 +184,7 @@ class Configuration {
             mock: {
                 tickTime: this.getMockTickTime(),
                 channelCount: this.getMockChannelCount(),
+                channelNames: this.getMockChannelNames(),
             },
         }
     }
