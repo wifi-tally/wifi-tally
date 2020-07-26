@@ -1,4 +1,5 @@
 var net = require('net')
+var xml2js = require('xml2js');
 
 // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
 class VmixConnector {
@@ -9,6 +10,8 @@ class VmixConnector {
         this.client
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
+        this.intervalHandle
+        this.xmlQueryInterval = 5000
     }
     connect() {
         const client = new net.Socket()
@@ -20,6 +23,12 @@ class VmixConnector {
             client.connect(this.port, this.ip)
         }
 
+        const queryXml = function() {
+            if(!client.connecting && !client.pending && !client.destroyed) {
+                client.write("XML\r\n")
+            }
+        }.bind(this)
+
         connectClient()
 
         client.on("connect", () => {
@@ -29,6 +38,9 @@ class VmixConnector {
 
         client.on("ready", () => {
             client.write("SUBSCRIBE TALLY\r\n")
+            // @TODO: we need to poll for new channels or renames. Is there a way to subscribe to those?
+            this.intervalHandle = setInterval(queryXml, this.xmlQueryInterval)
+            queryXml()
         })
 
         client.on("timeout", () => {
@@ -44,6 +56,11 @@ class VmixConnector {
         client.on('close', (hadError) => {
             this.communicator.notifyMixerIsDisconnected()
             console.log("Connection to vMix closed")
+
+            if(this.intervalHandle) {
+                clearInterval(this.intervalHandle);
+                this.intervalHandle = undefined;
+            }
 
             if (hadError) {
                 console.debug("Connection to vMix is reconnected after an error")
@@ -61,8 +78,12 @@ class VmixConnector {
                 this.wasSubcribeOkReceived = true
             } else if (command.startsWith("TALLY OK")) {
                 this.handleTallyCommand(command)
+            } else if (command.startsWith("XML ")) {
+                // @TODO: it would be better to detect the "XML" response itself, not the payload
+            } else if (command.startsWith("<vmix>")) {  
+                this.handleXmlCommand(command)
             } else {
-                this.debug("Ignoring unkown command from vmix")
+                console.debug("Ignoring unkown command from vmix")
             }
         }, this)
     }
@@ -91,10 +112,33 @@ class VmixConnector {
             this.communicator.notifyProgramChanged(programs, previews)
         }
     }
+    handleXmlCommand(command) {
+        xml2js.parseString(command, (error, result) => {
+            if (error) {
+                console.error("Error parsing XML response from vMix: " + error)
+            } else {
+                const inputs = (result.vmix || {}).inputs
+                if(inputs == undefined) {
+                    console.log("XML from vMix looks faulty. Could not find inputs.")
+                } else {
+                    const count = inputs[0].input.length
+                    const names = inputs[0].input.reduce((map, input, idx) => {
+                        map[idx+1] = input.$.shortTitle
+                        return map
+                    }, {})
+                    this.communicator.notifyChannels(count, names)
+                }
+            }
+        })
+    }
     disconnect() {
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
         const promise = new Promise(resolve => {
+            if(this.intervalHandle) {
+                clearInterval(this.intervalHandle);
+                this.intervalHandle = undefined;
+            }
             if (this.client && ! this.client.destroyed) {
                 if (this.client.isConnected) {
                     // if we are connected: try to be nice

@@ -12,15 +12,76 @@ const waitUntil = (fn) => {
     })
 }
 
+class MockCommunicator {
+    constructor(configuration, emitter) {
+        this.isConnected = false
+        this.channelCount
+        this.channelNames
+        this.programs
+        this.previews
+    }
+
+    notifyProgramChanged(programs, previews) {
+        this.programs = programs
+        this.previews = previews
+    }
+
+    notifyChannels(count, names) {
+        this.channelCount = count
+        this.channelNames = names
+    }
+
+    notifyMixerIsConnected() {
+        this.isConnected = true
+    }
+
+    notifyMixerIsDisconnected() {
+        this.isConnected = false
+    }
+}
+
+const mockVMix = () => {
+    const config = {
+        version: "0.1.2.3",
+        tallies: "012",
+        xml: '<vmix><version>{version}</version><edition>Trial</edition><inputs><input key="44bcd391-0f5e-433f-8a45-d5960a973a75" number="1" type="Blank" title="Blank" shortTitle="Blank" state="Paused" position="0" duration="0" loop="False">Blank</input><input key="5c6147a9-398b-4013-969f-6b372b0be254" number="2" type="Blank" title="Blank" shortTitle="Blank" state="Paused" position="0" duration="0" loop="False">Blank</input></inputs><overlays><overlay number="1" /><overlay number="2" /><overlay number="3" /><overlay number="4" /><overlay number="5" /><overlay number="6" /></overlays><preview>1</preview><active>1</active><fadeToBlack>False</fadeToBlack><transitions><transition number="1" effect="VerticalSlide" duration="500" /><transition number="2" effect="Merge" duration="1000" /><transition number="3" effect="Wipe" duration="1000" /><transition number="4" effect="CubeZoom" duration="1000" /></transitions><recording>False</recording><external>False</external><streaming>False</streaming><playList>False</playList><multiCorder>False</multiCorder><fullscreen>False</fullscreen><audio><master volume="100" muted="False" meterF1="0" meterF2="0" headphonesVolume="100" /></audio></vmix>'
+    }
+    const server = net.Server((sck) => {
+        sck.on('data', data => {
+            data = data.toString()
+            data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
+                console.debug("< " + command)
+                if(command == "XML") {
+                    const response = config.xml.replace("{version}", config.version)
+                    sck.write(Buffer.from('XML ' + response.length + '\r\n' + response + '\r\n'))
+                } else if(command == "SUBSCRIBE TALLY") {
+                    sck.write(Buffer.from("SUBSCRIBE OK TALLY Subscribed\r\n", "utf-8"))
+                    setTimeout(() => {
+                        sck.write(Buffer.from("TALLY OK " + config.tallies + "\r\n", "utf-8"))
+                    }, 100)
+                } else {
+                    console.log("vMix Mock received an unknown command: " + command)
+                }
+            })
+        })
+        sck.write(Buffer.from("VERSION OK " + config.version + "\r\n", "utf-8"))
+    })
+
+    server.listen(0)
+
+    config.serverIp = server.address().address
+    config.serverPort = server.address().port
+    config.close = server.close.bind(server)
+
+    return config
+}
+
 describe('VmixConnector', () => {
     describe('onData', () => {
         test('recognizes VERSION OK', async () => {
-            const emitter = new EventEmitter()
-            const server = net.Server((sck) => {
-                sck.write(Buffer.from("VERSION OK 0.1.2.3\r\n", "utf-8"))
-            })
-            server.listen(0)
-            const vmix = new VmixConnector('127.0.0.1', server.address().port, emitter)
+            const communicator = new MockCommunicator()
+            const server = mockVMix()
+            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
             try {
                 expect(vmix.wasHelloReceived).toBe(false)
                 vmix.connect()
@@ -28,24 +89,13 @@ describe('VmixConnector', () => {
                     expect(vmix.wasHelloReceived).toBe(true)
                 )
             } finally {
-                vmix.disconnect()
-                // @TODO: fix the hacky wait for disconnect
-                await new Promise((resolve, _) => setTimeout(() => resolve(), 500))
                 await server.close()
             }
         })
         test('recognizes SUBSCRIBE OK TALLY', async () => {
-            const emitter = new EventEmitter()
-            const server = net.Server((sck) => {
-                sck.on('data', data => {
-                    expect(data.toString()).toBe("SUBSCRIBE TALLY\r\n")
-                    sck.write(Buffer.from("SUBSCRIBE OK TALLY Subscribed\r\n", "utf-8"))
-                })
-                sck.write(Buffer.from("VERSION OK 0.1.2.3", "utf-8"))
-            })
-            // @TODO: random free port
-            server.listen(0)
-            const vmix = new VmixConnector('127.0.0.1', server.address().port, emitter)
+            const communicator = new MockCommunicator()
+            const server = mockVMix()
+            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
             try {
                 expect(vmix.wasSubcribeOkReceived).toBe(false)
                 vmix.connect()
@@ -53,73 +103,52 @@ describe('VmixConnector', () => {
                     expect(vmix.wasSubcribeOkReceived).toBe(true)
                 )
             } finally {
-                vmix.disconnect()
-                // @TODO: fix the hacky wait for disconnect
-                await new Promise((resolve, _) => setTimeout(() => resolve(), 500))
                 await server.close()
             }
         })
         test('parses TALLY OK command', async () => {
-            const emitter = new EventEmitter()
-
-            const server = net.Server((sck) => {
-                sck.on('data', data => {
-                    expect(data.toString()).toBe("SUBSCRIBE TALLY\r\n")
-                    sck.write(Buffer.from("SUBSCRIBE OK TALLY Subscribed\r\n", "utf-8"))
-                    setTimeout(() => {
-                        sck.write(Buffer.from("TALLY OK 012\r\n", "utf-8"))
-                    }, 100)
-                })
-                sck.write(Buffer.from("VERSION OK 0.1.2.3", "utf-8"))
-            })
-            // @TODO: random free port
-            server.listen(0)
-            const vmix = new VmixConnector('127.0.0.1', server.address().port, emitter)
+            const communicator = new MockCommunicator()
+            const server = mockVMix()
+            server.tallies = "012"
+            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
             try {
                 vmix.connect()
-                await new Promise((resolve, _) => {
-                    emitter.on("program.changed", (programs, previews) => {
-                        expect(programs).toEqual([2])
-                        expect(previews).toEqual([3])
-                        resolve()
-                    })
+                await waitUntil(() => communicator.programs != undefined).then(() => {
+                    expect(communicator.programs).toEqual([2])
+                    expect(communicator.previews).toEqual([3])
                 })
             } finally {
-                vmix.disconnect()
-                // @TODO: fix the hacky wait for disconnect
-                await new Promise((resolve, _) => setTimeout(() => resolve(), 500))
                 await server.close()
             }
         })
         test('parses complex TALLY OK command', async () => {
-            const emitter = new EventEmitter()
+            const communicator = new MockCommunicator()
+            const server = mockVMix()
+            server.tallies = "012210"
+            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
 
-            const server = net.Server((sck) => {
-                sck.on('data', data => {
-                    expect(data.toString()).toBe("SUBSCRIBE TALLY\r\n")
-                    sck.write(Buffer.from("SUBSCRIBE OK TALLY Subscribed\r\n", "utf-8"))
-                    setTimeout(() => {
-                        sck.write(Buffer.from("TALLY OK 012210\r\n", "utf-8"))
-                    }, 100)
-                })
-                sck.write(Buffer.from("VERSION OK 0.1.2.3", "utf-8"))
-            })
-            // @TODO: random free port
-            server.listen(0)
-            const vmix = new VmixConnector('127.0.0.1', server.address().port, emitter)
             try {
                 vmix.connect()
-                await new Promise((resolve, _) => {
-                    emitter.on("program.changed", (programs, previews) => {
-                        expect(programs).toEqual([2, 5])
-                        expect(previews).toEqual([3, 4])
-                        resolve()
-                    })
+                await waitUntil(() => communicator.programs != undefined).then(() => {
+                    expect(communicator.programs).toEqual([2, 5])
+                    expect(communicator.previews).toEqual([3, 4])
                 })
             } finally {
-                vmix.disconnect()
-                // @TODO: fix the hacky wait for disconnect
-                await new Promise((resolve, _) => setTimeout(() => resolve(), 500))
+                await server.close()
+            }
+        })
+        test('recognizes XML response', async () => {
+            const communicator = new MockCommunicator()
+            const server = mockVMix()
+            server.xml = '<vmix><version>{version}</version><edition>Trial</edition><inputs><input key="0182ffa0-9fa9-4514-91af-37ef60240c87" number="1" type="Colour" title="Foobar" shortTitle="Foobar" state="Paused" position="0" duration="0" loop="False">Foobar</input><input key="a108d01e-26f4-466f-a37d-d8f91f3fd6eb" number="2" type="Colour" title="Tolle rote Farbe" shortTitle="Tolle rote Farbe" state="Paused" position="0" duration="0" loop="False">Tolle rote Farbe</input><input key="3f6e4c1b-a13f-46b0-9537-676a4fb17ea3" number="3" type="Colour" title="Colour Bars" shortTitle="Colour Bars" state="Paused" position="0" duration="0" loop="False">Colour Bars</input></inputs><overlays><overlay number="1" /><overlay number="2" /><overlay number="3" /><overlay number="4" /><overlay number="5" /><overlay number="6" /></overlays><preview>2</preview><active>3</active><fadeToBlack>False</fadeToBlack><transitions><transition number="1" effect="VerticalSlide" duration="500" /><transition number="2" effect="Merge" duration="1000" /><transition number="3" effect="Wipe" duration="1000" /><transition number="4" effect="CubeZoom" duration="1000" /></transitions><recording>False</recording><external>False</external><streaming>False</streaming><playList>False</playList><multiCorder>False</multiCorder><fullscreen>False</fullscreen><audio><master volume="100" muted="False" meterF1="0" meterF2="0" headphonesVolume="100" /></audio></vmix>'
+            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
+            try {
+                vmix.connect()
+                await waitUntil(() => communicator.channelCount != undefined).then(() => {
+                    expect(communicator.channelCount).toEqual(3)
+                    expect(communicator.channelNames).toEqual({1: "Foobar", 2: "Tolle rote Farbe", 3: "Colour Bars"})
+                })
+            } finally {
                 await server.close()
             }
         })
