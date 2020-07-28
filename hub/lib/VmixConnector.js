@@ -20,6 +20,7 @@ class VmixConnector {
         const connectClient = () => {
             this.wasHelloReceived = false
             this.wasSubcribeOkReceived = false
+            console.log(this.port, this.ip)
             client.connect(this.port, this.ip)
         }
 
@@ -64,7 +65,9 @@ class VmixConnector {
 
             if (hadError) {
                 console.debug("Connection to vMix is reconnected after an error")
-                client.connect(this.port, this.ip)
+                setTimeout(() => {
+                    client.connect(this.port, this.ip)
+                }, 200)
             }
         })
 

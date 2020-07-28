@@ -27,7 +27,7 @@
     "build": "next build",
     "start": "node server.js",
     "test": "jest --watch --runInBand --detectOpenHandles",
-    "test:ci": "jest --ci"
+    "test:ci": "jest --ci --detectOpenHandles"
   },
   "jest": {
     "testMatch": [
