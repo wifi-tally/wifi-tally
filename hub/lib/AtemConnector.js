@@ -1,21 +1,11 @@
 // atem-connection v2.0.0 is needed to monitor status of the connection
 const { Atem, AtemConnectionStatus } = require('atem-connection')
 
-const haveValuesChanged = (lastArray, newArray) => {
-    if(Array.isArray(lastArray) && Array.isArray(newArray)) {
-        return lastArray.length !== newArray.length || lastArray.some((value, index) => value !== newArray[index])
-    } else {
-        return lastArray !== newArray
-    }
-}
-
 class AtemConnector {
     constructor(ip, port, communicator) {
         this.ip = ip
         this.port = port
         this.communicator = communicator
-        this.currentPrograms = null
-        this.currentPreviews = null
         this.isAtemConnected = false
     }
     connect() {
@@ -33,10 +23,9 @@ class AtemConnector {
             console.log("Connected to ATEM")
             this.communicator.notifyMixerIsConnected()
 
-            this.currentPrograms = this.myAtem.listVisibleInputs("program").sort()
-            this.currentPreviews = this.myAtem.listVisibleInputs("preview").sort()
-        
-            this.communicator.notifyProgramChanged(this.currentPrograms, this.currentPreviews)
+            const programs = this.myAtem.listVisibleInputs("program").sort()
+            const previews = this.myAtem.listVisibleInputs("preview").sort()
+            this.communicator.notifyProgramChanged(programs, previews)
         })
         
         this.myAtem.on('disconnected', () => {
@@ -49,21 +38,15 @@ class AtemConnector {
 
         this.myAtem.on('stateChanged', (state, pathToChange) => {
             // could be improved if figured out the path
-            var programs = this.myAtem.listVisibleInputs("program").sort()
-            var previews = this.myAtem.listVisibleInputs("preview").sort()
-        
-            if(haveValuesChanged(this.currentPrograms, programs) || haveValuesChanged(this.currentPreviews, previews)) {
-                console.log("Atem " + pathToChange)
-                this.currentPrograms = programs
-                this.currentPreviews = previews
-
-                this.communicator.notifyProgramChanged(programs, previews)
-            }
+            const programs = this.myAtem.listVisibleInputs("program").sort()
+            const previews = this.myAtem.listVisibleInputs("preview").sort()
+            this.communicator.notifyProgramChanged(programs, previews)
         })
     }
     disconnect() {
         console.log("Cutting connection to Atem mixer.")
         this.isAtemConnected = false
+        this.communicator.notifyMixerIsDisconnected()
         if(this.myAtem) {
             this.myAtem.removeAllListeners("info")
             this.myAtem.removeAllListeners("error")
