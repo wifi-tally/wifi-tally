@@ -155,7 +155,7 @@ class Configuration {
     }
 
     setChannelCount(count) {
-        this.channelCount = parseInt(count, 10)
+        this.channelCount = parseInt(count, 10) || MixerDriver.defaultChannelCount
     }
 
     getChannelNames() {
@@ -163,7 +163,7 @@ class Configuration {
     }
 
     setChannelNames(names) {
-        this.channelNames = names
+        this.channelNames = names || MixerDriver.defaultChannelNames
     }
 
     mixerConfigToObject() {
