@@ -17,15 +17,7 @@ class MixerDriver {
 
         this.isChangingMixer = false
 
-        this.currentPrograms = null
-        this.currentPreviews = null
-
         this.changeMixer(configuration.getMixerSelection())
-
-        this.emitter.on('program.changed', (programs, previews) => {
-            this.currentPrograms = programs
-            this.currentPreviews = previews
-        })
 
         this.emitter.on('config.changed', () => {
             if (this.isChangingMixer) {
@@ -106,11 +98,11 @@ class MixerDriver {
     }
 
     getCurrentPrograms() {
-        return this.currentPrograms
+        return this.communicator.getCurrentPrograms()
     }
 
     getCurrentPreviews() {
-        return this.currentPreviews
+        return this.communicator.getCurrentPreviews()
     }
     isConnected() {
         return this.currentMixerInstance && this.currentMixerInstance.isConnected()
