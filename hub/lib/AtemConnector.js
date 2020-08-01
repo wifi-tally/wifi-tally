@@ -37,10 +37,17 @@ class AtemConnector {
         })
 
         this.myAtem.on('stateChanged', (state, pathToChange) => {
+            console.debug(pathToChange)
             // could be improved if figured out the path
             const programs = this.myAtem.listVisibleInputs("program").sort()
             const previews = this.myAtem.listVisibleInputs("preview").sort()
             this.communicator.notifyProgramChanged(programs, previews)
+
+            const count = Object.keys(state.inputs).length
+            const channelNames = state.input.reduce((map, input) => {
+                map[input.inputId] = map.shortName
+            }, {})
+            this.communicator.notifyChannels(count, channelNames)
         })
     }
     disconnect() {
