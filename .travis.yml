@@ -58,7 +58,11 @@ script:
   - mkdir -p $TRAVIS_BUILD_DIR/release/docs
   - cp -r $TRAVIS_BUILD_DIR/documentation/docs $TRAVIS_BUILD_DIR/release/docs/markdown
   - cp -r $TRAVIS_BUILD_DIR/documentation/site $TRAVIS_BUILD_DIR/release/docs/html
+
+  - cd $TRAVIS_BUILD_DIR/hub
+  - npm install --production
   - cp -r $TRAVIS_BUILD_DIR/hub $TRAVIS_BUILD_DIR/release/hub
+
   - find $TRAVIS_BUILD_DIR/release -name ".gitignore" -delete
 
   - cd $TRAVIS_BUILD_DIR/release
