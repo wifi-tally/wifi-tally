@@ -1,3 +1,7 @@
+# TBD
+
+* [BREAKING] location where the hub stores its configuration has been changed from `hub/config.json` to `$HOME/.wifi-tally.json` #21
+
 # v0.1-alpha4
 
 * [FIXED] Compiled `lc` files in the release are working again. #24

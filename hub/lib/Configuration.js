@@ -1,11 +1,12 @@
-const fs = require('fs');
+const fs = require('fs')
+const os = require('os')
 const MixerDriver = require('./MixerDriver')
 const AtemConnector = require('./AtemConnector')
 const VmixConnector = require('./VmixConnector')
 const MockConnector = require('./MockConnector')
 
 class Configuration {
-    constructor(configFileName, emitter) {
+    constructor(emitter) {
         this.emitter = emitter
         this.atemIp
         this.atemPort
@@ -18,7 +19,15 @@ class Configuration {
         this.channelCount = MixerDriver.defaultChannelCount
         this.channelNames = MixerDriver.defaultChannelNames
         this.mixerSelection = null
-        this.configFileName = configFileName
+        this.configFileName = this.getConfigFilePath()
+        this.load()
+    }
+
+    getConfigFilePath() {
+        return process.env.CONFIG_FILE || (os.homedir() + "/.wifi-tally.json")
+    }
+
+    load() {
         if(fs.existsSync(this.configFileName)) {
             const rawdata = fs.readFileSync(this.configFileName)
             const config = JSON.parse(rawdata)
@@ -50,7 +59,7 @@ class Configuration {
                 this.mockChannelNames = config.mock.channelNames
             }
         } else {
-            console.log("Configuration File " + this.configFileName + " does not exist.")
+            console.warn("Configuration File " + this.configFileName + " does not exist.")
         }
     }
 

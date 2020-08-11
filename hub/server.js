@@ -24,7 +24,7 @@ const EventEmitter = require('events')
 // - config.changed.atem
 // - config.changed.mock
 const myEmitter = new EventEmitter()
-const myConfiguration = new Configuration("config.json", myEmitter)
+const myConfiguration = new Configuration(myEmitter)
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
 const myTallyDriver = new TallyDriver(myConfiguration.getTallies(), myEmitter)
 
