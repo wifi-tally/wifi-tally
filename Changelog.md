@@ -1,6 +1,7 @@
 # TBD
 
 * [BREAKING] location where the hub stores its configuration has been changed from `hub/config.json` to `$HOME/.wifi-tally.json` #21
+* [BREAKING] The firmware is no longer part of the repository and will be built on Travis. If you need a firmware for development, get it from the latest release. #25
 
 # v0.1-alpha4
 

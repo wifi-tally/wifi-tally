@@ -2,10 +2,19 @@ os: linux
 dist: bionic
 language: python
 
+addons:
+  apt:
+    packages:
+      # for building the firmware
+      - srecord
+      # easy listing of what will be added to the release
+      - tree
+
 env:
   # nodemcu uses an old lua version
   - LUA="5.1.4"
     NODEMCU_FIRMWARE="3.0-master_20190907"
+    NODEMCU_MODULES="encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi"
 
 before_install:
   # lua toolchain for running tests
@@ -14,9 +23,32 @@ before_install:
   - export PATH=$PATH:$PWD/lua_install/bin # Add directory with all installed binaries to PATH
 
   # nodemcu toolchain to cross compile
-  - git clone --depth 1 --branch "${NODEMCU_FIRMWARE}" https://github.com/nodemcu/nodemcu-firmware.git $HOME/nodemcu-firmware
-  - make -C $HOME/nodemcu-firmware/app/lua/luac_cross/
-  - export PATH=$PATH:$HOME/nodemcu-firmware
+  - git clone --depth 1 --recurse-submodules --branch "${NODEMCU_FIRMWARE}" https://github.com/nodemcu/nodemcu-firmware.git $TRAVIS_BUILD_DIR/nodemcu-firmware
+  - make -C $TRAVIS_BUILD_DIR/nodemcu-firmware/app/lua/luac_cross/
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/nodemcu-firmware
+
+  # nodemcu-custom-build to easily build the firmware
+  - git clone --depth 1 --branch master https://github.com/marcelstoer/nodemcu-custom-build.git $TRAVIS_BUILD_DIR/nodemcu-custom-build
+  # @see https://github.com/marcelstoer/nodemcu-custom-build/blob/master/.travis.yml for used environment variables
+  - export USER_PROLOG=""
+  - export X_EMAIL="invalid@example.com"
+  - export X_BRANCH=$NODEMCU_FIRMWARE
+  - export X_MODULES=$NODEMCU_MODULES
+  - export X_U8G_FONTS="font_6x10,font_chikita"
+  - export X_U8G_DISPLAY_I2C=""
+  - export X_U8G_DISPLAY_SPI=""
+  - export X_UCG_DISPLAY_SPI=""
+  - export X_LUA_FLASH_STORE="0x15000"
+  - export X_SPIFFS_FIXED_LOCATION="0"
+  - export X_SPIFFS_MAX_FILESYSTEM_SIZE="0"
+  - export X_SSL_ENABLED="false"
+  - export X_DEBUG_ENABLED="false"
+  - export X_FATFS_ENABLED="false"
+  - export X_NUMBER_OF_MODULES=$(echo $X_MODULES | awk -F\, '{print NF}')
+  # needed to build esptool.py
+  - pip install pyserial
+  # before-script.sh expects the folder at that location
+  - ln -s $TRAVIS_BUILD_DIR/nodemcu-custom-build/ESP8266 $TRAVIS_BUILD_DIR
 
   # tools for building docs
   - pip install mkdocs mkdocs-material pygments mkdocs-macros-plugin
@@ -24,8 +56,18 @@ before_install:
 
 install:
   - luarocks install busted
+  - cd $TRAVIS_BUILD_DIR/nodemcu-firmware
+  - bash "${TRAVIS_BUILD_DIR}/nodemcu-custom-build/ESP8266/install.sh"
+
+before_script:
+  - cd $TRAVIS_BUILD_DIR/nodemcu-firmware
+  - bash "${TRAVIS_BUILD_DIR}/nodemcu-custom-build/ESP8266/before-script.sh"
 
 script:
+  # building the firmware
+  - cd $TRAVIS_BUILD_DIR/nodemcu-firmware
+  - bash "${TRAVIS_BUILD_DIR}/firmware/script.sh"
+
   # building and testing the tally
   - cd $TRAVIS_BUILD_DIR/tally
   - make test
@@ -37,19 +79,20 @@ script:
 
   # building and testing the hub
   - cd $TRAVIS_BUILD_DIR/hub
-  - npm install --dev
-  - npm run test:ci
-  - rm -rf node_modules package-lock.json
   - npm install
+  - npm run test:ci
   - npm run build
+  - rm -rf node_modules # everything fine - clear node_modules of dev dependencies
+  - npm install --production
 
-  # building the release
+  # bundling the release
   - mkdir -p $TRAVIS_BUILD_DIR/release
   - cp $TRAVIS_BUILD_DIR/Readme.md $TRAVIS_BUILD_DIR/release
   - cp $TRAVIS_BUILD_DIR/LICENSE $TRAVIS_BUILD_DIR/release
   - echo "${TRAVIS_BRANCH}" > $TRAVIS_BUILD_DIR/release/VERSION.txt
 
-  - cp -r $TRAVIS_BUILD_DIR/firmware $TRAVIS_BUILD_DIR/release/firmware
+  - mkdir $TRAVIS_BUILD_DIR/release/firmware
+  - cp $TRAVIS_BUILD_DIR/nodemcu-firmware/bin/nodemcu-*.bin $TRAVIS_BUILD_DIR/release/firmware
 
   - cp -r $TRAVIS_BUILD_DIR/tally/out $TRAVIS_BUILD_DIR/release/tally
   - cp $TRAVIS_BUILD_DIR/tally/tally-settings.ini.example $TRAVIS_BUILD_DIR/release/tally
@@ -60,12 +103,14 @@ script:
   - cp -r $TRAVIS_BUILD_DIR/documentation/site $TRAVIS_BUILD_DIR/release/docs/html
 
   - cd $TRAVIS_BUILD_DIR/hub
-  - npm install --production
   - cp -r $TRAVIS_BUILD_DIR/hub $TRAVIS_BUILD_DIR/release/hub
 
   - find $TRAVIS_BUILD_DIR/release -name ".gitignore" -delete
 
   - cd $TRAVIS_BUILD_DIR/release
+  # log the files added to release
+  - tree -I "node_modules"
+  - du -h -d1
   - zip -Jrq "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.zip" *
   - tar -czf "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.tar.gz" *
   - tar -cjf "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.tar.xz" *
