@@ -41,16 +41,15 @@ class AtemConnector {
         
         this.myAtem.on('disconnected', () => {
             console.log(
-                this.isAtemConnected ? "Lost connection to ATEM" : "Could not connect to ATEM"
+                this.isAtemConnected ?
+                "Lost connection to ATEM" :
+                "Could not connect to ATEM. This could mean that the maximum number of devices are already connected to ATEM."
             )
             this.isAtemConnected = false
             this.communicator.notifyMixerIsDisconnected()
         })
 
-        this.myAtem.on('stateChanged', (state, pathToChange) => {
-            console.debug(pathToChange)
-            this.onStateChange()
-        })
+        this.myAtem.on('stateChanged', this.onStateChange.bind(this))
     }
     disconnect() {
         console.log("Cutting connection to Atem mixer.")
