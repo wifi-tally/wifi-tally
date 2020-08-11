@@ -48,6 +48,14 @@ Most LED strips that can be separated after _every_ LED and have 4 pins should f
 
 I recommend taking one with 120LEDs per meter to not have the LEDS be spaced too much.
 
+### an USB power source
+
+The whole setup draws far less than `200mA` and can be powered via USB.
+
+* Some cameras have USB outlets that you can use
+* `200mA` is little enough that even the smallest power bank can supply the Tally for hours
+* use any old USB charger
+
 ## Setup
 
 Running the tally lights consists of two steps:
