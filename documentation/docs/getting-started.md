@@ -194,7 +194,7 @@ Switch back to `Tallies` in the navigation and assign the video channels of the 
 tallies.
 
 !!! info
-    The Tallies and their assigned channels are automatically saved in the `config.json` file.
+    The Tallies and their assigned channels are automatically saved in `.wifi-tally.json` in your home directory.
     So the configuration is restored when the Hub is restarted. 
 
 !!! success
