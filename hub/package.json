@@ -23,9 +23,9 @@
     "xml2js": "^0.4.23"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=dev node server.js",
+    "dev": "node server.js",
     "build": "next build",
-    "start": "node server.js",
+    "start": "cross-env NODE_ENV=prod node server.js",
     "test": "jest --watch --runInBand --detectOpenHandles",
     "test:ci": "jest --ci --detectOpenHandles"
   },
