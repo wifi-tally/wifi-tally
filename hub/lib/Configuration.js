@@ -30,61 +30,77 @@ class Configuration {
     load() {
         if(fs.existsSync(this.configFileName)) {
             const rawdata = fs.readFileSync(this.configFileName)
-            const config = JSON.parse(rawdata)
-            if(config.tallies) {
-                this.tallies = config.tallies
-            }
-            if(config.atem && config.atem.ip) {
-                this.atemIp = config.atem.ip
-            }
-            if(config.atem && config.atem.port) {
-                this.atemPort = config.atem.port
-            }
-            if(config.vmix && config.vmix.ip) {
-                this.vmixIp = config.vmix.ip
-            }
-            if(config.vmix && config.vmix.port) {
-                this.vmixPort = config.vmix.port
-            }
-            if(config.mixer) {
-                this.mixerSelection = config.mixer
-            }
-            if(config.mock && config.mock.tickTime) {
-                this.mockTickTime = config.mock.tickTime
-            }
-            if(config.mock && config.mock.channelCount) {
-                this.mockChannelCount = config.mock.channelCount
-            }
-            if(config.mock && config.mock.channelNames) {
-                this.mockChannelNames = config.mock.channelNames
+            try {
+                const config = JSON.parse(rawdata)
+                if(config.tallies) {
+                    this.tallies = config.tallies
+                }
+                if(config.atem && config.atem.ip) {
+                    this.atemIp = config.atem.ip
+                }
+                if(config.atem && config.atem.port) {
+                    this.atemPort = config.atem.port
+                }
+                if(config.vmix && config.vmix.ip) {
+                    this.vmixIp = config.vmix.ip
+                }
+                if(config.vmix && config.vmix.port) {
+                    this.vmixPort = config.vmix.port
+                }
+                if(config.mixer) {
+                    this.mixerSelection = config.mixer
+                }
+                if(config.mock && config.mock.tickTime) {
+                    this.mockTickTime = config.mock.tickTime
+                }
+                if(config.mock && config.mock.channelCount) {
+                    this.mockChannelCount = config.mock.channelCount
+                }
+                if(config.mock && config.mock.channelNames) {
+                    this.mockChannelNames = config.mock.channelNames
+                }
+            } catch (e) {
+                if (e instanceof SyntaxError && rawdata.byteLength == 0) {
+                    console.warn("Could not parse " + this.configFileName + ", because file is empty. Using defaults.")
+                } else { 
+                    console.error("Error when parsing " + this.configFileName)
+                    throw e 
+                }
             }
         } else {
-            console.warn("Configuration File " + this.configFileName + " does not exist.")
+            console.warn("Configuration File " + this.configFileName + " does not exist. Using defaults.")
         }
     }
 
-    save() {
-        fs.writeFile(this.configFileName, JSON.stringify({
-            _warning: "This file was automatically generated.",
-            _warning2: "Do not edit it while the hub is running. Your changes will be lost.",
-            mixer: this.mixerSelection,
-            atem: {
-              ip: this.atemIp,
-              port: this.atemPort,
-            },
-            vmix: {
-              ip: this.vmixIp,
-              port: this.vmixPort,
-            },
-            mock: {
-                tickTime: this.mockTickTime,
-                channelCount: this.mockChannelCount,
-                channelNames: this.mockChannelNames,
-            },
-            tallies: this.tallies,
-          }, null, '\t'), err => {
-            if(err) { console.error(err) }
-          })
+    async save() {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(this.configFileName, JSON.stringify({
+                _warning: "This file was automatically generated.",
+                _warning2: "Do not edit it while the hub is running. Your changes will be lost.",
+                mixer: this.mixerSelection,
+                atem: {
+                    ip: this.atemIp,
+                    port: this.atemPort,
+                },
+                vmix: {
+                    ip: this.vmixIp,
+                    port: this.vmixPort,
+                },
+                mock: {
+                    tickTime: this.mockTickTime,
+                    channelCount: this.mockChannelCount,
+                    channelNames: this.mockChannelNames,
+                },
+                tallies: this.tallies,
+            }, null, '\t'), err => {
+                if(err) {
+                    console.error(err)
+                    reject()
+                } else {
+                    resolve()
+                }
+            })
+        })
     }
 
     updateAtemConfig(atemIp, atemPort) {
