@@ -8,12 +8,12 @@ const EventEmitter = require('events')
 describe('Configuration', () => {
     describe('load()', () => {
         test('issues a warning if file does not exist and uses defaults', () => {
-            var warningsLogged = 0
+            let warningsLogged = 0
             console.warn = () => { warningsLogged++ }
             process.env.CONFIG_FILE = "/tmp/this/file/does/not/exist.json"
             
             const emitter = new EventEmitter()
-            var config
+            let config
             expect(() => {
                 config = new Configuration(emitter)
             }).not.toThrow(SyntaxError)
@@ -23,14 +23,14 @@ describe('Configuration', () => {
         })
         // @see https://github.com/wifi-tally/wifi-tally/issues/26
         test('issues a warning if file is empty and uses defaults', done => {
-            var warningsLogged = 0
+            let warningsLogged = 0
             console.warn = () => { warningsLogged++ }
             tmp.file((err, path) => {
                 if (err) { throw err }
                 process.env.CONFIG_FILE = path
                 
                 const emitter = new EventEmitter()
-                var config
+                let config
                 expect(() => {
                     config = new Configuration(emitter)
                 }).not.toThrow(SyntaxError)
@@ -95,7 +95,7 @@ describe('Configuration', () => {
             process.env.CONFIG_FILE = path
             
             const emitter = new EventEmitter()
-            var beforeConfig = new Configuration(emitter)
+            let beforeConfig = new Configuration(emitter)
             
             beforeConfig.updateMixerSelection(mixerSelection)
             beforeConfig.updateAtemConfig(atemIp, atemPort)
@@ -104,7 +104,7 @@ describe('Configuration', () => {
             beforeConfig.updateTallies({toValueObjectsForSave: () => mockTallyData})
             await beforeConfig.save()
 
-            var afterConfig = new Configuration(emitter)
+            let afterConfig = new Configuration(emitter)
             
             expect(beforeConfig.getMixerSelection()).toEqual(mixerSelection)
             expect(afterConfig.getMixerSelection()).toEqual(mixerSelection)

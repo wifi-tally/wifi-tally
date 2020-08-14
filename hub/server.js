@@ -103,7 +103,7 @@ myEmitter.on('tally.removed', tally => {
     console.debug("Tally " + tally.name + " removed from configuration")
 })
 myEmitter.on('tally.logged', (tally, log) => {
-    var fn = console.info
+    let fn = console.info
     if(log.isError()) { 
       fn = console.error 
     } else if(log.isWarning()) {

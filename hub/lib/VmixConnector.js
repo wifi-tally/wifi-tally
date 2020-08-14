@@ -1,5 +1,5 @@
-var net = require('net')
-var xml2js = require('xml2js');
+let net = require('net')
+let xml2js = require('xml2js');
 
 // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
 class VmixConnector {
@@ -97,8 +97,8 @@ class VmixConnector {
             console.error("Tally OK command was ill formed")
         } else {
             const [_, state] = result
-            var programs = []
-            var previews = []
+            let programs = []
+            let previews = []
             // vMix encodes tally states as numbers:
             // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
             // 0 = off

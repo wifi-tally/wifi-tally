@@ -84,7 +84,7 @@ const ChatOne = props => {
   }
 
   const formatChannelOption = (idx, invalid) => {
-    var label = "Channel " + idx
+    let label = "Channel " + idx
     if(channels.names[idx]) {
       label = channels.names[idx]
     }
@@ -95,7 +95,7 @@ const ChatOne = props => {
   }
 
   const format = tally => {
-    var classPatched = "card "
+    let classPatched = "card "
 
     if(tally.state == Tally.DISCONNECTED) {
       classPatched += "bg-dark "

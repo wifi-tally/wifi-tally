@@ -17,7 +17,7 @@ const TallyDetails = props => {
   })
 
   const format = (log, idx) => {
-    var className = "log "
+    let className = "log "
     if(log.isWarning()) {
       className = className + "bg-warning "
     } else if (log.isError()) {

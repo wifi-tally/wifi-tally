@@ -6,10 +6,10 @@ describe('MixerCommunicator', () => {
     describe('notifyProgramChanged', () => {
         test('sends an event and fills getters', () => {
             const emitter = new EventEmitter()
-            var eventSeen = 0
+            let eventSeen = 0
 
-            var expectedPrograms = [1]
-            var expectedPreviews = [2]
+            let expectedPrograms = [1]
+            let expectedPreviews = [2]
             emitter.on("program.changed", (programs, previews) => {
                 eventSeen++
                 expect(programs).toEqual(expectedPrograms)
@@ -34,7 +34,7 @@ describe('MixerCommunicator', () => {
         })
         test('debounces', () => {
             const emitter = new EventEmitter()
-            var eventSeen = 0
+            let eventSeen = 0
             emitter.on("program.changed", _ => eventSeen++)
             const config = new Configuration("does_not_exist.json", emitter)
 
@@ -69,7 +69,7 @@ describe('MixerCommunicator', () => {
     describe('notifyChannels', () => {
         test('sends an event', () => {
             const emitter = new EventEmitter()
-            var eventSeen = 0
+            let eventSeen = 0
 
             emitter.on("config.changed", () => eventSeen++)
             const config = new Configuration("does_not_exist.json", emitter)
@@ -96,7 +96,7 @@ describe('MixerCommunicator', () => {
         })
         test('debounces', () => {
             const emitter = new EventEmitter()
-            var eventSeen = 0
+            let eventSeen = 0
 
             emitter.on("config.changed", () => eventSeen++)
             const config = new Configuration("does_not_exist.json", emitter)
@@ -134,8 +134,8 @@ describe('MixerCommunicator', () => {
     describe('notifyMixerIsConnected/Disconnected', () => {
         test('sends an event', () => {
             const emitter = new EventEmitter()
-            var connectEventSeen = 0
-            var disconnectEventSeen = 0
+            let connectEventSeen = 0
+            let disconnectEventSeen = 0
 
             emitter.on("mixer.connected", () => connectEventSeen++)
             emitter.on("mixer.disconnected", () => disconnectEventSeen++)
@@ -157,8 +157,8 @@ describe('MixerCommunicator', () => {
         })
         test('debounces', () => {
             const emitter = new EventEmitter()
-            var connectEventSeen = 0
-            var disconnectEventSeen = 0
+            let connectEventSeen = 0
+            let disconnectEventSeen = 0
 
             emitter.on("mixer.connected", () => connectEventSeen++)
             emitter.on("mixer.disconnected", () => disconnectEventSeen++)

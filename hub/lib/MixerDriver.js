@@ -23,7 +23,7 @@ class MixerDriver {
             if (this.isChangingMixer) {
                 return
             }
-            var needsRefresh = false
+            let needsRefresh = false
             if(configuration.getMixerSelection() !== this.currentMixerId) {
                 // a different mixer was selected
                 console.debug("A different mixer was selected")
@@ -69,7 +69,7 @@ class MixerDriver {
 
             console.log("Using mixer configuration \"" + newMixerId + "\"")
 
-            var MixerClass
+            let MixerClass
             if(newMixerId == AtemConnector.ID) {
                 this.getCurrentMixerSettings = () => [this.configuration.getAtemIp(), this.configuration.getAtemPort()]
                 MixerClass = AtemConnector

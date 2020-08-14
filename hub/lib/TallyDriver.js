@@ -9,7 +9,7 @@ const keepAlivesPerSecond = 10
 
 const updateTally = function(tally, io, programs, previews) {
     if(tally.isActive()) {
-        var command = "release"
+        let command = "release"
         if(tally.isHighlighted()) {
             command = "highlight"
         } else if(programs === null) {
