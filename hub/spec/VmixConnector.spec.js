@@ -40,10 +40,6 @@ class MockCommunicator {
     }
 }
 
-const mockVMix = async () => {
-    
-}
-
 describe('VmixConnector', () => {
     describe('onData', () => {
         beforeEach(() => {
