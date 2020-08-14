@@ -18,7 +18,7 @@ const createTallyList = (tallies, showDisconnected, showUnpatched) => {
     tally => (tally.isActive() || showDisconnected) && (tally.isPatched() || showUnpatched)
   ).sort(
     (one, two) => {
-      if (one.isActive() != two.isActive()) {
+      if (one.isActive() !== two.isActive()) {
         return one.isActive() ? -1 : 1
       } else {
         return one.name.localeCompare(two.name)
@@ -34,7 +34,7 @@ const ChatOne = props => {
   const [isMixerConnected, setIsMixerConnected] = useState(props.isMixerConnected || false)
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
-  const [channels, setChannels] = useState(props.channels != undefined ? props.channels : {})
+  const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : {})
 
   const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
 
@@ -97,7 +97,7 @@ const ChatOne = props => {
   const format = tally => {
     let classPatched = "card "
 
-    if(tally.state == Tally.DISCONNECTED) {
+    if(tally.state === Tally.DISCONNECTED) {
       classPatched += "bg-dark "
       if(!tally.isPatched()) {
         classPatched += "border-light "
@@ -136,21 +136,21 @@ const ChatOne = props => {
             </select>
             </div>
           </form>
-          {tally.state != Tally.DISCONNECTED ? (
+          {tally.state !== Tally.DISCONNECTED ? (
             <a href="#" className="card-link" onClick={e => handleHighlightTally(e, tally)}>Highlight</a>
           ) : ""}
-          {tally.state != Tally.CONNECTED ? (
+          {tally.state !== Tally.CONNECTED ? (
             <a href="#" className="card-link" onClick={e => handleRemoveTally(e, tally)}>Remove</a>
           ) : ""}
           <Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
             <a className="card-link">Logs</a>
           </Link>
         </div>
-        {tally.state == Tally.DISCONNECTED ? (
+        {tally.state === Tally.DISCONNECTED ? (
           <div className="card-footer">disconnected</div>
         ) : (         
-          <div className={tally.state == Tally.MISSING ? "card-footer bg-warning" : "card-footer"}>
-            <div className="card-footer-left">{tally.state == Tally.CONNECTED ? "connected" : "missing"}</div>
+          <div className={tally.state === Tally.MISSING ? "card-footer bg-warning" : "card-footer"}>
+            <div className="card-footer-left">{tally.state === Tally.CONNECTED ? "connected" : "missing"}</div>
             <div className="card-footer-right text-muted">{tally.address}:{tally.port}</div>
           </div>
         )}

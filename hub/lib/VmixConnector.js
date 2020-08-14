@@ -93,7 +93,7 @@ class VmixConnector {
     handleTallyCommand(command) {
         const result = command.match(/^TALLY OK (\d*)$/)
 
-        if (result == null) {
+        if (result === null) {
             console.error("Tally OK command was ill formed")
         } else {
             const [_, state] = result
@@ -105,9 +105,9 @@ class VmixConnector {
             // 1 = program
             // 2 = preview
             state.split('').forEach((val, idx) => {
-                if (val =="1") {
+                if (val === "1") {
                     programs.push(idx + 1)
-                } else if (val =="2") {
+                } else if (val === "2") {
                     previews.push(idx + 1)
                 }
             })
@@ -121,7 +121,7 @@ class VmixConnector {
                 console.error(`Error parsing XML response from vMix: ${error}`)
             } else {
                 const inputs = (result.vmix || {}).inputs
-                if(inputs == undefined) {
+                if(inputs === undefined) {
                     console.log("XML from vMix looks faulty. Could not find inputs.")
                 } else {
                     const count = inputs[0].input.length

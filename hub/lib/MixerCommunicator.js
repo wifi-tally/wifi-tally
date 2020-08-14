@@ -9,22 +9,22 @@ const haveValuesChanged = (lastArray, newArray) => {
 }
 
 const isSame = (one, two) => {
-    if (typeof one != typeof two) {
+    if (typeof one !== typeof two) {
         return false
-    } else if (typeof one == "object") {
+    } else if (typeof one === "object") {
         const keyOne = Object.keys(one)
         const keyTwo = Object.keys(two)
-        if (keyOne.length != keyTwo.length) {
+        if (keyOne.length !== keyTwo.length) {
             return false
         }
         for (const [k, v] of Object.entries(one)) {
-            if (two[k] != v) {
+            if (two[k] !== v) {
                 return false
             }
         }
         return true
     } else {
-        return one == two
+        return one === two
     }
 }
 
@@ -50,7 +50,7 @@ class MixerCommunicator {
 
     notifyChannels(count, names) {
         // @TODO: type check
-        if (count != this.configuration.getChannelCount() || (names && !isSame(names, this.configuration.getChannelNames()))) {
+        if (count !== this.configuration.getChannelCount() || (names && !isSame(names, this.configuration.getChannelNames()))) {
             this.configuration.setChannelCount(count)
             this.configuration.setChannelNames(names)
             this.configuration.save()
@@ -60,14 +60,14 @@ class MixerCommunicator {
     }
 
     notifyMixerIsConnected() {
-        if (this.currentConnection != true) {
+        if (this.currentConnection !== true) {
             this.currentConnection = true
             this.emitter.emit('mixer.connected')
         }
     }
 
     notifyMixerIsDisconnected() {
-        if (this.currentConnection != false) {
+        if (this.currentConnection !== false) {
             this.currentConnection = false
             this.emitter.emit('mixer.disconnected')
         }

@@ -17,16 +17,16 @@ class Log {
         this.message = message
     }
     isError() {
-        return this.severity == Log.ERROR
+        return this.severity === Log.ERROR
     }
     isWarning() {
-        return this.severity == Log.WARNING
+        return this.severity === Log.WARNING
     }
     isInfo() {
-        return this.severity == Log.INFO
+        return this.severity === Log.INFO
     }
     isStatus() {
-        return this.severity == Log.STATUS
+        return this.severity === Log.STATUS
     }
     toValueObject() {
         return {

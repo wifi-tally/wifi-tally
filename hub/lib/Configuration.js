@@ -60,7 +60,7 @@ class Configuration {
                     this.mockChannelNames = config.mock.channelNames
                 }
             } catch (e) {
-                if (e instanceof SyntaxError && rawdata.byteLength == 0) {
+                if (e instanceof SyntaxError && rawdata.byteLength === 0) {
                     console.warn(`Could not parse ${this.configFileName}, because file is empty. Using defaults.`)
                 } else { 
                     console.error(`Error when parsing ${this.configFileName}`)

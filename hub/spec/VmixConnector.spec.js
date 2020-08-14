@@ -5,7 +5,7 @@ const EventEmitter = require('events')
 const waitUntil = (fn) => {
     return new Promise((resolve, _) => {
         setInterval(() => {
-            if (fn() == true) {
+            if (fn() === true) {
                 resolve()
             }
         }, 100)
@@ -53,10 +53,10 @@ describe('VmixConnector', () => {
                     data = data.toString()
                     data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
                         console.debug(`< ${command}`)
-                        if(command == "XML") {
+                        if(command === "XML") {
                             const response = global.vMixServerConfig.xml.replace("{version}", global.vMixServerConfig.version)
                             sck.write(Buffer.from(`'XML ${response.length}\r\n${response}\r\n`))
-                        } else if(command == "SUBSCRIBE TALLY") {
+                        } else if(command === "SUBSCRIBE TALLY") {
                             sck.write(Buffer.from("SUBSCRIBE OK TALLY Subscribed\r\n", "utf-8"))
                             setTimeout(() => {
                                 sck.writable && sck.write(Buffer.from(`TALLY OK ${global.vMixServerConfig.tallies}\r\n`, "utf-8"))
@@ -110,7 +110,7 @@ describe('VmixConnector', () => {
             try {
                 expect(vmix.wasHelloReceived).toBe(false)
                 vmix.connect()
-                await waitUntil(() => vmix.wasHelloReceived == true).then(() => 
+                await waitUntil(() => vmix.wasHelloReceived === true).then(() =>
                     expect(vmix.wasHelloReceived).toBe(true)
                 )
             } finally {
@@ -124,7 +124,7 @@ describe('VmixConnector', () => {
             try {
                 expect(vmix.wasSubcribeOkReceived).toBe(false)
                 vmix.connect()
-                await waitUntil(() => vmix.wasSubcribeOkReceived == true).then(() => 
+                await waitUntil(() => vmix.wasSubcribeOkReceived === true).then(() =>
                     expect(vmix.wasSubcribeOkReceived).toBe(true)
                 )
             } finally {
@@ -138,7 +138,7 @@ describe('VmixConnector', () => {
             const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
             try {
                 vmix.connect()
-                await waitUntil(() => communicator.programs != undefined).then(() => {
+                await waitUntil(() => communicator.programs !== undefined).then(() => {
                     expect(communicator.programs).toEqual([2])
                     expect(communicator.previews).toEqual([3])
                 })
@@ -154,7 +154,7 @@ describe('VmixConnector', () => {
 
             try {
                 vmix.connect()
-                await waitUntil(() => communicator.programs != undefined).then(() => {
+                await waitUntil(() => communicator.programs !== undefined).then(() => {
                     expect(communicator.programs).toEqual([2, 5])
                     expect(communicator.previews).toEqual([3, 4])
                 })
@@ -169,7 +169,7 @@ describe('VmixConnector', () => {
             const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
             try {
                 vmix.connect()
-                await waitUntil(() => communicator.channelCount != undefined).then(() => {
+                await waitUntil(() => communicator.channelCount !== undefined).then(() => {
                     expect(communicator.channelCount).toEqual(3)
                     expect(communicator.channelNames).toEqual({1: "Foobar", 2: "Tolle rote Farbe", 3: "Colour Bars"})
                 })

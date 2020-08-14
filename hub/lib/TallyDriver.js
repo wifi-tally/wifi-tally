@@ -96,12 +96,12 @@ class TallyDriver {
                 } else {
                     const diff = now - lastTallyReport.get(tally.name) // milliseconds
                     if(diff > 30000) {
-                        if(tally.state != Tally.DISCONNECTED) {
+                        if(tally.state !== Tally.DISCONNECTED) {
                             tally.state = Tally.DISCONNECTED
                             this.emitter.emit('tally.timedout', tally, diff)
                         }
                     } else if(diff > 3000) {
-                        if(tally.state != Tally.MISSING) {
+                        if(tally.state !== Tally.MISSING) {
                             tally.state = Tally.MISSING
                             this.emitter.emit('tally.missing', tally, diff)
                         }
@@ -123,7 +123,7 @@ class TallyDriver {
             this.tallies.set(tallyName, tally)
         }
         const tally = this.tallies.get(tallyName)
-        if(tally.state != Tally.CONNECTED) {
+        if(tally.state !== Tally.CONNECTED) {
             tally.state = Tally.CONNECTED
             tally.address = rinfo.address;
             tally.port = rinfo.port;
@@ -198,7 +198,7 @@ class TallyDriver {
 
 TallyDriver.parseTallyHo = function(cmd) {
     const result = cmd.match(/^([^ ]+) "(.+)"/)
-    if (result == null) {
+    if (result === null) {
         throw new InvalidCommandError(cmd)
     } else {
         const [_, command, name] = result
@@ -211,7 +211,7 @@ TallyDriver.parseTallyHo = function(cmd) {
 TallyDriver.parseLog = function(cmd) {
     const result = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
 
-    if (result == null) {
+    if (result === null) {
         throw new InvalidCommandError(cmd)
     } else {
         const [_, command, name, severity, message] = result

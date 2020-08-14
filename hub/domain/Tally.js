@@ -14,10 +14,10 @@ class Tally {
         return this.channelId >= 0
     }
     isConnected() {
-        return this.address !== null && this.port !== null && this.state == Tally.CONNECTED
+        return this.address !== null && this.port !== null && this.state === Tally.CONNECTED
     }
     isActive() {
-        return this.address !== null && this.port !== null && this.state != Tally.DISCONNECTED
+        return this.address !== null && this.port !== null && this.state !== Tally.DISCONNECTED
     }
     setHighlight(highlight) {
         this.highlight = highlight
@@ -43,9 +43,9 @@ class Tally {
         }
     }
     isIn(channels = []) {
-        if (channels == null) return false
+        if (channels === null) return false
 
-        return channels.indexOf(this.channelId) != -1
+        return channels.indexOf(this.channelId) !== -1
     }
 }
 

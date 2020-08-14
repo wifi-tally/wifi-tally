@@ -30,13 +30,13 @@ class MixerDriver {
                 needsRefresh = true
             } else if (this.getCurrentMixerSettings) {
                 const mixerSettings = this.getCurrentMixerSettings()
-                if (this.currentMixerSettings.length != mixerSettings.length) {
+                if (this.currentMixerSettings.length !== mixerSettings.length) {
                     // a new setting was added (not sure why this would happen, but definitely a reason to restart)
                     console.debug("mixer connection is restarted, because number of settings were changed")
                     needsRefresh = true
                 } else {
                     const anyChanges = this.currentMixerSettings.some((value, idx) => {
-                        return value != mixerSettings[idx]
+                        return value !== mixerSettings[idx]
                     })
                     if (anyChanges) {
                         console.debug("mixer connection is restarted, because settings were changed")
@@ -70,16 +70,16 @@ class MixerDriver {
             console.log(`Using mixer configuration "${newMixerId}"`)
 
             let MixerClass
-            if(newMixerId == AtemConnector.ID) {
+            if(newMixerId === AtemConnector.ID) {
                 this.getCurrentMixerSettings = () => [this.configuration.getAtemIp(), this.configuration.getAtemPort()]
                 MixerClass = AtemConnector
-            } else if(newMixerId == VmixConnector.ID) {
+            } else if(newMixerId === VmixConnector.ID) {
                 this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
                 MixerClass = VmixConnector
-            } else if(newMixerId == MockConnector.ID) {
+            } else if(newMixerId === MockConnector.ID) {
                 this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime(), this.configuration.getMockChannelCount(), this.configuration.getMockChannelNames()]
                 MixerClass = MockConnector
-            } else if(newMixerId == NullConnector.ID) {
+            } else if(newMixerId === NullConnector.ID) {
                 this.getCurrentMixerSettings = () => []
                 MixerClass = NullConnector
             } else {

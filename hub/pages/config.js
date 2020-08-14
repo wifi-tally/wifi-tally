@@ -58,7 +58,7 @@ const Config = props => {
               {allowedMixers.map(addMixerOption)}
             </select>
           </div>
-            {currentMixerId == "mock" ? (
+            {currentMixerId === "mock" ? (
               <fieldset>
                 <legend>Mock Configuration</legend>
                 <p className="text-muted">
@@ -80,7 +80,7 @@ const Config = props => {
                 </div>
               </fieldset>
             ): ""}
-            {currentMixerId == "atem" ? (
+            {currentMixerId === "atem" ? (
               <fieldset>
                 <legend>ATEM Configuration</legend>
                 <p className="text-muted">
@@ -96,7 +96,7 @@ const Config = props => {
                 </div>
               </fieldset>
             ) : ""}
-            {currentMixerId == "vmix" ? (
+            {currentMixerId === "vmix" ? (
               <fieldset>
                 <legend>vMix Configuration</legend>
                 <p className="text-muted">
@@ -112,7 +112,7 @@ const Config = props => {
                 </div>
               </fieldset>
             ) : ""}
-            {currentMixerId == "null" ? (
+            {currentMixerId === "null" ? (
               <fieldset>
                 <p className="text-muted">This cuts the connection to any video mixer.</p>
               </fieldset>
