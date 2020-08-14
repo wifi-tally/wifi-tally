@@ -30,7 +30,7 @@ class InvalidCommandError extends Error {
     constructor(...args) {
         super(...args)
 
-        this.message = 'Received an invalid command: "' + this.message + '"'
+        this.message = `Received an invalid command: "${this.message}"`
     }
 }
 
@@ -47,7 +47,7 @@ class TallyDriver {
         this.io = dgram.createSocket('udp4')
         
         this.io.on('error', (err) => {
-            console.log('server error: ' + err.stack);
+            console.log(`server error: ${err.stack}`);
             this.io.close();
         });
         
@@ -75,8 +75,8 @@ class TallyDriver {
         });
         
         this.io.on('listening', () => {
-            const address = this.io.address();
-            console.log('Listening for Tallies on  ' + address.address + ':' + address.port);
+            const address = this.io.address()
+            console.log(`Listening for Tallies on ${address.address}:${address.port}`)
         });
         
         this.io.bind(7411)

@@ -29,7 +29,7 @@ class AtemConnector {
         this.myAtem.on('info', console.log)
         this.myAtem.on('error', console.error)
 
-        console.log("Connecting to ATEM at " + this.ip + ":" + this.port)
+        console.log(`Connecting to ATEM at ${this.ip}:${this.port}`)
 
         this.myAtem.connect(this.ip, this.port)
         this.myAtem.on('connected', () => {

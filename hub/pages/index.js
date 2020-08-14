@@ -84,12 +84,12 @@ const ChatOne = props => {
   }
 
   const formatChannelOption = (idx, invalid) => {
-    let label = "Channel " + idx
+    let label = `Channel ${idx}`
     if(channels.names[idx]) {
       label = channels.names[idx]
     }
     if(invalid) {
-      label = "(" + label + ")"
+      label = `(${label})`
     }
     return (<option value={idx} key={idx}>{label}</option>)
   }

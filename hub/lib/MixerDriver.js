@@ -54,7 +54,7 @@ class MixerDriver {
 
     async changeMixer(newMixerId) {
         if(!MixerDriver.getAllowedMixers(this.configuration.isDev()).includes(newMixerId)) {
-            console.error("Can not switch to unknown mixer with id " + newMixerId)
+            console.error(`Can not switch to unknown mixer with id ${newMixerId}`)
             return
         }
 
@@ -67,7 +67,7 @@ class MixerDriver {
                 await Promise.resolve(ret)
             }
 
-            console.log("Using mixer configuration \"" + newMixerId + "\"")
+            console.log(`Using mixer configuration "${newMixerId}"`)
 
             let MixerClass
             if(newMixerId == AtemConnector.ID) {
@@ -83,7 +83,7 @@ class MixerDriver {
                 this.getCurrentMixerSettings = () => []
                 MixerClass = NullConnector
             } else {
-                console.error("Someone(TM) forgot to implement the " + newMixerId + " mixer in MixerDriver.js.")
+                console.error(`Someone(TM) forgot to implement the ${newMixerId} mixer in MixerDriver.js.`)
                 return
             }
             this.currentMixerId = newMixerId

@@ -52,21 +52,21 @@ describe('VmixConnector', () => {
                 sck.on('data', data => {
                     data = data.toString()
                     data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
-                        console.debug("< " + command)
+                        console.debug(`< ${command}`)
                         if(command == "XML") {
                             const response = global.vMixServerConfig.xml.replace("{version}", global.vMixServerConfig.version)
-                            sck.write(Buffer.from('XML ' + response.length + '\r\n' + response + '\r\n'))
+                            sck.write(Buffer.from(`'XML ${response.length}\r\n${response}\r\n`))
                         } else if(command == "SUBSCRIBE TALLY") {
                             sck.write(Buffer.from("SUBSCRIBE OK TALLY Subscribed\r\n", "utf-8"))
                             setTimeout(() => {
-                                sck.writable && sck.write(Buffer.from("TALLY OK " + global.vMixServerConfig.tallies + "\r\n", "utf-8"))
+                                sck.writable && sck.write(Buffer.from(`TALLY OK ${global.vMixServerConfig.tallies}\r\n`, "utf-8"))
                             }, 100)
                         } else {
-                            console.log("vMix Mock received an unknown command: " + command)
+                            console.log(`vMix Mock received an unknown command: ${command}`)
                         }
                     })
                 })
-                sck.write(Buffer.from("VERSION OK " + global.vMixServerConfig.version + "\r\n", "utf-8"))
+                sck.write(Buffer.from(`VERSION OK ${global.vMixServerConfig.version}\r\n`, "utf-8"))
             })
 
             const promise = new Promise((resolve, reject) => {

@@ -9,7 +9,7 @@ class MockConnector {
         this.isActive = false
     }
     connect() {
-        console.log("Simulating a mock video mixer with " + this.channelCount + " channels that changes programs every " + this.tickTime + "ms")
+        console.log(`Simulating a mock video mixer with ${this.channelCount} channels that changes programs every ${this.tickTime}ms`)
         this.isActive = true
         this.communicator.notifyMixerIsConnected()
         this.communicator.notifyChannels(this.channelCount, this.channelNames.split(",").map(name => name.trim()).reduce((map, name, idx) => {

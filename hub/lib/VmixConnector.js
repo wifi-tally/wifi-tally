@@ -49,7 +49,7 @@ class VmixConnector {
         })
 
         client.on("error", error => {
-            console.error(error.name + ": " + error.message)
+            console.error(`${error.name}: ${error.message}`)
         })
 
         client.on('data', this.onData.bind(this))
@@ -74,7 +74,7 @@ class VmixConnector {
     }
     onData(data) {
         data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
-            console.debug("> " + command)
+            console.debug(`> ${command}`)
             if (command.startsWith("VERSION OK")) {
                 this.wasHelloReceived = true
             } else if (command.startsWith("SUBSCRIBE OK TALLY")) {
@@ -118,7 +118,7 @@ class VmixConnector {
     handleXmlCommand(command) {
         xml2js.parseString(command, (error, result) => {
             if (error) {
-                console.error("Error parsing XML response from vMix: " + error)
+                console.error(`Error parsing XML response from vMix: ${error}`)
             } else {
                 const inputs = (result.vmix || {}).inputs
                 if(inputs == undefined) {

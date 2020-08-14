@@ -61,14 +61,14 @@ class Configuration {
                 }
             } catch (e) {
                 if (e instanceof SyntaxError && rawdata.byteLength == 0) {
-                    console.warn("Could not parse " + this.configFileName + ", because file is empty. Using defaults.")
+                    console.warn(`Could not parse ${this.configFileName}, because file is empty. Using defaults.`)
                 } else { 
-                    console.error("Error when parsing " + this.configFileName)
+                    console.error(`Error when parsing ${this.configFileName}`)
                     throw e 
                 }
             }
         } else {
-            console.warn("Configuration File " + this.configFileName + " does not exist. Using defaults.")
+            console.warn(`Configuration File ${this.configFileName} does not exist. Using defaults.`)
         }
     }
 

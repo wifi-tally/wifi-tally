@@ -46,7 +46,7 @@ myEmitter.on('program.changed', (programs, previews) => {
 })
 
 const sendLogToTally = (tally, log) => {
-  io.emit('tally.logged.' + tally.name, log)
+  io.emit(`tally.logged.${tally.name}`, log)
 }
 const sendTalliesToBrowser = function() {
   io.emit('tallies', myTallyDriver.toValueObjects())
@@ -58,16 +58,16 @@ myEmitter.on('tally.connected', sendTalliesToBrowser)
 myEmitter.on('tally.changed', sendTalliesToBrowser)
 myEmitter.on('tally.logged', sendLogToTally)
 myEmitter.on('tally.changed', (tally) => {
-  io.emit('tally.changed.' + tally.name, myTallyDriver.toValueObjects())
+  io.emit(`tally.changed.${tally.name}`, myTallyDriver.toValueObjects())
 })
 myEmitter.on('tally.missing', sendTalliesToBrowser)
 myEmitter.on('tally.missing', (tally, diff) => {
-  const log = tally.addLog(new Date(), Log.STATUS, "Tally got missing. It has not reported for " + diff + "ms")
+  const log = tally.addLog(new Date(), Log.STATUS, `Tally got missing. It has not reported for ${diff}ms`)
   sendLogToTally(tally, log)
 })
 myEmitter.on('tally.timedout', sendTalliesToBrowser)
 myEmitter.on('tally.timedout', (tally, diff) => {
-  const log = tally.addLog(new Date(), Log.STATUS, "Tally got disconnected after not reporting for " + diff + "ms")
+  const log = tally.addLog(new Date(), Log.STATUS, `Tally got disconnected after not reporting for ${diff}ms`)
   sendLogToTally(tally, log)
 })
 myEmitter.on('tally.removed', sendTalliesToBrowser)
@@ -88,19 +88,19 @@ myEmitter.on('tally.changed', (tally) => myTallyDriver.updateTally(tally.name))
 
 // log stuff
 myEmitter.on('tally.connected', tally => {
-    console.info("Tally " + tally.name + " connected")
+    console.info(`Tally ${tally.name} connected`)
 })
 myEmitter.on('tally.changed', tally => {
-    console.debug("Tally " + tally.name + " changed configuration")
+    console.debug(`Tally ${tally.name} changed configuration`)
 })
 myEmitter.on('tally.missing', tally => {
-    console.warn("Tally " + tally.name + " went missing")
+    console.warn(`Tally ${tally.name} went missing`)
 })
 myEmitter.on('tally.timedout', tally => {
-    console.warn("Tally " + tally.name + " timed out")
+    console.warn(`Tally ${tally.name} timed out`)
 })
 myEmitter.on('tally.removed', tally => {
-    console.debug("Tally " + tally.name + " removed from configuration")
+    console.debug(`Tally ${tally.name} removed from configuration`)
 })
 myEmitter.on('tally.logged', (tally, log) => {
     let fn = console.info
@@ -109,10 +109,10 @@ myEmitter.on('tally.logged', (tally, log) => {
     } else if(log.isWarning()) {
       fn = console.warn
     }
-    fn(tally.name + ': "' + log.message + '"')
+    fn(`${tally.name}: ${log.message}`)
 })
 myEmitter.on('config.changed.mixer', mixerSelection => {
-    console.info("configured mixer was changed to \"" + mixerSelection + "\"")
+    console.info(`configured mixer was changed to "${mixerSelection}"`)
 })
 myEmitter.on('config.changed.atem', () => {
     console.info("configuration of ATEM was changed")
