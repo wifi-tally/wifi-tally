@@ -17,11 +17,11 @@ class MockConnector {
             return map
         }, new Map()))
 
-        const fn = function() {
+        const fn = () => {
             const mockCurrentPrograms = [Math.floor(Math.random() * (this.channelCount + 1))]
             const mockCurrentPreviews = [Math.floor(Math.random() * (this.channelCount + 1))]
             this.communicator.notifyProgramChanged(mockCurrentPrograms, mockCurrentPreviews)
-        }.bind(this)
+        }
         this.intervalHandle = setInterval(fn, this.tickTime)
         fn()
     }

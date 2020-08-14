@@ -24,11 +24,11 @@ class VmixConnector {
             client.connect(this.port, this.ip)
         }
 
-        const queryXml = function() {
+        const queryXml = () => {
             if(!client.connecting && !client.pending && !client.destroyed) {
                 client.write("XML\r\n")
             }
-        }.bind(this)
+        }
 
         connectClient()
 

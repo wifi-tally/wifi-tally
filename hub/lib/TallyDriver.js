@@ -88,7 +88,7 @@ class TallyDriver {
             tally.state = Tally.CONNECTED
         })
 
-        setInterval(function() {
+        setInterval(() => {
             const now = new Date()
             this.tallies.forEach(tally => {
                 if(!lastTallyReport.has(tally.name)) {
@@ -108,14 +108,14 @@ class TallyDriver {
                     }
                 }
             })
-        }.bind(this), 500)
+        }, 500)
 
         // send keep-alive messages
         // - show the tally, we are still here
         // - compensate for lost packages
-        setInterval(function() {
+        setInterval(() => {
             this.updateTallies()
-        }.bind(this), 1000 / keepAlivesPerSecond)
+        }, 1000 / keepAlivesPerSecond)
     }
     _tallyReported(tallyName, rinfo) {
         if (!this.tallies.has(tallyName)) {
@@ -141,10 +141,10 @@ class TallyDriver {
         console.log("highlight", tallyName)
         if(this.tallies.has(tallyName)) {
             const tally = this.tallies.get(tallyName)
-            setTimeout(function(){
+            setTimeout(() => {
                 tally.setHighlight(false)
                 this.updateTally(tallyName)
-            }.bind(this), tallyHighlightTime)
+            }, tallyHighlightTime)
             tally.setHighlight(true)
             this.updateTally(tallyName)
         }
