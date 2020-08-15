@@ -35,4 +35,4 @@ const useSocket = function (eventName, cb) {
   return socket
 }
 
-export {useSocket, socketEventEmitter}
+export {useSocket, socketEventEmitter, socket}

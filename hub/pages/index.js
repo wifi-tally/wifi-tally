@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
-import {useSocket, socketEventEmitter} from '../hooks/useSocket'
+import {useSocket, socketEventEmitter, socket} from '../hooks/useSocket'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
@@ -35,11 +35,11 @@ const ChatOne = props => {
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
   const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : {})
-  const [isHubConnected, setIsHubConnected] = useState(false)
+  const [isHubConnected, setIsHubConnected] = useState(socket.connected)
 
   const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
 
-  const socket = useSocket('program.changed', data => {
+  useSocket('program.changed', data => {
     setPrograms(data.programs)
     setPreviews(data.previews)
   })
