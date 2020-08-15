@@ -12,10 +12,10 @@ const updateTally = function(tally, io, programs, previews) {
         let command = "release"
         if(tally.isHighlighted()) {
             command = "highlight"
-        } else if(programs === null) {
+        } else if(programs === null && tally.isPatched()) {
             // mixer is disconnected
             command = "unknown"
-        } else if (tally.isIn(programs)) {
+        } else if (programs !== null && tally.isIn(programs)) {
             command = "on-air"
         } else if (previews !== null && tally.isIn(previews)) {
             command = "preview"
