@@ -24,8 +24,6 @@ const updateTally = function(tally, io, programs, previews) {
     }
 }
 
-// - handles connections with Tallies.
-// - emits signals when tallies connect, go missing or disconnect
 class InvalidCommandError extends Error {
     constructor(...args) {
         super(...args)
@@ -34,6 +32,8 @@ class InvalidCommandError extends Error {
     }
 }
 
+// - handles connections with Tallies.
+// - emits signals when tallies connect, go missing or disconnect
 class TallyDriver {
     constructor(tallies, emitter) {
         this.tallies = new Map();
