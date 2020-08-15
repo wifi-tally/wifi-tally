@@ -3,7 +3,7 @@ import fetch from 'isomorphic-unfetch'
 import {useSocket, socketEventEmitter} from '../hooks/useSocket'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import {BroadcastIcon, ServerIcon} from '@primer/octicons-react'
+import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
 
 
 const Tally = require('../domain/Tally')
@@ -35,6 +35,7 @@ const ChatOne = props => {
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
   const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : {})
+  const [isHubConnected, setIsHubConnected] = useState(false)
 
   const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
 
@@ -54,11 +55,11 @@ const ChatOne = props => {
   })
 
   socketEventEmitter.on("connected", function() {
-    console.log("connected")
+    setIsHubConnected(true)
   })
 
   socketEventEmitter.on("disconnected", function() {
-    console.log("disconnected")
+    setIsHubConnected(false)
   })
 
   const patchTally = function(tally, channel) {
@@ -160,15 +161,29 @@ const ChatOne = props => {
 
   const nrConnectedTallies = countConnectedTallies(tallies)
 
+  function refreshPage() {
+    window.location.reload(false)
+    return false
+  }
+
   return (
     <Layout>
       <div>
         <div className="btn-group mb-2" role="group">
           <button type="button" className={"btn btn-sm " + (showDisconnected ? "btn-primary" : "btn-dark")} onClick={toggleDisconnected}>Show Disconnected</button>
           <button type="button" className={"btn btn-sm " + (showUnpatched ? "btn-primary" : "btn-dark")} onClick={toggleUnpatched}>Show Unpatched</button>
+          <button type="button" className={"btn btn-secondary disabled"} title={"Hub " + (isHubConnected ? "connected" : "disconnected")}><DeviceDesktopIcon /> {isHubConnected ? 1 : 0}</button>
           <button type="button" className={"btn btn-secondary disabled"} title={"Video Mixer " + (isMixerConnected ? "connected" : "disconnected")}><ServerIcon /> {isMixerConnected ? 1 : 0}</button>
           <button type="button" className={"btn btn-secondary disabled"} title={nrConnectedTallies + " connected tallies"}><BroadcastIcon /> {nrConnectedTallies}</button>
         </div>
+        { isHubConnected ? "" : (
+          <div className="alert alert-danger">
+            <h4 className="alert-heading">Hub disconnected</h4>
+            <p>The displayed information might be outdated.</p>
+            <p>We will try to reconnect automatically, but you might also try to <a href="#" onClick={refreshPage}>reload the page</a>.</p>
+          </div>
+        )}
+
         <div id="tallies">
           {tallies.map(format)}
         </div>

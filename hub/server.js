@@ -126,6 +126,8 @@ myEmitter.on('program.changed', (programs, previews) => {
 
 // socket.io server
 io.on('connection', socket => {
+  socket.emit('tallies', myTallyDriver.toValueObjects())
+
   socket.on('tally.patch', (tallyName, channelId) => {
     myTallyDriver.patchTally(tallyName, parseInt(channelId, 10))
   })
