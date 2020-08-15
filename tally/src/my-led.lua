@@ -1,12 +1,18 @@
 -- pins used for the operators light
 local pinOpG, pinOpR, pinOpB = 2, 3, 4
 
+-- the pin that is sometimes connected to an LED on the board
+local pinOnBoard = 0
+
 -- pins used for the main light
 local pinMainG, pinMainR, pinMainB = 5, 6, 7
+
+gpio.mode(pinOnBoard, gpio.OUTPUT)
 
 -- the timer used for the status LED that signalizes network errors
 local timer = tmr.create()
 
+-- setup all the RGB pins as pwm pins
 pwm2.setup_pin_hz(pinOpR, 1000, 100, 100)
 pwm2.setup_pin_hz(pinOpG, 1000, 100, 100)
 pwm2.setup_pin_hz(pinOpB, 1000, 100, 100)
@@ -57,6 +63,15 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
         pwm2.set_duty(pinMainR, colorR and showOnMain and darkness or 100)
         pwm2.set_duty(pinMainG, colorG and showOnMain and darkness or 100)
         pwm2.set_duty(pinMainB, colorB and showOnMain and darkness or 100)
+
+        -- pwm2 does not support to drive pin D0, so we try to emulate the flashPattern as good as possible without PWM
+        if colorB and darkness > 0 then
+            -- only turn LED off if a flash pattern in blue color expects it to be off
+            -- this causes the LED to be on by default
+            gpio.write(pinOnBoard, gpio.HIGH)
+        else
+            gpio.write(pinOnBoard, gpio.LOW)
+        end
     end
 
     return function()
