@@ -57,17 +57,32 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
             darkness = 0
         end
 
-        pwm2.set_duty(pinOpR, colorR and darkness or 100)
-        pwm2.set_duty(pinOpG, colorG and darkness or 100)
-        pwm2.set_duty(pinOpB, colorB and darkness or 100)
-        pwm2.set_duty(pinMainR, colorR and showOnMain and darkness or 100)
-        pwm2.set_duty(pinMainG, colorG and showOnMain and darkness or 100)
-        pwm2.set_duty(pinMainB, colorB and showOnMain and darkness or 100)
+        local operatorDuty = darkness
+        local operatorOff = 100
+        if MySettings.operatorType() == LightTypes.COMMON_CATHODE then
+            operatorDuty = 100 - darkness
+            operatorOff = 0
+        end
+        pwm2.set_duty(pinOpR, colorR and operatorDuty or operatorOff)
+        pwm2.set_duty(pinOpG, colorG and operatorDuty or operatorOff)
+        pwm2.set_duty(pinOpB, colorB and operatorDuty or operatorOff)
+
+        local stageDuty = darkness
+        local stageOff = 100
+        if MySettings.stageType() == LightTypes.COMMON_CATHODE then
+            stageDuty = 100 - darkness
+            stageOff = 0
+        end
+        pwm2.set_duty(pinMainR, colorR and showOnMain and stageDuty or stageOff)
+        pwm2.set_duty(pinMainG, colorG and showOnMain and stageDuty or stageOff)
+        pwm2.set_duty(pinMainB, colorB and showOnMain and stageDuty or stageOff)
 
         -- pwm2 does not support to drive pin D0, so we try to emulate the flashPattern as good as possible without PWM
         if colorB and darkness > 0 then
             -- only turn LED off if a flash pattern in blue color expects it to be off
             -- this causes the LED to be on by default
+
+            -- with common anode HIGH means OFF
             gpio.write(pinOnBoard, gpio.HIGH)
         else
             gpio.write(pinOnBoard, gpio.LOW)
