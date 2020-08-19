@@ -1,5 +1,5 @@
 -- pins used for the operators light
-local pinOpG, pinOpR, pinOpB = 2, 3, 4
+local pinOpG, pinOpR, pinOpB = 1, 2, 3
 
 -- the pin that is sometimes connected to an LED on the board
 local pinOnBoard = 0

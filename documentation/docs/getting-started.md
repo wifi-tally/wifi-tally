@@ -84,9 +84,9 @@ All you need to do is connecting the LED strip to the NodeMCU board.
 
 | board PIN | strip PIN |
 | --- | --- |
-| D4 | B |
-| D3 | R |
-| D2 | G |
+| D3 | B |
+| D2 | R |
+| D1 | G |
 | 3V3 | + or +5V |
 
 !!! info
