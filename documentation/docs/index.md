@@ -17,8 +17,13 @@ common video mixers.
 * utilizes your local network and access points
 * Open Source / Open Hardware
 
+## Supported Video Mixers
+
+* [Blackmagic Design ATEM](https://www.blackmagicdesign.com/products)
+* [vMix](https://www.vmix.com/software/)
+
 !!! info
-    Currently only ATEM video mixers are supported, but please [open an issue](https://github.com/wifi-tally/wifi-tally/issues)
+    Please [open an issue](https://github.com/wifi-tally/wifi-tally/issues)
     if you want others to be supported too. It is really simple to integrate them
     and the only reason they have not been integrated yet, is that nobody has needed it already. :D
 
