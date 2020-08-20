@@ -1,10 +1,8 @@
 describe("Settings parser", function()
 
+    require "spec.nodemcu-mock"
+
     local function mockSettings(fileName, additionalLines)
-        -- mocks
-        _G.node = {
-            chipid = function() return 12345678 end
-        }
         _G.file = {
             exists = function() return type(fileName) == 'string' end,
             open = function()
@@ -29,7 +27,6 @@ describe("Settings parser", function()
             end,
         }
     end
-
     -- auto-insulate every test
     local realIt = it
     it = function(name, func)

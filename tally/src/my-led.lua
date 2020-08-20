@@ -93,8 +93,8 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
         if currentId ~= id then
             currentId = id
             timer:unregister()
-            timer:alarm(1000 * seconds / len, tmr.ALARM_AUTO, next)
             next()
+            timer:alarm(1000 * seconds / len, tmr.ALARM_AUTO, next)
         end
     end
 end
