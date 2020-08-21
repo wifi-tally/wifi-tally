@@ -315,4 +315,189 @@ describe("Led", function()
             assert.is_same(0, _G.pinByTime:get(pinOnBoard, 1000))
         end)
     end)
+    describe("supports operatorType() \"rgb-\"", function()
+        insulate("for example onAir()", function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+
+            require "src.my-led"
+            _G.MyLed.onAir()
+
+            it("should invert levels of the operator light", function()
+                for time=0,3000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinOpG, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinOpB, time), time .. "s")
+                end
+            end)
+            it("should not invert levels of the stage light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinMainR, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinMainG, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
+                end
+            end)
+            it("should not invert the levels of the board light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
+                end
+            end)
+        end)
+        insulate("for example waitForWifiConnection()", function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+
+            require "src.my-led"
+            _G.MyLed.waitForWifiConnection()
+
+            it("should invert levels of the operator light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinOpG, time), time .. "s")
+                end
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 100))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 200))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 300))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 400))
+                assert.is_same(0.3, _G.pinByTime:get(pinOpB, 500))
+                assert.is_same(0.3, _G.pinByTime:get(pinOpB, 600))
+                assert.is_same(0.3, _G.pinByTime:get(pinOpB, 700))
+                assert.is_same(0.3, _G.pinByTime:get(pinOpB, 800))
+                assert.is_same(0.3, _G.pinByTime:get(pinOpB, 900))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 1000))
+
+            end)
+            it("should not invert levels of the stage light", function()
+                for time=0,3000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinMainR, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinMainG, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
+                end
+            end)
+            it("should not invert the levels of the board light", function()
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 100))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 200))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 300))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 400))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 500))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 600))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 700))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 800))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 900))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 1000))
+            end)
+        end)
+    end)
+    describe("supports stageType() \"rgb-\"", function()
+        insulate("for example onAir()", function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+
+            require "src.my-led"
+            _G.MyLed.onAir()
+
+            it("should not invert levels of the operator light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpG, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpB, time), time .. "s")
+                end
+            end)
+            it("should invert levels of the stage light", function()
+                for time=0,3000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinMainR, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinMainG, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinMainB, time), time .. "s")
+                end
+            end)
+            it("should not invert the levels of the board light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
+                end
+            end)
+        end)
+        insulate("for example waitForWifiConnection()", function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+
+            require "src.my-led"
+            _G.MyLed.waitForWifiConnection()
+
+            it("should not invert levels of the operator light", function()
+                for time=0,3000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpG, time), time .. "s")
+                end
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 100))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 200))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 300))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 400))
+                assert.is_same(0.7, _G.pinByTime:get(pinOpB, 500))
+                assert.is_same(0.7, _G.pinByTime:get(pinOpB, 600))
+                assert.is_same(0.7, _G.pinByTime:get(pinOpB, 700))
+                assert.is_same(0.7, _G.pinByTime:get(pinOpB, 800))
+                assert.is_same(0.7, _G.pinByTime:get(pinOpB, 900))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 1000))
+
+            end)
+            it("should invert levels of the stage light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinMainR, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinMainG, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinMainB, time), time .. "s")
+                end
+            end)
+            it("should not invert the levels of the board light", function()
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 100))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 200))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 300))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 400))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 500))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 600))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 700))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 800))
+                assert.is_same(1, _G.pinByTime:get(pinOnBoard, 900))
+                assert.is_same(0, _G.pinByTime:get(pinOnBoard, 1000))
+            end)
+        end)
+    end)
+    describe("supports stageType() and operatorType \"rgb-\"", function()
+        insulate("for example onAir()", function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+            MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+
+            require "src.my-led"
+            _G.MyLed.onAir()
+
+            it("should invert levels of the operator light", function()
+                for time=0,3000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinOpG, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinOpB, time), time .. "s")
+                end
+            end)
+            it("should invert levels of the stage light", function()
+                for time=0,3000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinMainR, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinMainG, time), time .. "s")
+                    assert.is_same(0, _G.pinByTime:get(pinMainB, time), time .. "s")
+                end
+            end)
+            it("should not invert the levels of the board light", function()
+                for time=0,3000,100 do
+                    assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
+                end
+            end)
+        end)
+    end)
 end)
