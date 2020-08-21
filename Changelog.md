@@ -4,6 +4,7 @@
 * [BREAKING] Pins for Stage Light have been moved from `D2-D4` to `D1-D3`
 * [BREAKING] The firmware is no longer part of the repository and will be built on Travis. If you need a firmware for development, get it from the latest release. #25
 * [ADDED] allow the use of LEDs with common cathode #31
+* [ADDED] allow the use of WS2812 strips, NeoPixel and the like #29
 
 # v0.1-alpha4
 

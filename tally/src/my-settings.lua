@@ -12,7 +12,9 @@ local hubIp = nil
 local hubPort = 7411
 local name = string.format("%x", node.chipid())
 local operatorType = LightTypes.COMMON_ANODE
+local operatorWs2812Lights = 5
 local stageType = LightTypes.COMMON_ANODE
+local stageWs2812Lights = 0
 
 local trim = function(s)
     return s:match("^%s*(.-)%s*$")
@@ -51,8 +53,14 @@ _G.MySettings = {
     operatorType = function()
         return operatorType
     end,
+    operatorNumberOfWs2812Lights = function()
+        return operatorWs2812Lights
+    end,
     stageType = function()
         return stageType
+    end,
+    stageNumberOfWs2812Lights = function()
+        return stageWs2812Lights
     end,
     isValid = function()
         return staSsid ~= nil and hubIp ~= nil
@@ -88,12 +96,26 @@ if file.exists(fileName) then
                         else
                             MyLog.warning("Invalid operator.type \"" .. v .. "\"")
                         end
+                    elseif k == "operator.ws2812" then
+                        local value = tonumber(v)
+                        if value ~= nil and value >= 0 and value <= 10 then
+                            operatorWs2812Lights = value
+                        else
+                            MyLog.warning("operator.ws2812 needs to be number between 0 and 10, but got \"" .. v .. "\"")
+                        end
                     elseif k == "stage.type" then
                         local value = v:lower()
                         if isValueInTable(value, LightTypes) then
                             stageType = value
                         else
                             MyLog.warning("Invalid stage.type \"" .. v .. "\"")
+                        end
+                    elseif k == "stage.ws2812" then
+                        local value = tonumber(v)
+                        if value ~= nil and value >= 0 and value <= 10 then
+                            stageWs2812Lights = value
+                        else
+                            MyLog.warning("stage.ws2812 needs to be number between 0 and 10, but got \"" .. v .. "\"")
                         end
                     else
                         MyLog.warning("Unknown key " .. k .. " in configuration file. Did you mistype it?")

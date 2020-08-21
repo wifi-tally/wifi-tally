@@ -9,6 +9,9 @@ local pinMainG, pinMainR, pinMainB = 5, 6, 7
 
 gpio.mode(pinOnBoard, gpio.OUTPUT)
 
+-- uses D4
+ws2812.init(ws2812.MODE_SINGLE)
+
 -- the timer used for the status LED that signalizes network errors
 local timer = tmr.create()
 
@@ -57,6 +60,9 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
             darkness = 0
         end
 
+        --
+        -- DRIVE THE OPERATOR LIGHT
+        --
         local operatorDuty = darkness
         local operatorOff = 100
         if MySettings.operatorType() == LightTypes.COMMON_CATHODE then
@@ -67,6 +73,9 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
         pwm2.set_duty(pinOpG, colorG and operatorDuty or operatorOff)
         pwm2.set_duty(pinOpB, colorB and operatorDuty or operatorOff)
 
+        --
+        -- DRIVE THE STAGE LIGHT
+        --
         local stageDuty = darkness
         local stageOff = 100
         if MySettings.stageType() == LightTypes.COMMON_CATHODE then
@@ -77,6 +86,30 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
         pwm2.set_duty(pinMainG, colorG and showOnMain and stageDuty or stageOff)
         pwm2.set_duty(pinMainB, colorB and showOnMain and stageDuty or stageOff)
 
+        --
+        -- DRIVE THE WS2812 STRIP
+        --
+        if MySettings.operatorNumberOfWs2812Lights() + MySettings.stageNumberOfWs2812Lights() > 0 then
+            -- the API uses chars to represent brightness
+            local data = ""
+            for _=1,MySettings.operatorNumberOfWs2812Lights() do
+                data = data ..
+                string.char(math.ceil(colorG and (100 - darkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorR and (100 - darkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorB and (100 - darkness)*2.55 or 0))
+            end
+            for _=1,MySettings.stageNumberOfWs2812Lights() do
+                data = data ..
+                string.char(math.ceil(colorG and showOnMain and (100 - darkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorR and showOnMain and (100 - darkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorB and showOnMain and (100 - darkness)*2.55 or 0))
+            end
+            ws2812.write(data)
+        end
+
+        --
+        -- DRIVE THE ONBOARD LED
+        --
         -- pwm2 does not support to drive pin D0, so we try to emulate the flashPattern as good as possible without PWM
         if colorB and darkness > 0 then
             -- only turn LED off if a flash pattern in blue color expects it to be off

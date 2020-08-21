@@ -105,3 +105,32 @@ _G.tmr = {
         }
     end
 }
+
+_G.ws2812 = {
+    data = {},
+    MODE_SINGLE = "single",
+    init = function(mode)
+        if mode ~= "single" then
+            error("Only MODE_SINGLE is supported by the ws2812 mock", 2)
+        end
+    end,
+    write = function(data)
+        local time = _G.now
+        if time - math.floor(time) >= 0.5 then
+            time = math.ceil(time)
+        else
+            time = math.floor(time)
+        end
+        _G.ws2812.data[time] = data
+    end,
+    getDataAt = function(self, time)
+        local data = self.data[time]
+        if data == nil then return nil end
+        --@TODO: table.pack would be the way to go in Lua5.3
+        local dataStream = {}
+        for i=1,string.len(data) do
+            table.insert(dataStream, data:byte(i))
+        end
+        return dataStream
+    end,
+}

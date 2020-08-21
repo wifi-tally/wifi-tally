@@ -14,7 +14,7 @@ env:
   # nodemcu uses an old lua version
   - LUA="5.1.4"
     NODEMCU_FIRMWARE="3.0-master_20200610"
-    NODEMCU_MODULES="encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi"
+    NODEMCU_MODULES="encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi,ws2812"
 
 before_install:
   # lua toolchain for running tests

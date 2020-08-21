@@ -26,6 +26,12 @@ describe("Settings parser", function()
                 }
             end,
         }
+
+        local warnings = {}
+        _G.MyLog = {
+            warning = function(warning) table.insert(warnings, warning) end,
+            getWarnings = function() return warnings end,
+        }
     end
     -- auto-insulate every test
     local realIt = it
@@ -178,6 +184,120 @@ describe("Settings parser", function()
 
             assert.is_same("Invalid stage.type \"invalid\"", warnings[1])
             assert.is_same("grb+", MySettings.stageType())
+        end)
+    end)
+
+    insulate("operator.ws2812", function()
+        insulate("should be 5 by default", function()
+            it(function()
+                mockSettings("settings-all.ini")
+                require "src.my-settings"
+
+                assert.is_same(5, MySettings.operatorNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should allow to set it", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "operator.ws2812=2"
+                })
+                require "src.my-settings"
+
+                assert.is_same(2, MySettings.operatorNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should log a warning on invalid string", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "operator.ws2812=invalid"
+                })
+
+                require "src.my-settings"
+
+                assert.is_same("operator.ws2812 needs to be number between 0 and 10, but got \"invalid\"", MyLog.getWarnings()[1])
+                assert.is_same(5, MySettings.operatorNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should log a warning on negative number", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "operator.ws2812=-2"
+                })
+
+                require "src.my-settings"
+
+                assert.is_same("operator.ws2812 needs to be number between 0 and 10, but got \"-2\"", MyLog.getWarnings()[1])
+                assert.is_same(5, MySettings.operatorNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should log a warning on number bigger as 10", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "operator.ws2812=42"
+                })
+
+                require "src.my-settings"
+
+                assert.is_same("operator.ws2812 needs to be number between 0 and 10, but got \"42\"", MyLog.getWarnings()[1])
+                assert.is_same(5, MySettings.operatorNumberOfWs2812Lights())
+            end)
+        end)
+    end)
+
+    insulate("stage.ws2812", function()
+        insulate("should be 0 by default", function()
+            it(function()
+                mockSettings("settings-all.ini")
+                require "src.my-settings"
+
+                assert.is_same(0, MySettings.stageNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should allow to set it", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "stage.ws2812=2"
+                })
+                require "src.my-settings"
+
+                assert.is_same(2, MySettings.stageNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should log a warning on invalid string", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "stage.ws2812=invalid"
+                })
+
+                require "src.my-settings"
+
+                assert.is_same("stage.ws2812 needs to be number between 0 and 10, but got \"invalid\"", MyLog.getWarnings()[1])
+                assert.is_same(0, MySettings.stageNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should log a warning on negative number", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "stage.ws2812=-2"
+                })
+
+                require "src.my-settings"
+
+                assert.is_same("stage.ws2812 needs to be number between 0 and 10, but got \"-2\"", MyLog.getWarnings()[1])
+                assert.is_same(0, MySettings.stageNumberOfWs2812Lights())
+            end)
+        end)
+        insulate("should log a warning on number bigger as 10", function()
+            it(function()
+                mockSettings("settings-all.ini", {
+                    "stage.ws2812=42"
+                })
+
+                require "src.my-settings"
+
+                assert.is_same("stage.ws2812 needs to be number between 0 and 10, but got \"42\"", MyLog.getWarnings()[1])
+                assert.is_same(0, MySettings.stageNumberOfWs2812Lights())
+            end)
         end)
     end)
 

@@ -6,6 +6,9 @@ describe("Led", function()
     insulate("initial()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.initial()
 
@@ -23,6 +26,13 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should show blue on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+        end)
         it("should turn the on board light on", function()
             for time=0,3000,100 do
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
@@ -32,6 +42,9 @@ describe("Led", function()
     insulate("waitForWifiConnection()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.waitForWifiConnection()
 
@@ -51,7 +64,6 @@ describe("Led", function()
             assert.is_same(0.7, _G.pinByTime:get(pinOpB, 800))
             assert.is_same(0.7, _G.pinByTime:get(pinOpB, 900))
             assert.is_same(0, _G.pinByTime:get(pinOpB, 1000))
-
         end)
         it("should not show anything on the stage light", function()
             for time=0,3000,100 do
@@ -59,6 +71,23 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainG, time), time .. "s")
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
+        end)
+        it("should blink blue on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(500))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(1000))
         end)
         it("should make the on board light blink", function()
             assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
@@ -77,6 +106,9 @@ describe("Led", function()
     insulate("invalidSettingsFile()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.invalidSettingsFile()
 
@@ -107,6 +139,43 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should blink blue on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(167))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(333))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(500))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(667))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(833))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(2000))
+        end)
         it("should make the on board light blink", function()
             assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
             assert.is_same(1, _G.pinByTime:get(pinOnBoard, 167))
@@ -126,6 +195,9 @@ describe("Led", function()
     insulate("waitForWifiIp()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.waitForWifiIp()
 
@@ -148,6 +220,33 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should blink blue on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(250))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(500))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(750))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(1000))
+        end)
         it("should make the on board light blink", function()
             assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
             assert.is_same(1, _G.pinByTime:get(pinOnBoard, 250))
@@ -159,6 +258,9 @@ describe("Led", function()
     insulate("waitForServerConnection()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.waitForServerConnection()
 
@@ -183,6 +285,33 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should blink blue on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(167))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(333))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 77, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(500))
+            assert.is_same({
+                --g    r    b
+                  0,   0, 255, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(1000))
+        end)
         it("should make the on board light blink", function()
             assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
             assert.is_same(1, _G.pinByTime:get(pinOnBoard, 167))
@@ -196,6 +325,9 @@ describe("Led", function()
     insulate("onPreview()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.onPreview()
 
@@ -213,6 +345,13 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should show a permanent green on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                255,   0,   0, --operator
+                255,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+        end)
         it("should keep the on board light on", function()
             for time=0,3000,100 do
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
@@ -222,6 +361,9 @@ describe("Led", function()
     insulate("onAir()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.onAir()
 
@@ -239,6 +381,13 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should show a permanent red on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  0, 255,   0, --operator
+                  0, 255,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+        end)
         it("should keep the on board light on", function()
             for time=0,3000,100 do
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
@@ -248,6 +397,9 @@ describe("Led", function()
     insulate("onRelease()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.onRelease()
 
@@ -265,6 +417,13 @@ describe("Led", function()
                 assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
             end
         end)
+        it("should show a dim green on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                  3,   0,   0, --operator
+                  0,   0,   0, -- stage
+            }, _G.ws2812:getDataAt(0))
+        end)
         it("should keep the on board light on", function()
             for time=0,3000,100 do
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
@@ -274,6 +433,9 @@ describe("Led", function()
     insulate("onHighlight()", function()
         require "spec.nodemcu-mock"
         require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+
         require "src.my-led"
         _G.MyLed.onHighlight()
 
@@ -303,6 +465,53 @@ describe("Led", function()
                 assert.is_same(0, _G.pinByTime:get(pin, 1000), "pin " .. pin)
             end
         end)
+        it("should flash in white on the ws2128 strip", function()
+            assert.is_same({
+                --g    r    b
+                255, 255, 255, --operator
+                255, 255, 255, -- stage
+            }, _G.ws2812:getDataAt(0))
+            assert.is_same({
+                --g    r    b
+                 77,  77,  77, --operator
+                 77,  77,  77, -- stage
+            }, _G.ws2812:getDataAt(125))
+            assert.is_same({
+                --g    r    b
+                255, 255, 255, --operator
+                255, 255, 255, -- stage
+            }, _G.ws2812:getDataAt(250))
+            assert.is_same({
+                --g    r    b
+                 77,  77,  77, --operator
+                 77,  77,  77, -- stage
+            }, _G.ws2812:getDataAt(375))
+            assert.is_same({
+                --g    r    b
+                255, 255, 255, --operator
+                255, 255, 255, -- stage
+            }, _G.ws2812:getDataAt(500))
+            assert.is_same({
+                --g    r    b
+                 77,  77,  77, --operator
+                 77,  77,  77, -- stage
+            }, _G.ws2812:getDataAt(625))
+            assert.is_same({
+                --g    r    b
+                255, 255, 255, --operator
+                255, 255, 255, -- stage
+            }, _G.ws2812:getDataAt(750))
+            assert.is_same({
+                --g    r    b
+                 77,  77,  77, --operator
+                 77,  77,  77, -- stage
+            }, _G.ws2812:getDataAt(875))
+            assert.is_same({
+                --g    r    b
+                255, 255, 255, --operator
+                255, 255, 255, -- stage
+            }, _G.ws2812:getDataAt(1000))
+        end)
         it("should flash the on board light", function()
             assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
             assert.is_same(1, _G.pinByTime:get(pinOnBoard, 125))
@@ -319,6 +528,8 @@ describe("Led", function()
         insulate("for example onAir()", function()
             require "spec.nodemcu-mock"
             require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
             MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
 
             require "src.my-led"
@@ -338,6 +549,13 @@ describe("Led", function()
                     assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
                 end
             end)
+            it("should not change the ws2128 strip", function()
+                assert.is_same({
+                    --g    r    b
+                      0, 255,   0, --operator
+                      0, 255,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
             it("should not invert the levels of the board light", function()
                 for time=0,3000,100 do
                     assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
@@ -347,6 +565,8 @@ describe("Led", function()
         insulate("for example waitForWifiConnection()", function()
             require "spec.nodemcu-mock"
             require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
             MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
 
             require "src.my-led"
@@ -377,6 +597,23 @@ describe("Led", function()
                     assert.is_same(1, _G.pinByTime:get(pinMainB, time), time .. "s")
                 end
             end)
+            it("should not change the ws2128 strip", function()
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 255, --operator
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 77, --operator
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(500))
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 255, --operator
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(1000))
+            end)
             it("should not invert the levels of the board light", function()
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, 100))
@@ -396,6 +633,8 @@ describe("Led", function()
         insulate("for example onAir()", function()
             require "spec.nodemcu-mock"
             require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
             MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
 
             require "src.my-led"
@@ -415,6 +654,13 @@ describe("Led", function()
                     assert.is_same(0, _G.pinByTime:get(pinMainB, time), time .. "s")
                 end
             end)
+            it("should not change the ws2128 strip", function()
+                assert.is_same({
+                    --g    r    b
+                      0, 255,   0, --operator
+                      0, 255,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
             it("should not invert the levels of the board light", function()
                 for time=0,3000,100 do
                     assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
@@ -424,6 +670,8 @@ describe("Led", function()
         insulate("for example waitForWifiConnection()", function()
             require "spec.nodemcu-mock"
             require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
             MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
 
             require "src.my-led"
@@ -454,6 +702,23 @@ describe("Led", function()
                     assert.is_same(0, _G.pinByTime:get(pinMainB, time), time .. "s")
                 end
             end)
+            it("should not change the ws2128 strip", function()
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 255, --operator
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 77, --operator
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(500))
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 255, --operator
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(1000))
+            end)
             it("should not invert the levels of the board light", function()
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, 0))
                 assert.is_same(0, _G.pinByTime:get(pinOnBoard, 100))
@@ -473,6 +738,8 @@ describe("Led", function()
         insulate("for example onAir()", function()
             require "spec.nodemcu-mock"
             require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
             MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
             MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
 
@@ -493,10 +760,87 @@ describe("Led", function()
                     assert.is_same(0, _G.pinByTime:get(pinMainB, time), time .. "s")
                 end
             end)
+            it("should not change the ws2128 strip", function()
+                assert.is_same({
+                    --g    r    b
+                      0, 255,   0, --operator
+                      0, 255,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
             it("should not invert the levels of the board light", function()
                 for time=0,3000,100 do
                     assert.is_same(0, _G.pinByTime:get(pinOnBoard, time), time .. "s")
                 end
+            end)
+        end)
+    end)
+    describe("supports operatorNumberOfWs2812Lights() and stageNumberOfWs2812Lights()", function()
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 2 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 4 end -- mock
+
+            require "src.my-led"
+            _G.MyLed.initial()
+
+            it("should show operator lights before stage lights", function()
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 255, --operator
+                      0,   0, 255, --operator
+                      0,   0,   0, -- stage
+                      0,   0,   0, -- stage
+                      0,   0,   0, -- stage
+                      0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 2 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 0 end -- mock
+
+            require "src.my-led"
+            _G.MyLed.initial()
+
+            it("should only send operator lights when stageNumberOfWs2812Lights is 0", function()
+                assert.is_same({
+                    --g    r    b
+                      0,   0, 255,
+                      0,   0, 255,
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 0 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 2 end -- mock
+
+            require "src.my-led"
+            _G.MyLed.initial()
+
+            it("should only send stage lights when stageNumberOfWs2812Lights is 0", function()
+                assert.is_same({
+                    --g    r    b
+                      0,   0,   0,
+                      0,   0,   0,
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorNumberOfWs2812Lights = function() return 0 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 0 end -- mock
+
+            require "src.my-led"
+            _G.MyLed.initial()
+
+            it("should not send anything when both settings are 0", function()
+                assert.is_same(nil, _G.ws2812:getDataAt(0))
             end)
         end)
     end)

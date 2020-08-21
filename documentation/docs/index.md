@@ -15,6 +15,7 @@ common video mixers.
 * Fast communication and lightweight protocol
 * uses a Central Hub to communicate
 * utilizes your local network and access points
+* support for RGB Leds (anode, cathode), WS2812, NeoPixel, etc
 * Open Source / Open Hardware
 
 ## Supported Video Mixers
