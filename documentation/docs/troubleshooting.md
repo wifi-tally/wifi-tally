@@ -11,6 +11,8 @@ If the LED strip started flashing blue before turning black, see [below](#the-le
 * Did you upload all files to the Tally?
 * Is the LED strip correctly wired?
 * Is the LED strip working? Try to connect it to a 5V power source directly.
+* Are you using an LED strip with common cathode? Connect the common pin to `GND` and
+  [do the necessary configuration](tally.md#using-leds-with-common-cathode).
 * Is the NodeMCU working? Try to connect to it via USB
 * In case you are developing the Tally Code: It is normal the strip stays black, because the
   `init.lua` file is not uploaded.
@@ -76,6 +78,13 @@ This very likely points to an issue with your WiFi configuration.
 which signal the tally should show.**
 
 * Did the hub connect to your Video Mixer?
+
+## The colors on the LEDs are messed up
+
+* Is the wiring correct?
+* It is not unheared of, that the pins of LEDs are not labeled correctly. Maybe switch them around.
+* If the colors that should be on are off and vice versa, you probably use an LED with common
+  cathode. See the [tally documentation](tally.md#using-leds-with-common-cathode) how to fix it.
 
 ## The Hub can not connect to ATEM video mixer
 

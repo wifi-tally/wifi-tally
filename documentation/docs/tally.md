@@ -51,3 +51,16 @@ The configuration for this example would be
 operator.ws2812 = 0
 stage.ws2812    = 4
 ````
+
+## Using LEDs with common cathode
+
+You can use an LED with a common cathode with the tally. First connect the common pin
+to `GND` instead of `3V3` and then configure `tally-settings.ini` to drive the pins correctly.
+If you skip this step the colors that should be on are off, and vice versa.
+
+````ini
+operator.type = grb-
+stage.type    = grb-
+````
+
+You can also mix different RGB Led types for the Operator and Stage Light.
