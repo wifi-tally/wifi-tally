@@ -3,6 +3,7 @@
 * [BREAKING] location where the hub stores its configuration has been changed from `hub/config.json` to `$HOME/.wifi-tally.json` #21
 * [BREAKING] Pins for Stage Light have been moved from `D2-D4` to `D1-D3`
 * [BREAKING] The firmware is no longer part of the repository and will be built on Travis. If you need a firmware for development, get it from the latest release. #25
+* [BREAKING] The firmware needs to be updated as the `ws2812` module was added
 * [ADDED] allow the use of LEDs with common cathode #31
 * [ADDED] allow the use of WS2812 strips, NeoPixel and the like #29
 
