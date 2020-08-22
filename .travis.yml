@@ -82,8 +82,6 @@ script:
   - npm install
   - npm run test:ci
   - npm run build
-  - rm -rf node_modules # everything fine - clear node_modules of dev dependencies
-  - npm install --production
 
   # bundling the release
   - mkdir -p $TRAVIS_BUILD_DIR/release
@@ -101,8 +99,6 @@ script:
   - mkdir -p $TRAVIS_BUILD_DIR/release/docs
   - cp -r $TRAVIS_BUILD_DIR/documentation/docs $TRAVIS_BUILD_DIR/release/docs/markdown
   - cp -r $TRAVIS_BUILD_DIR/documentation/site $TRAVIS_BUILD_DIR/release/docs/html
-
-  - cd $TRAVIS_BUILD_DIR/hub
   - cp -r $TRAVIS_BUILD_DIR/hub $TRAVIS_BUILD_DIR/release/hub
 
   - find $TRAVIS_BUILD_DIR/release -name ".gitignore" -delete
