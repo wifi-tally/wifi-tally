@@ -14,7 +14,7 @@ extra:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/wifi-tally
   github_link: https://github.com/wifi-tally/wifi-tally
-  latest_version: v0.1-alpha4
+  latest_version: v0.1.0
   hub_default_port: 3000
   tally_default_port: 7411
 theme:

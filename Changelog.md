@@ -1,11 +1,22 @@
-# TBD
+# v0.1.0
 
 * [BREAKING] location where the hub stores its configuration has been changed from `hub/config.json` to `$HOME/.wifi-tally.json` #21
 * [BREAKING] Pins for Stage Light have been moved from `D2-D4` to `D1-D3`
 * [BREAKING] The firmware is no longer part of the repository and will be built on Travis. If you need a firmware for development, get it from the latest release. #25
 * [BREAKING] The firmware needs to be updated as the `ws2812` module was added
+* [FIXED] prevent hub from crashing on invalid message #19
+* [FIXED] hub does boot even if the configuration is empty
+* [ADDED] Support for vMix added #12
+* [ADDED] the hub does not use generic channel names (like `Channel 1`) if the video mixer has a name configured
+* [ADDED] the channel drop-down in the hub is limited to the number of channels supported by the video mixer
+* [ADDED] the web page shows if it has lost connection to the hub and reloads #20
 * [ADDED] allow the use of LEDs with common cathode #31
 * [ADDED] allow the use of WS2812 strips, NeoPixel and the like #29
+* [ADDED] better log if it looks as if Atem rejected a connection #16
+* [CHANGED] use cross-env to allow hub to run on windows #18
+* [CHANGED] npm dependencies of the hub updated
+* [CHANGED] firmware version of the tally updated
+* [CHANGED] tallies that are not patched in the hub now do not show the "video mixer not connected" error
 
 # v0.1-alpha4
 
