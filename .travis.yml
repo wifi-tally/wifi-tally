@@ -16,6 +16,7 @@ env:
     NODEMCU_FIRMWARE="3.0-master_20200610"
     NODEMCU_MODULES="encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi,ws2812"
     NODEJS_VERSION="12"
+    NODEJS_MODULE_VERSION="72"
 
 before_install:
   # lua toolchain for running tests
@@ -103,6 +104,13 @@ script:
   - mkdir -p $TRAVIS_BUILD_DIR/release/docs
   - cp -r $TRAVIS_BUILD_DIR/documentation/docs $TRAVIS_BUILD_DIR/release/docs/markdown
   - cp -r $TRAVIS_BUILD_DIR/documentation/site $TRAVIS_BUILD_DIR/release/docs/html
+
+  # include sass binaries for macos and windows
+  # otherwise you would run into https://github.com/sass/node-sass/issues/2536
+  - cd $TRAVIS_BUILD_DIR/hub/node_modules/node-sass
+  - SASS_BINARY_NAME="darwin-x64-${NODEJS_MODULE_VERSION}" node scripts/install.js
+  - SASS_BINARY_NAME="win32-x64-${NODEJS_MODULE_VERSION}" node scripts/install.js
+  - SASS_BINARY_NAME="linux-x64-${NODEJS_MODULE_VERSION}" node scripts/install.js
   - cp -r $TRAVIS_BUILD_DIR/hub $TRAVIS_BUILD_DIR/release/hub
 
   - find $TRAVIS_BUILD_DIR/release -name ".gitignore" -delete
