@@ -66,11 +66,11 @@ install:
 before_script:
   - cd $TRAVIS_BUILD_DIR/nodemcu-firmware
   - bash "${TRAVIS_BUILD_DIR}/nodemcu-custom-build/ESP8266/before-script.sh"
-
-script:
   # building the firmware
   - cd $TRAVIS_BUILD_DIR/nodemcu-firmware
   - bash "${TRAVIS_BUILD_DIR}/firmware/script.sh"
+
+script:
 
   # building and testing the tally
   - cd $TRAVIS_BUILD_DIR/tally
