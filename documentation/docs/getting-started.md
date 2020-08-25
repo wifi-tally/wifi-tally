@@ -171,7 +171,7 @@ Reboot the NodeMCU board by pressing the `RST` button on the board or disconnect
 ### Setting up the hub
 
 The hub requires [node.js](https://nodejs.org/en/) to run. Packages for Linux, MacOS and even Windows
-are offered on the [Download page](https://nodejs.org/en/download/). Get a fitting version.
+are offered on the [Download page](https://nodejs.org/en/download/). Get version `{{ hub_nodejs_version }}`.
 
 Enter the `hub` directory and run
 

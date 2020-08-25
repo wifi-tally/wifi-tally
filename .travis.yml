@@ -15,6 +15,7 @@ env:
   - LUA="5.1.4"
     NODEMCU_FIRMWARE="3.0-master_20200610"
     NODEMCU_MODULES="encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi,ws2812"
+    NODEJS_VERSION="12"
 
 before_install:
   # lua toolchain for running tests
@@ -79,7 +80,10 @@ script:
 
   # building and testing the hub
   - cd $TRAVIS_BUILD_DIR/hub
-  - npm install
+  - nvm use "${NODEJS_VERSION}"
+  - node -v
+  - npm -v
+  - npm ci
   - npm run test:ci
   - npm run build
 

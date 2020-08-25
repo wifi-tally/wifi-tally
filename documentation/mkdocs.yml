@@ -16,6 +16,7 @@ extra:
   github_link: https://github.com/wifi-tally/wifi-tally
   latest_version: v0.1.0
   hub_default_port: 3000
+  hub_nodejs_version: 12
   tally_default_port: 7411
 theme:
   name: material
