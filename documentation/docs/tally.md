@@ -9,9 +9,9 @@
 | `hub.ip` | **(required)** | The IP address the hub is running on |
 | `hub.port` | `{{ tally_default_port }}` | The port where the hub listens. |
 | `tally.name` | (chip id) | How you want _this_ tally to be labeled in the hub. This name needs to be unique amongst all tallies in your network. It must not be longer than `26` characters. Use of ASCII characters is recommended. |
-| `operator.type` | `grb+` | What type of RGB-LED strip is driven for the operator light. Use `grb+` for common anode and `grb-` for common cathode. |
+| `operator.type` | `grb+` | How the pins for the operator light are driven. Use `grb+` when a `high` state signalizes _off_ and `grb-` when a `low` state signalizes _off_. |
 | `operator.ws2812` | `5` | Number of WS2812 like LEDs in a strip that serve as operator lights. Has to be a number between `0` and `10`. The operator lights are the first in the strip, followed by the stage lights. |
-| `stage.type` | `grb+` | What type of RGB-LED strip is driven for the stage light. Use `grb+` for common anode and `grb-` for common cathode. |
+| `stage.type` | `grb+` | How the pins for the stage light are driven. Use `grb+` when a `high` state signalizes _off_ and `grb-` when a `low` state signalizes _off_. |
 | `operator.ws2812` | `0` | Number of WS2812 like LEDs in a strip that serve as stage lights. Has to be a number between `0` and `10`. The stage  lights come right after the operator lights in the strip. |
 
 ## Using WS2812, NeoPixel, etc
