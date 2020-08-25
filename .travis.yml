@@ -56,6 +56,8 @@ before_install:
   - pip install mkdocs mkdocs-material pygments mkdocs-macros-plugin
   - pip list
 
+  - export BUILD_NAME=$(git describe --tags --always)
+
 install:
   - luarocks install busted
   - cd $TRAVIS_BUILD_DIR/nodemcu-firmware
@@ -92,7 +94,7 @@ script:
   - mkdir -p $TRAVIS_BUILD_DIR/release
   - cp $TRAVIS_BUILD_DIR/Readme.md $TRAVIS_BUILD_DIR/release
   - cp $TRAVIS_BUILD_DIR/LICENSE $TRAVIS_BUILD_DIR/release
-  - echo "${TRAVIS_BRANCH}" > $TRAVIS_BUILD_DIR/release/VERSION.txt
+  - echo "${BUILD_NAME}" > $TRAVIS_BUILD_DIR/release/VERSION.txt
 
   - mkdir $TRAVIS_BUILD_DIR/release/firmware
   - cp $TRAVIS_BUILD_DIR/nodemcu-firmware/bin/nodemcu-*.bin $TRAVIS_BUILD_DIR/release/firmware
@@ -119,9 +121,22 @@ script:
   # log the files added to release
   - tree -I "node_modules"
   - du -h -d1
-  - zip -Jrq "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.zip" *
-  - tar -czf "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.tar.gz" *
-  - tar -cjf "$TRAVIS_BUILD_DIR/wifi-tally-${TRAVIS_BRANCH}.tar.xz" *
+  - mkdir "$TRAVIS_BUILD_DIR/artifacts"
+  - zip -Jrq "$TRAVIS_BUILD_DIR/artifacts/wifi-tally-${BUILD_NAME}.zip" *
+  - tar -czf "$TRAVIS_BUILD_DIR/artifacts/wifi-tally-${BUILD_NAME}.tar.gz" *
+  - tar -cjf "$TRAVIS_BUILD_DIR/artifacts/wifi-tally-${BUILD_NAME}.tar.xz" *
+  - >
+    echo "" &&
+    echo "--------------------------------------------------------------------" &&
+    echo "" &&
+    echo "If your build is successful the build artifacts will be available at" &&
+    echo "" &&
+    echo "  * ${AWS_S3_NIGHTLY_BASEURI}/wifi-tally-${BUILD_NAME}.zip" &&
+    echo "  * ${AWS_S3_NIGHTLY_BASEURI}/wifi-tally-${BUILD_NAME}.tar.gz" &&
+    echo "  * ${AWS_S3_NIGHTLY_BASEURI}/wifi-tally-${BUILD_NAME}.tar.xz" &&
+    echo "" &&
+    echo "--------------------------------------------------------------------" &&
+    echo ""
 
 deploy:
   - provider: pages
@@ -138,11 +153,21 @@ deploy:
     edge: true
     token: $GITHUB_TOKEN
     file_glob: true
-    file: "$TRAVIS_BUILD_DIR/wifi-tally-*"
+    file: "$TRAVIS_BUILD_DIR/artifacts/*"
     cleanup: false
     draft: true
     on:
       tags: true
+  - provider: s3
+    access_key_id: ${AWS_S3_NIGHTLY_ID}
+    secret_access_key: ${AWS_S3_NIGHTLY_KEY}
+    bucket: ${AWS_S3_NIGHTLY_BUCKET}
+    region: ${AWS_S3_NIGHTLY_REGION}
+    local_dir: "$TRAVIS_BUILD_DIR/artifacts"
+    skip_cleanup: true
+    acl: public_read
+    on:
+      all_branches: true
 
 notifications:
   email:
