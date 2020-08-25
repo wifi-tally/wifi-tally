@@ -9,6 +9,8 @@ site_description: A low-cost, high-reliable Open Source WiFi Tally Light
 #  - Download: download.md
 #  - About: about.md
 strict: true
+# works better when opening the documentation locally in a release
+use_directory_urls: false
 extra:
   social:
     - icon: fontawesome/brands/github-alt
