@@ -1,3 +1,5 @@
+console.log("starting")
+
 const TallyDriver = require('./lib/TallyDriver')
 const Configuration = require('./lib/Configuration')
 const MixerDriver = require('./lib/MixerDriver')

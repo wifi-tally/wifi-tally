@@ -45,5 +45,15 @@
     "jest": "^25.5.4",
     "tmp": "^0.2.1",
     "react-test-renderer": "^16.13.1"
+  },
+  "pkg": {
+    "assets": [
+      ".next/**/*"
+    ],
+    "scripts": [
+      ".next/dist/**/*",
+      "node_modules/@babel/runtime/**/*.js",
+      "node_modules/next/dist/next-server/**/*.js"
+    ]
   }
 }
