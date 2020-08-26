@@ -1,3 +1,9 @@
+// set NODE_ENV from argument to enable portability to windows
+const yargs = require('yargs').argv
+if (yargs.env !== undefined) {
+  process.env.NODE_ENV = yargs.env
+}
+
 const TallyDriver = require('./lib/TallyDriver')
 const Configuration = require('./lib/Configuration')
 const MixerDriver = require('./lib/MixerDriver')

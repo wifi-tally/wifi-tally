@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "homepage": "https://wifi-tally.github.io/",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/wifi-tally/wifi-tally"
+    "type": "git",
+    "url": "https://github.com/wifi-tally/wifi-tally"
   },
   "bin": "server.js",
   "dependencies": {
@@ -13,7 +13,6 @@
     "atem-connection": "^2.0.0",
     "bootstrap": "^4.5.2",
     "bootswatch": "^4.5.2",
-    "cross-env": "^7.0.2",
     "express": "^4.15.2",
     "isomorphic-unfetch": "^3.0.0",
     "lato-font": "^3.0.0",
@@ -23,12 +22,13 @@
     "sass": "^1.26.10",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.4.23",
+    "yargs": "^15.4.1"
   },
   "scripts": {
-    "dev": "node server.js",
+    "dev": "node server.js --env=development",
     "build": "next build",
-    "start": "cross-env NODE_ENV=production node server.js",
+    "start": "node server.js --env=production",
     "test": "jest --watch --runInBand --detectOpenHandles",
     "test:ci": "jest --ci --detectOpenHandles"
   },
