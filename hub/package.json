@@ -6,7 +6,7 @@
   "bin": "server.js",
   "dependencies": {
     "@primer/octicons-react": "^10.0.0",
-    "atem-connection": "^2.0.0-nightly-feat-proto-v230-topology-changes-20200418-110107-20e1513.0",
+    "atem-connection": "^2.0.0",
     "bootstrap": "^4.5.2",
     "bootswatch": "^4.5.2",
     "cross-env": "^7.0.2",
