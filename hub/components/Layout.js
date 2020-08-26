@@ -1,6 +1,4 @@
-
 import Link from 'next/link'
-import "../style/main.scss"
 
 const Layout = props => (
   <div>
