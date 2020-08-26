@@ -34,5 +34,5 @@ Refer to [Getting Started](getting-started.md) to start running your own Wifi Ta
 
 ## Download
 
-The latest version is [{{ latest_version }}]({{ github_link }}/releases/tag/{{ latest_version }}).
+See the [download page](download.md).
 
