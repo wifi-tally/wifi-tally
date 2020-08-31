@@ -3,7 +3,12 @@
 You need two parts to get the Tally Light operational: The Tally Lights themselves
 and the Hub that connects your video mixer and the Tallies.
 
-!TODO: graphic here! 
+![Architecture Setup](images/architecture.png)
+<span style="font-size:smaller;opacity:0.8">uses icons from the Noun Project by 
+[Eucalyp](https://thenounproject.com/browse/?i=3151803),
+[Atif Arshad](https://thenounproject.com/browse/?i=1294543),
+[Hrbon](https://thenounproject.com/browse?i=3014911) and
+[ProSymbals](https://thenounproject.com/browse/?i=1086042), all licensed [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode)</span>
 
 ## Things you need
 

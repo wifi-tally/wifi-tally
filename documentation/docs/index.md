@@ -1,19 +1,29 @@
 # Open Source Tally Light
 
-Wifi Tally is an Open Source / Open Hardware Wifi Tally Light.
+Wifi Tally is an Open Source Wifi Tally Light based on the ESP8266.
 
 It aims to be affordable without sacrificing reliability and works with most
 common video mixers.
+
+It's architecture uses a central Hub that connects the tallies to the video mixer and
+allows easy configuration and monitoring.
+
+![Architecture Setup](images/architecture.png)
+<span style="font-size:smaller;opacity:0.8">uses icons from the Noun Project by 
+[Eucalyp](https://thenounproject.com/browse/?i=3151803),
+[Atif Arshad](https://thenounproject.com/browse/?i=1294543),
+[Hrbon](https://thenounproject.com/browse?i=3014911) and
+[ProSymbals](https://thenounproject.com/browse/?i=1086042), all licensed [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode)</span>
 
 ![Tally Hub](images/tally-hub.png)
 
 ## Features
 
-* WiFi Tally Light
+* WiFi Tally Light based on the ESP8266
 * Hardware costs of about 10€
 * flexible USB power (battery pack, camera outlet, stationary)
 * Fast communication and lightweight protocol
-* uses a Central Hub to communicate
+* uses a central Hub to communicate, that allows easy monitoring
 * utilizes your local network and access points
 * support for RGB Leds (anode, cathode), WS2812, NeoPixel, etc
 * Open Source / Open Hardware
