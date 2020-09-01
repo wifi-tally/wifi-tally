@@ -12,7 +12,7 @@
 | `operator.type` | `grb+` | How the pins for the operator light are driven. Use `grb+` when a `high` state signalizes _off_ and `grb-` when a `low` state signalizes _off_. |
 | `operator.ws2812` | `5` | Number of WS2812 like LEDs in a strip that serve as operator lights. Has to be a number between `0` and `10`. The operator lights are the first in the strip, followed by the stage lights. |
 | `stage.type` | `grb+` | How the pins for the stage light are driven. Use `grb+` when a `high` state signalizes _off_ and `grb-` when a `low` state signalizes _off_. |
-| `operator.ws2812` | `0` | Number of WS2812 like LEDs in a strip that serve as stage lights. Has to be a number between `0` and `10`. The stage  lights come right after the operator lights in the strip. |
+| `stage.ws2812` | `0` | Number of WS2812 like LEDs in a strip that serve as stage lights. Has to be a number between `0` and `10`. The stage  lights come right after the operator lights in the strip. |
 
 ## Using WS2812, NeoPixel, etc
 
