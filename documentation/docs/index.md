@@ -5,7 +5,7 @@ Wifi Tally is an Open Source Wifi Tally Light based on the ESP8266.
 It aims to be affordable without sacrificing reliability and works with most
 common video mixers.
 
-It's architecture uses a central Hub that connects the tallies to the video mixer and
+Its architecture uses a central Hub that connects the tallies to the video mixer and
 allows easy configuration and monitoring.
 
 ![Architecture Setup](images/architecture.png)
