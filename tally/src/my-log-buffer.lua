@@ -8,6 +8,8 @@ local self = {
     INFO = "INFO",
     WARN = "WARN",
 }
+
+-- gives numeric index to indicate severity
 local numericSeverity = function(severityString)
     if severityString == self.ERROR then
         return 2
@@ -18,6 +20,7 @@ local numericSeverity = function(severityString)
     end
 end
 
+-- adds a log message to the buffer
 self.addLog = function(_, severity, msg)
     -- try to free space if buffer is full
     if #buffer >= maxBufferLength then
@@ -44,9 +47,13 @@ self.addLog = function(_, severity, msg)
         table.insert(buffer, {severity, msg:sub(0, maxStringLength)})
     end
 end
+
+-- returns Log count
 self.hasLog = function(_)
     return #buffer > 0
 end
+
+-- returns latest log from the buffer
 self.getLog = function(_)
     local record = buffer[1]
     if record then
