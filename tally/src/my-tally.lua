@@ -1,3 +1,4 @@
+-- returns elapsed time in ms from timestamp
 local diffMicroSeconds = function(time)
     local now = tmr.now()
     if now < time then return now + (2^32 - time) else return now - time end
@@ -9,7 +10,9 @@ local listenSocket = nil
 
 local timeLastPackageReceived = nil
 
+-- processes received data from hub and calls MyLed to display status
 local handleReceive = function(data)
+    -- timestamp from last received data
     timeLastPackageReceived = tmr.now()
     data = data:match("^%s*(.-)%s*$") -- trim
     if data == "preview" then
@@ -28,6 +31,7 @@ local handleReceive = function(data)
 end
 
 _G.MyTally = {
+    -- connects tally to the hub
     connect = function(self)
         if listenSocket == nil then
             listenSocket = net.createUDPSocket()
@@ -40,9 +44,11 @@ _G.MyTally = {
         MyLog.info(string.format("Contacting hub on %s:%d", MySettings:hubIp(), MySettings:hubPort()))
         self:sendInfo()
     end,
+    -- returns tally -> wifi connection status
     isReady = function()
         return MyWifi.isConnected() and listenSocket ~= nil
     end,
+    -- returns tally -> hub connection status
     isConnected = function()
         return timeLastPackageReceived ~= nil and diffMicroSeconds(timeLastPackageReceived) <= 3000000
     end,
@@ -56,18 +62,23 @@ _G.MyTally = {
         end
         listenSocket:send(MySettings:hubPort(), MySettings:hubIp(), data .. "\n")
     end,
+    -- returns tally name
     sendInfo = function(self)
         self:send(string.format('tally-ho "%s"', MySettings:name()))
     end,
+    -- returns Log message
     sendLog = function(self, severity, msg)
         self:send(string.format('log "%s" %s "%s"', MySettings:name(), severity, msg))
     end,
 }
 
+-- this timer maintains the connection to the hub
 tmr.create():alarm(1000, tmr.ALARM_AUTO, function()
+    -- check if Wifi is connected
     if MyWifi ~= nil and MyWifi.isConnected() then
-        -- check if we seemed to have lost connection to the base station
+        -- check if we seemed to have lost connection to the hub
         if not MyTally:isConnected() then
+            -- display status on LED 
             MyLed.waitForServerConnection()
         end
 
