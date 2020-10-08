@@ -16,7 +16,7 @@
     "express": "^4.15.2",
     "isomorphic-unfetch": "^3.0.0",
     "lato-font": "^3.0.0",
-    "next": "^9.5.2",
+    "next": "^9.5.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "sass": "^1.26.10",
