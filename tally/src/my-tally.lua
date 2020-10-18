@@ -1,3 +1,6 @@
+--- everything that handles the connection to the Hub,
+--- send and receive messages
+
 local diffMicroSeconds = function(time)
     local now = tmr.now()
     if now < time then return now + (2^32 - time) else return now - time end

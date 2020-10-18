@@ -1,3 +1,6 @@
+--- everything related to making LEDs blink.
+--- it serves as a library to everything else
+
 -- pins used for the operators light
 local pinOpG, pinOpR, pinOpB = 1, 2, 3
 
@@ -12,7 +15,7 @@ gpio.mode(pinOnBoard, gpio.OUTPUT)
 -- uses D4
 ws2812.init(ws2812.MODE_SINGLE)
 
--- the timer used for the status LED that signalizes network errors
+-- timer used to make LEDs flash on and off
 local timer = tmr.create()
 
 -- setup all the RGB pins as pwm pins
@@ -33,9 +36,19 @@ local colors = {
     BLACK = {false, false, false},
 }
 
+-- globally tracks an internal id of all configured flashing patterns
 local nextId = 0
+
+-- tracks which flashing pattern is currently shown. This way we can make sure to not start
+-- a pattern again from the beginning if it was already running.
 local currentId = nil
 
+--- this is a Factory to setup flash patterns
+--- It takes the parameters and returns a function that you can call if you want the according pattern to play
+--- @param pattern string A string representing the expected brightness of the LED (so it easily human readable)
+--- @param color table[3] a table of 3 boolean values if the RGB channels should be used
+--- @param seconds number how many seconds the whole pattern should last
+--- @param showOnMain boolean if this pattern should also be shown on the stage light
 local flashPattern = function(pattern, color, seconds, showOnMain)
     local colorR, colorG, colorB = color[1], color[2], color[3]
     if showOnMain == nil then showOnMain = color ~= colors.BLUE end
@@ -44,7 +57,10 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
     local id = nextId
     nextId = nextId + 1
 
+    -- number of equal-duration segments in the pattern
     local len = string.len(pattern)
+
+    -- the currently played segment in the pattern
     local idx = -1
     local next = function()
         idx = (idx + 1) % len
@@ -132,6 +148,7 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
     end
 end
 
+--- namespace of everything that makes LEDs blink
 _G.MyLed = {
     -- signal that nothing is being done
     initial = flashPattern("O", colors.BLUE),

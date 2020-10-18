@@ -1,4 +1,7 @@
--- buffer logs so they can be send to the hub
+--- buffer logs when the Hub is not connected yet
+--- so they can be send to the hub
+
+-- messages are stored in RAM. So be sensible with this parameters or it might flood the RAM.
 local maxBufferLength = 10
 local maxStringLength = 80
 local buffer = {}

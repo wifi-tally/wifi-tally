@@ -1,3 +1,6 @@
+--- handles the tally settings file, reads it and provides an interface for
+--- the other components to get validated, type-safe parameters from.
+
 local fileName = "/FLASH/tally-settings.ini"
 
 _G.LightTypes = {
@@ -66,6 +69,10 @@ _G.MySettings = {
         return staSsid ~= nil and hubIp ~= nil
     end,
 }
+
+--
+-- PARSE SETTINGS FILE
+--
 
 if file.exists(fileName) then
     local f = file.open(fileName, "r")

@@ -1,3 +1,5 @@
+--- everything establishing and maintaining a WiFi connection
+
 local isConnected = false
 
 _G.MyWifi = {
