@@ -2,6 +2,7 @@ const fs = require('fs')
 const os = require('os')
 const MixerDriver = require('./MixerDriver')
 const AtemConnector = require('./AtemConnector')
+const ObsConnector = require('./ObsConnector')
 const VmixConnector = require('./VmixConnector')
 const MockConnector = require('./MockConnector')
 
@@ -10,6 +11,8 @@ class Configuration {
         this.emitter = emitter
         this.atemIp
         this.atemPort
+        this.obsIp
+        this.obsPort
         this.vmixIp
         this.vmixPort
         this.mockTickTime
@@ -47,6 +50,12 @@ class Configuration {
                 if(config.vmix && config.vmix.port) {
                     this.vmixPort = config.vmix.port
                 }
+                if(config.obs && config.obs.ip) {
+                    this.obsIp = config.obs.ip
+                }
+                if(config.obs && config.obs.port) {
+                    this.obsPort = config.obs.port
+                }
                 if(config.mixer) {
                     this.mixerSelection = config.mixer
                 }
@@ -82,6 +91,10 @@ class Configuration {
                     ip: this.atemIp,
                     port: this.atemPort,
                 },
+                obs: {
+                    ip: this.obsIp,
+                    port: this.obsPort,
+                },
                 vmix: {
                     ip: this.vmixIp,
                     port: this.vmixPort,
@@ -106,6 +119,11 @@ class Configuration {
     updateAtemConfig(atemIp, atemPort) {
         this.atemIp = atemIp
         this.atemPort = atemPort
+    }
+
+    updateObsConfig(obsIp, obsPort) {
+        this.obsIp = obsIp
+        this.obsPort = obsPort
     }
 
     updateVmixConfig(vmixIp, vmixPort) {
@@ -145,6 +163,14 @@ class Configuration {
 
     getAtemPort() {
         return this.atemPort || AtemConnector.defaultPort
+    }
+
+    getObsIp() {
+        return this.obsIp || ObsConnector.defaultIp
+    }
+
+    getObsPort() {
+        return this.obsPort || ObsConnector.defaultPort
     }
 
     getVmixIp() {
@@ -201,6 +227,10 @@ class Configuration {
             channels: {
                 count: this.getChannelCount(),
                 names: this.getChannelNames(),
+            },
+            obs: {
+                ip: this.getObsIp(),
+                port: this.getObsPort(),
             },
             vmix: {
                 ip: this.getVmixIp(),

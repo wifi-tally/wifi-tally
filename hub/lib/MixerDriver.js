@@ -2,6 +2,7 @@ const AtemConnector = require('./AtemConnector.js')
 const VmixConnector = require('./VmixConnector.js')
 const MockConnector = require('./MockConnector.js')
 const NullConnector = require('./NullConnector.js')
+const ObsConnector = require('./ObsConnector.js')
 const MixerCommunicator = require('./MixerCommunicator.js')
 
 class MixerDriver {
@@ -76,6 +77,9 @@ class MixerDriver {
             } else if(newMixerId === VmixConnector.ID) {
                 this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
                 MixerClass = VmixConnector
+            } else if(newMixerId === ObsConnector.ID) {
+                this.getCurrentMixerSettings = () => [this.configuration.getObsIp(), this.configuration.getObsPort()]
+                MixerClass = ObsConnector
             } else if(newMixerId === MockConnector.ID) {
                 this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime(), this.configuration.getMockChannelCount(), this.configuration.getMockChannelNames()]
                 MixerClass = MockConnector
@@ -113,6 +117,7 @@ MixerDriver.getAllowedMixers = function(isDev) {
     const mixers = [
         NullConnector.ID,
         AtemConnector.ID,
+        ObsConnector.ID,
         VmixConnector.ID,
     ]
 

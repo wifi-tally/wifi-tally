@@ -6,6 +6,7 @@ import Layout from '../components/Layout'
 const mixerLabels = {
   mock: "Built-In Mock for testing",
   atem: "ATEM by Blackmagic Design",
+  obs: "OBS Studio",
   vmix: "vMix",
   "null": "Off",
 }
@@ -17,6 +18,8 @@ const Config = props => {
   const [atemPort, setAtemPort] = useState(props.atem.port)
   const [vmixIp, setVmixIp] = useState(props.vmix.ip)
   const [vmixPort, setVmixPort] = useState(props.vmix.port)
+  const [obsIp, setObsIp] = useState(props.obs.ip)
+  const [obsPort, setObsPort] = useState(props.obs.port)
   const [mockTickTime, setMockTickTime] = useState(props.mock.tickTime)
   const [mockChannelCount, setMockChannelCount] = useState(props.mock.channelCount)
   const [mockChannelNames, setMockChannelNames] = useState(props.mock.channelNames)
@@ -27,18 +30,20 @@ const Config = props => {
     setAtemPort(config.atem.port)
     setVmixIp(config.vmix.ip)
     setVmixPort(config.vmix.port)
+    setObsIp(config.obs.ip)
+    setObsPort(config.obs.port)
     setMockTickTime(config.mock.tickTime)
     setMockChannelCount(config.mock.channelCount)
     setMockChannelNames(config.mock.channelNames)
   })
 
   const handleSubmit = e => {
-    socket.emit('config.changeRequest', currentMixerId, atemIp, atemPort, vmixIp, vmixPort, mockTickTime, mockChannelCount, mockChannelNames)
+    socket.emit('config.changeRequest', currentMixerId, atemIp, atemPort, vmixIp, vmixPort, obsIp, obsPort, mockTickTime, mockChannelCount, mockChannelNames)
     e.preventDefault()
   }
 
   const addMixerOption = function(id) {
-    const label = mixerLabels[id]
+    const label = mixerLabels[id] || id
     return (
       <option key={id} value={id}>{label}</option>
     )
@@ -93,6 +98,22 @@ const Config = props => {
                 <div className="form-group">
                   <label htmlFor="atem-port">ATEM Port</label>
                   <input className="form-control" id="atem-port" type="text" value={atemPort} onChange={e => setAtemPort(e.target.value)} />
+                </div>
+              </fieldset>
+            ) : ""}
+            {currentMixerId === "obs" ? (
+              <fieldset>
+                <legend>OBS Studio Configuration</legend>
+                <p className="text-muted">
+                  Connects to OBS Studio over network. The <a href="https://github.com/Palakis/obs-websocket" target="_blank">obs-websocket plugin</a> has to be installed.
+                </p>
+                <div className="form-group">
+                  <label htmlFor="atem-ip">OBS Studio IP</label>
+                  <input className="form-control" id="obs-ip" type="text" value={obsIp} onChange={e => setObsIp(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="atem-port">OBS Studio Port</label>
+                  <input className="form-control" id="obs-port" type="text" value={obsPort} onChange={e => setObsPort(e.target.value)} />
                 </div>
               </fieldset>
             ) : ""}
