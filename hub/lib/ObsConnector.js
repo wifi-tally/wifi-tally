@@ -12,6 +12,7 @@ class ObsConnector {
         this.communicator = communicator
         // tracks which scenes are embedded into other scenes
         this.embeddedScenes = {}
+        this.reconnectTimeout = null
     }
     connect() {
         this.obs = new OBSWebSocket()
@@ -58,15 +59,25 @@ class ObsConnector {
         })
 
         const connect = () => {
+            if (this.reconnectTimeout) { 
+                clearTimeout(this.reconnectTimeout)
+            }
             console.log(`Connecting to OBS at ${this.ip}:${this.port}`)
             this.obs.connect({address: `${this.ip}:${this.port}`}).then(() => {
                 this.communicator.notifyMixerIsConnected()
                 this._updateScenes()
                 this._updatePreviewScene()
+                console.log("Connected to OBS")
+
+                this.obs.on('ConnectionClosed', () => {
+                    this.obs.removeAllListeners('ConnectionClosed')
+                    console.error("Connection to OBS lost")
+                    this.reconnectTimeout = setTimeout(connect, reconnectTimeoutMs)
+                })
             }).catch(err => {
                 this.communicator.notifyMixerIsDisconnected()
-                console.error("error when connecting to obs:", err)
-                setTimeout(connect, reconnectTimeoutMs)
+                console.error("error when connecting to OBS:", err.error)
+                this.reconnectTimeout = setTimeout(connect, reconnectTimeoutMs)
             })
         }
 
@@ -77,13 +88,9 @@ class ObsConnector {
     _updatePreviewScene() {
         this.obs.send("GetPreviewScene").then(data => {
             // console.debug("GetPreviewScene", data)
-
-            // if studio mode is disabled we get an error and fail gracefully
-            if (!data.error) {
-                this._notifyPreviewChanged([data.name])
-            }
+            this._notifyPreviewChanged([data.name])
         }).catch(err => {
-            console.error(err)
+            // if studio mode is disabled we get an error and fail gracefully
         })
     }
     _updateScenes() {
@@ -128,7 +135,11 @@ class ObsConnector {
     }
 
     disconnect() {
+        if (this.reconnectTimeout) { 
+            clearTimeout(this.reconnectTimeout)
+        }
         if (this.obs) {
+            this.obs.removeAllListeners('ConnectionClosed')
             this.obs.disconnect()
         }
     }

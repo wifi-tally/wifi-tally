@@ -144,7 +144,7 @@ describe('ObsConnector', () => {
                             } else {
                                 return {
                                     error: "studio mode not enabled",
-                                    messageId: 2,
+                                    status: "error",
                                 }
                             }
                         default: 
