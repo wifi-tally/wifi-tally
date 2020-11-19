@@ -37,7 +37,8 @@ class ObsConnector {
         })
         this.obs.on('TransitionBegin', data => {
             // console.debug('TransitionBegin', data)
-            this._notifyProgramChanged([data.fromScene, data.toScene])
+            // "filter" removes non-truthy values
+            this._notifyProgramChanged([data.fromScene, data.toScene].filter(scene => scene))
         })
         this.obs.on('TransitionEnd', data => {
             // console.debug('TransitionEnd', data)

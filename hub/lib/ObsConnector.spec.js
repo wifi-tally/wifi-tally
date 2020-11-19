@@ -55,6 +55,7 @@ describe('ObsConnector', () => {
     describe('onData', () => {
         beforeEach(() => {
             let socket = null
+            let isTransitionRunning = false
             global.obsServer = {
                 server: null,
                 scenes: [],
@@ -69,11 +70,22 @@ describe('ObsConnector', () => {
                     }))
                 },
                 transitionBegin: (newScene) => {
-                    socket.send(JSON.stringify({
-                        'update-type': "TransitionBegin",
-                        fromScene: global.obsServer.currentScene,
-                        toScene: newScene,
-                    }))
+                    if (isTransitionRunning) {
+                        // if a transition is already running, OBS just cuts to the new scene
+                        global.obsServer.currentScene = newScene
+                        socket.send(JSON.stringify({
+                            'update-type': "TransitionBegin",
+                            toScene: newScene,
+                        }))
+                        isTransitionRunning = false
+                    } else {
+                        socket.send(JSON.stringify({
+                            'update-type': "TransitionBegin",
+                            fromScene: global.obsServer.currentScene,
+                            toScene: newScene,
+                        }))
+                        isTransitionRunning = true
+                    }
                 },
                 transitionEnd: (newScene) => {
                     // it also sends the SwitchScenes event
@@ -83,6 +95,7 @@ describe('ObsConnector', () => {
                         'update-type': "TransitionEnd",
                         toScene: newScene,
                     }))
+                    isTransitionRunning = false
                 },
                 preview: (scene) => {
                     global.obsServer.previewScene = scene
@@ -333,6 +346,31 @@ describe('ObsConnector', () => {
                 server.transitionEnd("Cam 2")
                 await waitUntil(() => communicator.programs !== ["Cam 1", "Cam 2"])
                 expect(communicator.programs).toEqual(["Cam 2"])
+            } finally {
+                await obs.disconnect()
+            }
+        })
+        test('it does not crash when a transition is aborted', async () => {
+            const communicator = new MockCommunicator()
+            const server = global.obsServer
+            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+
+            server.scenes = [
+                { name: "Cam 1" },
+                { name: "Cam 2" },
+            ]
+            server.currentScene = "Cam 1"
+
+            try {
+                obs.connect()
+                await waitUntil(() => obs.isConnected())
+                expect(communicator.programs).toEqual(["Cam 1"])
+
+                server.transitionBegin("Cam 2")
+                await waitUntil(() => communicator.programs !== ["Cam 1"])
+                server.transitionBegin("Cam 1")
+                await waitUntil(() => communicator.programs !== ["Cam 1", "Cam 2"])
+                expect(communicator.programs).toEqual(["Cam 1"])
             } finally {
                 await obs.disconnect()
             }
