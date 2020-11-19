@@ -1,4 +1,4 @@
-const TallyDriver = require('../lib/TallyDriver')
+const TallyDriver = require('./TallyDriver')
 
 describe('TallyDriver', () => {
     describe('parseTallyHo', () => {

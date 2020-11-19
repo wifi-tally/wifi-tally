@@ -2,7 +2,7 @@ const tmp = require('tmp')
 tmp.setGracefulCleanup()
 const fs = require('fs')
 
-const Configuration = require('../lib/Configuration')
+const Configuration = require('./Configuration')
 const EventEmitter = require('events')
 const Channel = require('../domain/Channel')
 

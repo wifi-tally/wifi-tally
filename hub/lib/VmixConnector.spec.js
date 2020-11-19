@@ -1,4 +1,4 @@
-const VmixConnector = require('../lib/VmixConnector')
+const VmixConnector = require('./VmixConnector')
 const net = require('net')
 const EventEmitter = require('events')
 

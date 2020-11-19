@@ -1,5 +1,5 @@
-const MixerCommunicator = require('../lib/MixerCommunicator.js')
-const Configuration = require('../lib/Configuration.js')
+const MixerCommunicator = require('./MixerCommunicator.js')
+const Configuration = require('./Configuration.js')
 const EventEmitter = require('events')
 
 describe('MixerCommunicator', () => {
