@@ -4,6 +4,7 @@ const fs = require('fs')
 
 const Configuration = require('../lib/Configuration')
 const EventEmitter = require('events')
+const Channel = require('../domain/Channel')
 
 describe('Configuration', () => {
     describe('load()', () => {
@@ -75,6 +76,8 @@ describe('Configuration', () => {
         const atemPort = 1234
         const vmixIp = "10.1.1.43"
         const vmixPort = 2345
+        const obsIp = "10.1.1.44"
+        const obsPort = 3456
         const mockTickTime = 4242
         const mockChannelCount = 42
         const mockChannelNames = "foobar, baz"
@@ -90,6 +93,11 @@ describe('Configuration', () => {
             }
         }
 
+        const mockChannels = [
+            new Channel(5, "Chanel No 5"),
+            new Channel("foobar", "Baz"),
+        ]
+
         tmp.file(async (err, path) => {
             if (err) { throw err }
             process.env.CONFIG_FILE = path
@@ -99,9 +107,11 @@ describe('Configuration', () => {
             
             beforeConfig.updateMixerSelection(mixerSelection)
             beforeConfig.updateAtemConfig(atemIp, atemPort)
+            beforeConfig.updateObsConfig(obsIp, obsPort)
             beforeConfig.updateVmixConfig(vmixIp, vmixPort)
             beforeConfig.updateMockConfig(mockTickTime, mockChannelCount, mockChannelNames)
             beforeConfig.updateTallies({toValueObjectsForSave: () => mockTallyData})
+            beforeConfig.setChannels(mockChannels)
             await beforeConfig.save()
 
             let afterConfig = new Configuration(emitter)
@@ -113,6 +123,11 @@ describe('Configuration', () => {
             expect(afterConfig.getAtemIp()).toEqual(atemIp)
             expect(beforeConfig.getAtemPort()).toEqual(atemPort)
             expect(afterConfig.getAtemPort()).toEqual(atemPort)
+            
+            expect(beforeConfig.getObsIp()).toEqual(obsIp)
+            expect(afterConfig.getObsIp()).toEqual(obsIp)
+            expect(beforeConfig.getObsPort()).toEqual(obsPort)
+            expect(afterConfig.getObsPort()).toEqual(obsPort)
             
             expect(beforeConfig.getVmixIp()).toEqual(vmixIp)
             expect(afterConfig.getVmixIp()).toEqual(vmixIp)
@@ -128,6 +143,15 @@ describe('Configuration', () => {
 
             expect(beforeConfig.getTallies()).toEqual(mockTallyData)
             expect(afterConfig.getTallies()).toEqual(mockTallyData)
+
+            expect(beforeConfig.getChannels()[0].id).toEqual("5")
+            expect(afterConfig.getChannels()[0].id).toEqual("5")
+            expect(beforeConfig.getChannels()[0].name).toEqual("Chanel No 5")
+            expect(afterConfig.getChannels()[0].name).toEqual("Chanel No 5")
+            expect(beforeConfig.getChannels()[1].id).toEqual("foobar")
+            expect(afterConfig.getChannels()[1].id).toEqual("foobar")
+            expect(beforeConfig.getChannels()[1].name).toEqual("Baz")
+            expect(afterConfig.getChannels()[1].name).toEqual("Baz")
 
             done()
         })

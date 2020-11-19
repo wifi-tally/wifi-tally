@@ -119,7 +119,7 @@ class TallyDriver {
     }
     _tallyReported(tallyName, rinfo) {
         if (!this.tallies.has(tallyName)) {
-            const tally = new Tally(tallyName, -1)
+            const tally = new Tally(tallyName)
             this.tallies.set(tallyName, tally)
         }
         const tally = this.tallies.get(tallyName)

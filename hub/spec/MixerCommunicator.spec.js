@@ -81,18 +81,18 @@ describe('MixerCommunicator', () => {
 
             communicator.notifyChannelNames(3)
             expect(eventSeen).toEqual(1)
-            expect(config.getChannelCount()).toEqual(3)
+            expect(config.getChannels()).toHaveLength(3)
 
             communicator.notifyChannelNames(3, {1: "foobar", 2: "baz", 3: "bar"})
             expect(eventSeen).toEqual(2)
-            expect(config.getChannelCount()).toEqual(3)
-            expect(config.getChannelNames()).toEqual({1: "foobar", 2: "baz", 3: "bar"})
+            expect(config.getChannels()).toHaveLength(3)
+            expect(config.getChannels().map(c => c.name)).toEqual(["foobar", "baz", "bar"])
 
             // can be nulled
             communicator.notifyChannelNames(null, null)
             expect(eventSeen).toEqual(3)
-            expect(config.getChannelCount()).not.toEqual(3)
-            expect(config.getChannelNames()).toEqual({})
+            expect(config.getChannels()).not.toHaveLength(3)
+            expect(config.getChannels()).toEqual([])
         })
         test('debounces', () => {
             const emitter = new EventEmitter()

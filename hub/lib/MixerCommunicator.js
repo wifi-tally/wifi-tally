@@ -1,5 +1,7 @@
 /* helper so that video mixer connectors do not need to implement events */
 
+const Channel = require("../domain/Channel")
+
 const haveValuesChanged = (lastArray, newArray) => {
     if(Array.isArray(lastArray) && Array.isArray(newArray)) {
         return lastArray.length !== newArray.length || lastArray.some((value, index) => value !== newArray[index])
@@ -49,10 +51,28 @@ class MixerCommunicator {
     }
 
     notifyChannelNames(count, names) {
-        // @TODO: type check
-        if (count !== this.configuration.getChannelCount() || (names && !isSame(names, this.configuration.getChannelNames()))) {
-            this.configuration.setChannelCount(count)
-            this.configuration.setChannelNames(names)
+        if (count === null) {
+            this.notifyChannels(null)
+        } else {
+            names = names || {}
+            
+            // empty array with `count` elements.
+            // `fill` is necessary, because Array() does not fill the array with anything - not even `undefined` ¯\_(ツ)_/¯
+            const range = Array(count).fill(null)
+            
+            const channels = range.map((_,i) => {
+                const name = names[i+1]
+                return new Channel(i+1, name)
+            })
+
+            this.notifyChannels(channels)
+        }
+    }
+
+    notifyChannels(channels) {
+        channels = channels || []
+        if (JSON.stringify(channels.map(c => c.toValueObject())) !== JSON.stringify(this.configuration.getChannels().map(c => c.toValueObject()))) {
+            this.configuration.setChannels(channels)
             this.configuration.save()
 
             this.emitter.emit("config.changed")

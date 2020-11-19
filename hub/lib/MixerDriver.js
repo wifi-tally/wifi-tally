@@ -4,6 +4,7 @@ const MockConnector = require('./MockConnector.js')
 const NullConnector = require('./NullConnector.js')
 const ObsConnector = require('./ObsConnector.js')
 const MixerCommunicator = require('./MixerCommunicator.js')
+const Channel = require('../domain/Channel.js')
 
 class MixerDriver {
     constructor(configuration, emitter) {
@@ -136,7 +137,8 @@ MixerDriver.isValidMixerId = function(name, isDev) {
     return MixerDriver.getAllowedMixers(isDev).includes(name)
 }
 
-MixerDriver.defaultChannelCount = 8
-MixerDriver.defaultChannelNames = {}
+MixerDriver.defaultChannels = Array(8).fill(null).map((_,i) => {
+    return new Channel(i+1)
+})
 
 module.exports = MixerDriver

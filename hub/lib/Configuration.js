@@ -5,6 +5,7 @@ const AtemConnector = require('./AtemConnector')
 const ObsConnector = require('./ObsConnector')
 const VmixConnector = require('./VmixConnector')
 const MockConnector = require('./MockConnector')
+const Channel = require('../domain/Channel')
 
 class Configuration {
     constructor(emitter) {
@@ -19,8 +20,7 @@ class Configuration {
         this.mockChannelCount
         this.mockChannelNames
         this.tallies = []
-        this.channelCount = MixerDriver.defaultChannelCount
-        this.channelNames = MixerDriver.defaultChannelNames
+        this.channels = MixerDriver.defaultChannels
         this.mixerSelection = null
         this.configFileName = this.getConfigFilePath()
         this.load()
@@ -68,6 +68,9 @@ class Configuration {
                 if(config.mock && config.mock.channelNames) {
                     this.mockChannelNames = config.mock.channelNames
                 }
+                if(Array.isArray(config.channels)) {
+                    this.channels = config.channels.map(vo => Channel.fromValueObject(vo))
+                }
             } catch (e) {
                 if (e instanceof SyntaxError && rawdata.byteLength === 0) {
                     console.warn(`Could not parse ${this.configFileName}, because file is empty. Using defaults.`)
@@ -105,6 +108,7 @@ class Configuration {
                     channelNames: this.mockChannelNames,
                 },
                 tallies: this.tallies,
+                channels: this.channels.map(channel => channel.toValueObject()),
             }, null, '\t'), err => {
                 if(err) {
                     console.error(err)
@@ -201,33 +205,23 @@ class Configuration {
         }
     }
 
-    getChannelCount() {
-        return this.channelCount
+    setChannels(channels) {
+        this.channels = channels
     }
-
-    setChannelCount(count) {
-        this.channelCount = parseInt(count, 10) || MixerDriver.defaultChannelCount
-    }
-
-    getChannelNames() {
-        return this.channelNames
-    }
-
-    setChannelNames(names) {
-        this.channelNames = names || MixerDriver.defaultChannelNames
+    
+    getChannels() {
+        return this.channels
     }
 
     mixerConfigToObject() {
+        console.log(this.channels)
         return {
             currentMixerId: this.getMixerSelection(),
             atem: {
                 ip: this.getAtemIp(),
                 port: this.getAtemPort(),
             },
-            channels: {
-                count: this.getChannelCount(),
-                names: this.getChannelNames(),
-            },
+            channels: this.channels.map(channel => channel.toValueObject()),
             obs: {
                 ip: this.getObsIp(),
                 port: this.getObsPort(),

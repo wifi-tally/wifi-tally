@@ -3,7 +3,9 @@ import fetch from 'isomorphic-unfetch'
 import {useSocket, socketEventEmitter, socket} from '../hooks/useSocket'
 import Layout from '../components/Layout'
 import Link from 'next/link'
+import Channel from '../domain/Channel'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
+import ChannelSelector from '../components/ChannelSelector'
 
 
 const Tally = require('../domain/Tally')
@@ -34,7 +36,7 @@ const ChatOne = props => {
   const [isMixerConnected, setIsMixerConnected] = useState(props.isMixerConnected || false)
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
-  const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : {})
+  const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : [])
   const [isHubConnected, setIsHubConnected] = useState(socket.connected)
 
   const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
@@ -51,7 +53,7 @@ const ChatOne = props => {
     setIsMixerConnected(mixer.isConnected)
   })
   useSocket('config', config => {
-    setChannels(config.channels)
+    setChannels(config.channels.map(c => Channel.fromValueObject(c)))
   })
 
   socketEventEmitter.on("connected", function() {
@@ -82,17 +84,6 @@ const ChatOne = props => {
   const handleRemoveTally = (e, tally) => {
     socket.emit('tally.remove', tally.name)
     e.preventDefault()
-  }
-
-  const formatChannelOption = (idx, invalid) => {
-    let label = `Channel ${idx}`
-    if(channels.names[idx]) {
-      label = channels.names[idx]
-    }
-    if(invalid) {
-      label = `(${label})`
-    }
-    return (<option value={idx} key={idx}>{label}</option>)
   }
 
   const format = tally => {
@@ -129,12 +120,7 @@ const ChatOne = props => {
         <div className="card-body">
           <form>
             <div className="form-group">
-            <select className="form-control" value={tally.channelId} onChange={e => patchTally(tally, e.target.value)}>
-              <option value="-1">(unpatched)</option>
-              {/* selection of all available channels */}
-              {Array.from(Array(channels.count).keys()).map(i => i+1).map(idx => formatChannelOption(idx, false))}
-              {tally.channelId > channels.count ? formatChannelOption(tally.channelId, true) : ""}
-            </select>
+              <ChannelSelector className="form-control" defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
             </div>
           </form>
           {tally.state !== Tally.DISCONNECTED ? (
@@ -199,7 +185,7 @@ ChatOne.getInitialProps = async (context) => {
   // @TODO: use asynchronous calls
   const config = await fetch(baseUrl + '/atem')
   const configJson = await config.json()
-  info.channels = configJson.channels
+  info.channels = configJson.channels.map(c => Channel.fromValueObject(c))
 
   return info
 }

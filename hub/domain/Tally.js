@@ -1,7 +1,7 @@
 const Log = require('./Log')
 
 class Tally {
-    constructor(name, channelId = -1, address = null, port = null, state = Tally.DISCONNECTED) {
+    constructor(name, channelId = null, address = null, port = null, state = Tally.DISCONNECTED) {
         this.name = name
         this.channelId = channelId
         this.address = address
@@ -11,7 +11,7 @@ class Tally {
         this.logs = []
     }
     isPatched() {
-        return this.channelId >= 0
+        return this.channelId !== null
     }
     isConnected() {
         return this.address !== null && this.port !== null && this.state === Tally.CONNECTED
