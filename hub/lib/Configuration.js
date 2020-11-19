@@ -214,7 +214,6 @@ class Configuration {
     }
 
     mixerConfigToObject() {
-        console.log(this.channels)
         return {
             currentMixerId: this.getMixerSelection(),
             atem: {

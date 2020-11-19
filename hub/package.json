@@ -34,7 +34,10 @@
     "test:ci": "jest --ci --detectOpenHandles"
   },
   "jest": {
-    "testPathIgnorePatterns": ["<rootDir>/.next/", "<rootDir>/node_modules/"],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ],
     "testMatch": [
       "**/*.spec.js"
     ],
@@ -52,6 +55,7 @@
     "jest": "^25.5.4",
     "jest-dom": "^4.0.0",
     "react-test-renderer": "^16.13.1",
-    "tmp": "^0.2.1"
+    "tmp": "^0.2.1",
+    "ws": "^7.4.0"
   }
 }

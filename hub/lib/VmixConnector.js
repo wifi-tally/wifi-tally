@@ -112,7 +112,7 @@ class VmixConnector {
                 }
             })
 
-            this.communicator.notifyProgramChanged(programs, previews)
+            this.communicator.notifyProgramPreviewChanged(programs, previews)
         }
     }
     handleXmlCommand(command) {

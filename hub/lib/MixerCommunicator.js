@@ -68,6 +68,20 @@ class MixerCommunicator {
         }
     }
 
+    notifyProgramChanged(programs) {
+        const programChanged = this._changeProgramsIfNecessary(programs)
+        if (programChanged) {
+            this.emitter.emit('program.changed', this.currentPrograms, this.currentPreviews)
+        }
+    }
+
+    notifyPreviewChanged(previews) {
+        const previewChanged = this._changePreviewsIfNecessary(previews)
+        if (previewChanged) {
+            this.emitter.emit('program.changed', this.currentPrograms, this.currentPreviews)
+        }
+    }
+
     notifyChannelNames(count, names) {
         if (count === null) {
             this.notifyChannels(null)
