@@ -1,3 +1,8 @@
+# Upcoming
+
+* [ADDED] Support vor OBS added #27
+* [CHANGED] npm dependencies of the hub updated
+
 # v0.1.0
 
 * [BREAKING] location where the hub stores its configuration has been changed from `hub/config.json` to `$HOME/.wifi-tally.json` #21
