@@ -29,7 +29,7 @@ const createTallyList = (tallies, showDisconnected, showUnpatched) => {
   )
 }
 
-const ChatOne = props => {
+const IndexPage = props => {
   const [talliesData, setTallies] = useState(props.tallies || new Array())
   const [programs, setPrograms] = useState(props.programs || [])
   const [previews, setPreviews] = useState(props.previews || [])
@@ -178,7 +178,7 @@ const ChatOne = props => {
   )
 }
 
-ChatOne.getInitialProps = async (context) => {
+IndexPage.getInitialProps = async (context) => {
   const baseUrl = context && context.req ? `${context.req.protocol}://${context.req.get('Host')}` : '';
   const response = await fetch(baseUrl + '/tallies')
   const info = await response.json()
@@ -190,4 +190,4 @@ ChatOne.getInitialProps = async (context) => {
   return info
 }
 
-export default ChatOne;
+export default IndexPage;
