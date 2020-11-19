@@ -3,13 +3,13 @@ const Configuration = require('../lib/Configuration.js')
 const EventEmitter = require('events')
 
 describe('MixerCommunicator', () => {
-    describe('notifyProgramChanged', () => {
+    describe('notifyProgramPreviewChanged', () => {
         test('sends an event and fills getters', () => {
             const emitter = new EventEmitter()
             let eventSeen = 0
 
-            let expectedPrograms = [1]
-            let expectedPreviews = [2]
+            let expectedPrograms = ["1"]
+            let expectedPreviews = ["2"]
             emitter.on("program.changed", (programs, previews) => {
                 eventSeen++
                 expect(programs).toEqual(expectedPrograms)
@@ -20,14 +20,14 @@ describe('MixerCommunicator', () => {
             const communicator = new MixerCommunicator(config, emitter)
 
             expect(eventSeen).toEqual(0)
-            communicator.notifyProgramChanged([1], [2])
+            communicator.notifyProgramPreviewChanged([1], [2])
             expect(eventSeen).toEqual(1)
-            expect(communicator.getCurrentPrograms()).toEqual([1])
-            expect(communicator.getCurrentPreviews()).toEqual([2])
+            expect(communicator.getCurrentPrograms()).toEqual(["1"])
+            expect(communicator.getCurrentPreviews()).toEqual(["2"])
 
             expectedPreviews = null
             expectedPrograms = null
-            communicator.notifyProgramChanged(null, null)
+            communicator.notifyProgramPreviewChanged(null, null)
             expect(eventSeen).toEqual(2)
             expect(communicator.getCurrentPrograms()).toEqual(null)
             expect(communicator.getCurrentPreviews()).toEqual(null)
@@ -41,28 +41,28 @@ describe('MixerCommunicator', () => {
             const communicator = new MixerCommunicator(config, emitter)
 
             expect(eventSeen).toEqual(0)
-            communicator.notifyProgramChanged([1], [2])
+            communicator.notifyProgramPreviewChanged([1], [2])
             expect(eventSeen).toEqual(1)
             // same settings again
-            communicator.notifyProgramChanged([1], [2])
+            communicator.notifyProgramPreviewChanged([1], [2])
             expect(eventSeen).toEqual(1)
             // preview has changed
-            communicator.notifyProgramChanged([1], [3])
+            communicator.notifyProgramPreviewChanged([1], [3])
             expect(eventSeen).toEqual(2)
             // program has changed
-            communicator.notifyProgramChanged([2], [3])
+            communicator.notifyProgramPreviewChanged([2], [3])
             expect(eventSeen).toEqual(3)
             // preview added
-            communicator.notifyProgramChanged([2], [3,4])
+            communicator.notifyProgramPreviewChanged([2], [3,4])
             expect(eventSeen).toEqual(4)
             // same settings again
-            communicator.notifyProgramChanged([2], [3,4])
+            communicator.notifyProgramPreviewChanged([2], [3,4])
             expect(eventSeen).toEqual(4)
             // program removed
-            communicator.notifyProgramChanged([], [3,4])
+            communicator.notifyProgramPreviewChanged([], [3,4])
             expect(eventSeen).toEqual(5)
             // same settings again
-            communicator.notifyProgramChanged([], [3,4])
+            communicator.notifyProgramPreviewChanged([], [3,4])
             expect(eventSeen).toEqual(5)
         })
     })

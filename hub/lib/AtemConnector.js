@@ -11,7 +11,7 @@ class AtemConnector {
     onStateChange() {
         const programs = this.myAtem.listVisibleInputs("program").sort()
         const previews = this.myAtem.listVisibleInputs("preview").sort()
-        this.communicator.notifyProgramChanged(programs, previews)
+        this.communicator.notifyProgramPreviewChanged(programs, previews)
 
         const channelNames = Object.values(this.myAtem.state.inputs).reduce((map, input) => {
             if (input.isExternal) {

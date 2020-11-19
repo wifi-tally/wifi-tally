@@ -40,13 +40,31 @@ class MixerCommunicator {
         this.currentConnection = null
     }
 
-    notifyProgramChanged(programs, previews) {
-        // @TODO: type check
-        if (haveValuesChanged(programs, this.currentPrograms) || haveValuesChanged(previews, this.currentPreviews)) {
+    _changeProgramsIfNecessary(programs) {
+        programs = programs ? programs.map(v => v.toString()) : null
+        if (haveValuesChanged(programs, this.currentPrograms)) {
             this.currentPrograms = programs
-            this.currentPreviews = previews
+            return true
+        } else {
+            return false
+        }
+    }
 
-            this.emitter.emit('program.changed', programs, previews)
+    _changePreviewsIfNecessary(previews) {
+        previews = previews ? previews.map(v => v.toString()) : null
+        if (haveValuesChanged(previews, this.currentPreviews)) {
+            this.currentPreviews = previews
+            return true
+        } else {
+            return false
+        }
+    }
+
+    notifyProgramPreviewChanged(programs, previews) {
+        const programChanged = this._changeProgramsIfNecessary(programs)
+        const previewChanged = this._changePreviewsIfNecessary(previews)
+        if (previewChanged || programChanged) {
+            this.emitter.emit('program.changed', this.currentPrograms, this.currentPreviews)
         }
     }
 

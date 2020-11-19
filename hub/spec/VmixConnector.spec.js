@@ -21,7 +21,7 @@ class MockCommunicator {
         this.previews
     }
 
-    notifyProgramChanged(programs, previews) {
+    notifyProgramPreviewChanged(programs, previews) {
         this.programs = programs
         this.previews = previews
     }

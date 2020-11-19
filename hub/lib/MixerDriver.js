@@ -64,7 +64,7 @@ class MixerDriver {
         try {
             if(this.currentMixerInstance) {
                 const ret = this.currentMixerInstance.disconnect()
-                this.communicator.notifyProgramChanged(null, null)
+                this.communicator.notifyProgramPreviewChanged(null, null)
                 this.communicator.notifyChannelNames(MixerDriver.defaultChannelCount, MixerDriver.defaultChannelNames)
                 await Promise.resolve(ret)
             }

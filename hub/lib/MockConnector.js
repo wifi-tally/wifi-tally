@@ -20,7 +20,7 @@ class MockConnector {
         const fn = () => {
             const mockCurrentPrograms = [Math.floor(Math.random() * (this.channelCount + 1))]
             const mockCurrentPreviews = [Math.floor(Math.random() * (this.channelCount + 1))]
-            this.communicator.notifyProgramChanged(mockCurrentPrograms, mockCurrentPreviews)
+            this.communicator.notifyProgramPreviewChanged(mockCurrentPrograms, mockCurrentPreviews)
         }
         this.intervalHandle = setInterval(fn, this.tickTime)
         fn()

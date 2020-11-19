@@ -6,7 +6,7 @@ class NullConnector {
     }
     connect() {
         console.log("No video mixer connected.")
-        this.communicator.notifyProgramChanged(null, null)
+        this.communicator.notifyProgramPreviewChanged(null, null)
     }
     disconnect() {}
 
