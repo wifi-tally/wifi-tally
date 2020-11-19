@@ -26,7 +26,7 @@ class MockCommunicator {
         this.previews = previews
     }
 
-    notifyChannels(count, names) {
+    notifyChannelNames(count, names) {
         this.channelCount = count
         this.channelNames = names
     }

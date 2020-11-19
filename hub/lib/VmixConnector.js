@@ -129,7 +129,7 @@ class VmixConnector {
                         map[idx+1] = input.$.shortTitle
                         return map
                     }, {})
-                    this.communicator.notifyChannels(count, names)
+                    this.communicator.notifyChannelNames(count, names)
                 }
             }
         })

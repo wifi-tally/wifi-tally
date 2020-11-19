@@ -20,7 +20,7 @@ class AtemConnector {
             return map
         }, {})
         const channelCount = Object.keys(channelNames).length
-        this.communicator.notifyChannels(channelCount, channelNames)
+        this.communicator.notifyChannelNames(channelCount, channelNames)
     }
     connect() {
         this.myAtem = new Atem({

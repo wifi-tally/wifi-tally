@@ -66,7 +66,7 @@ describe('MixerCommunicator', () => {
             expect(eventSeen).toEqual(5)
         })
     })
-    describe('notifyChannels', () => {
+    describe('notifyChannelNames', () => {
         test('sends an event', () => {
             const emitter = new EventEmitter()
             let eventSeen = 0
@@ -79,17 +79,17 @@ describe('MixerCommunicator', () => {
 
             expect(eventSeen).toEqual(0)
 
-            communicator.notifyChannels(3)
+            communicator.notifyChannelNames(3)
             expect(eventSeen).toEqual(1)
             expect(config.getChannelCount()).toEqual(3)
 
-            communicator.notifyChannels(3, {1: "foobar", 2: "baz", 3: "bar"})
+            communicator.notifyChannelNames(3, {1: "foobar", 2: "baz", 3: "bar"})
             expect(eventSeen).toEqual(2)
             expect(config.getChannelCount()).toEqual(3)
             expect(config.getChannelNames()).toEqual({1: "foobar", 2: "baz", 3: "bar"})
 
             // can be nulled
-            communicator.notifyChannels(null, null)
+            communicator.notifyChannelNames(null, null)
             expect(eventSeen).toEqual(3)
             expect(config.getChannelCount()).not.toEqual(3)
             expect(config.getChannelNames()).toEqual({})
@@ -106,28 +106,28 @@ describe('MixerCommunicator', () => {
 
             expect(eventSeen).toEqual(0)
 
-            communicator.notifyChannels(3)
+            communicator.notifyChannelNames(3)
             expect(eventSeen).toEqual(1)
             // do it again
-            communicator.notifyChannels(3)
+            communicator.notifyChannelNames(3)
             expect(eventSeen).toEqual(1)
             // add channels
-            communicator.notifyChannels(3, {1: "foobar", 2: "baz", 3: "bar"})
+            communicator.notifyChannelNames(3, {1: "foobar", 2: "baz", 3: "bar"})
             expect(eventSeen).toEqual(2)
             // do it again
-            communicator.notifyChannels(3, {1: "foobar", 2: "baz", 3: "bar"})
+            communicator.notifyChannelNames(3, {1: "foobar", 2: "baz", 3: "bar"})
             expect(eventSeen).toEqual(2)
             // change in name
-            communicator.notifyChannels(3, {1: "blubber", 2: "baz", 3: "bar"})
+            communicator.notifyChannelNames(3, {1: "blubber", 2: "baz", 3: "bar"})
             expect(eventSeen).toEqual(3)
             // do it again
-            communicator.notifyChannels(3, {1: "blubber", 2: "baz", 3: "bar"})
+            communicator.notifyChannelNames(3, {1: "blubber", 2: "baz", 3: "bar"})
             expect(eventSeen).toEqual(3)
             // remove channel
-            communicator.notifyChannels(2, {1: "blubber", 2: "baz"})
+            communicator.notifyChannelNames(2, {1: "blubber", 2: "baz"})
             expect(eventSeen).toEqual(4)
             // add channels
-            communicator.notifyChannels(4, {1: "blubber", 2: "baz", 3: "bar", 4: "bluna"})
+            communicator.notifyChannelNames(4, {1: "blubber", 2: "baz", 3: "bar", 4: "bluna"})
             expect(eventSeen).toEqual(5)
         })
     })

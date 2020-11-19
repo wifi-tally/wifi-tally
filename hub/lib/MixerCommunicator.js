@@ -48,7 +48,7 @@ class MixerCommunicator {
         }
     }
 
-    notifyChannels(count, names) {
+    notifyChannelNames(count, names) {
         // @TODO: type check
         if (count !== this.configuration.getChannelCount() || (names && !isSame(names, this.configuration.getChannelNames()))) {
             this.configuration.setChannelCount(count)
