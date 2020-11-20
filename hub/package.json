@@ -27,7 +27,7 @@
     "yargs": "^15.4.1"
   },
   "scripts": {
-    "dev": "node server.js --env=development",
+    "dev": "ts-node --project tsconfig.server.json server.ts --env=development",
     "build": "next build",
     "start": "node server.js --env=production",
     "test": "jest --watch --runInBand --detectOpenHandles",
@@ -50,12 +50,17 @@
     "@testing-library/dom": "^7.27.1",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^9.5.0",
+    "@types/express": "^4.17.9",
+    "@types/node": "^14.14.9",
+    "@types/react": "^16.14.0",
     "babel-jest": "^25.5.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^25.5.4",
     "jest-dom": "^4.0.0",
     "react-test-renderer": "^16.13.1",
     "tmp": "^0.2.1",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.1.2",
     "ws": "^7.4.0"
   }
 }
