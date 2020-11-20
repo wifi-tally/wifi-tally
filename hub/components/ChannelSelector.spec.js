@@ -2,6 +2,7 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import ChannelSelector from './ChannelSelector';
 import Channel from '../domain/Channel';
+import '@testing-library/jest-dom';
 
 test('it only renders the unpatched option by default', () => {
     const root = document.createElement('div')

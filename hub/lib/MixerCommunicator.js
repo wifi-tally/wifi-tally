@@ -64,21 +64,21 @@ class MixerCommunicator {
         const programChanged = this._changeProgramsIfNecessary(programs)
         const previewChanged = this._changePreviewsIfNecessary(previews)
         if (previewChanged || programChanged) {
-            this.emitter.emit('program.changed', this.currentPrograms, this.currentPreviews)
+            this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 
     notifyProgramChanged(programs) {
         const programChanged = this._changeProgramsIfNecessary(programs)
         if (programChanged) {
-            this.emitter.emit('program.changed', this.currentPrograms, this.currentPreviews)
+            this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 
     notifyPreviewChanged(previews) {
         const previewChanged = this._changePreviewsIfNecessary(previews)
         if (previewChanged) {
-            this.emitter.emit('program.changed', this.currentPrograms, this.currentPreviews)
+            this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 

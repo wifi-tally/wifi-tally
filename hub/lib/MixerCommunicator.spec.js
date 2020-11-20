@@ -10,7 +10,7 @@ describe('MixerCommunicator', () => {
 
             let expectedPrograms = ["1"]
             let expectedPreviews = ["2"]
-            emitter.on("program.changed", (programs, previews) => {
+            emitter.on("program.changed", ({programs, previews}) => {
                 eventSeen++
                 expect(programs).toEqual(expectedPrograms)
                 expect(previews).toEqual(expectedPreviews)

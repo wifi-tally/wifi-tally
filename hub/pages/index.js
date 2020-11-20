@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
 import {useSocket, socketEventEmitter, socket} from '../hooks/useSocket'
+import useSocketInfo from '../hooks/useSocketInfo'
+import useMixerInfo from '../hooks/useMixerInfo'
 import Layout from '../components/Layout'
 import Link from 'next/link'
 import Channel from '../domain/Channel'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
 import ChannelSelector from '../components/ChannelSelector'
+import useProgramPreview from '../hooks/useProgramPreview'
 
 
 const Tally = require('../domain/Tally')
@@ -31,37 +34,20 @@ const createTallyList = (tallies, showDisconnected, showUnpatched) => {
 
 const IndexPage = props => {
   const [talliesData, setTallies] = useState(props.tallies || new Array())
-  const [programs, setPrograms] = useState(props.programs || [])
-  const [previews, setPreviews] = useState(props.previews || [])
-  const [isMixerConnected, setIsMixerConnected] = useState(props.isMixerConnected || false)
   const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
   const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
   const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : [])
-  const [isHubConnected, setIsHubConnected] = useState(socket.connected)
+  const isMixerConnected = useMixerInfo()
+  const isHubConnected = useSocketInfo()
+  const [programs, previews] = useProgramPreview()
 
   const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
-
-  useSocket('program.changed', data => {
-    setPrograms(data.programs)
-    setPreviews(data.previews)
-  })
 
   useSocket('tallies', tallies => {
     setTallies(tallies)
   })
-  useSocket('mixer', mixer => {
-    setIsMixerConnected(mixer.isConnected)
-  })
   useSocket('config', config => {
     setChannels(config.channels.map(c => Channel.fromValueObject(c)))
-  })
-
-  socketEventEmitter.on("connected", function() {
-    setIsHubConnected(true)
-  })
-
-  socketEventEmitter.on("disconnected", function() {
-    setIsHubConnected(false)
   })
 
   const patchTally = function(tally, channel) {

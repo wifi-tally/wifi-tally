@@ -15,6 +15,7 @@ const next = require('next')
 const Log = require('./domain/Log')
 
 const EventEmitter = require('events')
+const SocketAwareEventPipe = require('./lib/SocketAwareEventPipe')
 
 // - program.changed
 // - tally.connected
@@ -30,6 +31,7 @@ const EventEmitter = require('events')
 // - config.changed.atem
 // - config.changed.mock
 const myEmitter = new EventEmitter()
+myEmitter.setMaxListeners(99)
 const myConfiguration = new Configuration(myEmitter)
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
 const myTallyDriver = new TallyDriver(myConfiguration.getTallies(), myEmitter)
@@ -46,19 +48,11 @@ myEmitter.on('tally.connected', updateTallies)
 myEmitter.on('tally.changed', updateTallies)
 myEmitter.on('tally.removed', updateTallies)
 
-// send events to browsers
-myEmitter.on('program.changed', (programs, previews) => {
-  io.emit('program.changed', {programs, previews})
-})
-
 const sendLogToTally = (tally, log) => {
   io.emit(`tally.logged.${tally.name}`, log)
 }
 const sendTalliesToBrowser = function() {
   io.emit('tallies', myTallyDriver.toValueObjects())
-}
-const sendMixerStateToBrowser = function(isConnected) {
-  return () => io.emit('mixer', {isConnected})
 }
 myEmitter.on('tally.connected', sendTalliesToBrowser)
 myEmitter.on('tally.changed', sendTalliesToBrowser)
@@ -82,11 +76,8 @@ myEmitter.on('config.changed', function() {
   io.emit('config', myConfiguration.mixerConfigToObject())
 })
 
-myEmitter.on('mixer.connected', sendMixerStateToBrowser(true))
-myEmitter.on('mixer.disconnected', sendMixerStateToBrowser(false))
-
 // send events to tallies
-myEmitter.on('program.changed', (programs, previews) => {
+myEmitter.on('program.changed', ({programs, previews}) => {
   myTallyDriver.setState(programs, previews)
 })
 myEmitter.on('tally.connected', (tally) => myTallyDriver.updateTally(tally.name))
@@ -126,13 +117,58 @@ myEmitter.on('config.changed.atem', () => {
 myEmitter.on('config.changed.mock', () => {
     console.info("configuration of Mock was changed")
 })
-myEmitter.on('program.changed', (programs, previews) => {
+myEmitter.on('program.changed', ({programs, previews}) => {
     console.info("Program/Preview was changed to ", programs, previews)
 })
 
 // socket.io server
 io.on('connection', socket => {
   socket.emit('tallies', myTallyDriver.toValueObjects())
+
+  const mixerEvents = [
+    // @TODO: use event objects instead of repeating the same structure again and again
+    new SocketAwareEventPipe(myEmitter, 'mixer.connected', socket, (socket) => {
+      socket.emit('mixer.state', {
+        isMixerConnected: true
+      })
+    }),
+    new SocketAwareEventPipe(myEmitter, 'mixer.disconnected', socket, (socket) => {
+      socket.emit('mixer.state', {
+        isMixerConnected: false
+      })
+    }),
+  ]
+  socket.on('events.mixer.subscribe', () => {
+    mixerEvents.forEach(pipe => pipe.register())
+    socket.emit('mixer.state', {
+      isMixerConnected: myMixerDriver.isConnected()
+    })
+  })
+  socket.off('events.mixer.unsubscribe', () => {
+    // @TODO: not used yet
+    mixerEvents.forEach(pipe => pipe.unregister())
+  })
+
+  const programEvents = [
+    new SocketAwareEventPipe(myEmitter, 'program.changed', socket, (socket, {programs, previews}) => {
+      socket.emit('program.state', {
+        programs: programs,
+        previews: previews,
+      })
+    })
+  ]
+  socket.on('events.program.subscribe', () => {
+    programEvents.forEach(pipe => pipe.register())
+
+    socket.emit('program.state', {
+      programs: myMixerDriver.getCurrentPrograms(),
+      previews: myMixerDriver.getCurrentPreviews(),
+    })
+  })
+  socket.on('events.program.unsubscribe', () => {
+    // @TODO: not used yet
+    programEvents.forEach(pipe => pipe.unregister())
+  })
 
   socket.on('tally.patch', (tallyName, channelId) => {
     myTallyDriver.patchTally(tallyName, channelId)
@@ -157,9 +193,6 @@ io.on('connection', socket => {
 nextApp.prepare().then(() => {
   app.get('/tallies', (req, res) => {
     res.json({
-      programs: myMixerDriver.getCurrentPrograms(),
-      previews: myMixerDriver.getCurrentPreviews(),
-      isMixerConnected: myMixerDriver.isConnected(),
       tallies: myTallyDriver.toValueObjects(),
     })
   })
