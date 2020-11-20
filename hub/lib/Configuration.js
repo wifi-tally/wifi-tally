@@ -5,7 +5,7 @@ const AtemConnector = require('./AtemConnector')
 const ObsConnector = require('./ObsConnector')
 const VmixConnector = require('./VmixConnector')
 const MockConnector = require('./MockConnector')
-const Channel = require('../domain/Channel')
+const {channelFromValueObject} = require('../domain/Channel')
 
 class Configuration {
     constructor(emitter) {
@@ -69,7 +69,7 @@ class Configuration {
                     this.mockChannelNames = config.mock.channelNames
                 }
                 if(Array.isArray(config.channels)) {
-                    this.channels = config.channels.map(vo => Channel.fromValueObject(vo))
+                    this.channels = config.channels.map(vo => channelFromValueObject(vo))
                 }
             } catch (e) {
                 if (e instanceof SyntaxError && rawdata.byteLength === 0) {

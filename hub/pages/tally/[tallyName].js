@@ -3,11 +3,11 @@ import fetch from 'isomorphic-unfetch'
 import {useSocket} from '../../hooks/useSocket'
 import Layout from '../../components/Layout'
 
-const Tally = require('../../domain/Tally')
-const Log = require('../../domain/Log')
+const {tallyFromValueObject} = require('../../domain/Tally')
+const {Log} = require('../../domain/Log')
 
 const TallyDetails = props => {
-  const [tally, setTally] = useState(Tally.fromValueObject(props.tally))
+  const [tally, setTally] = useState(tallyFromValueObject(props.tally))
   const [logs, setLogs] = useState(props.logs.map(log => Log.fromValueObject(log)))
 
   const socket = useSocket('tally.logged.' + tally.name, log => {

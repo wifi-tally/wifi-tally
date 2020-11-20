@@ -4,7 +4,7 @@ const MockConnector = require('./MockConnector.js')
 const NullConnector = require('./NullConnector.js')
 const ObsConnector = require('./ObsConnector.js')
 const MixerCommunicator = require('./MixerCommunicator.js')
-const Channel = require('../domain/Channel.js')
+const {Channel} = require('../domain/Channel')
 
 class MixerDriver {
     constructor(configuration, emitter) {

@@ -1,5 +1,8 @@
-class Channel {
-    constructor(id, name) {
+export class Channel {
+    id: string
+    name?: string
+
+    constructor(id: string, name?: string) {
         this.id = id.toString()
         this.name = name
     }
@@ -11,16 +14,16 @@ class Channel {
         }
     }
     toString() {
-        return name || id
+        return this.name || this.id
     }
 }
 
-Channel.fromValueObject = function(valueObject) {
+export type ChannelType = typeof Channel
+
+export const channelFromValueObject = function(valueObject: any) {
     const channel = new Channel(
         valueObject.id,
         valueObject.name,
     )
     return channel
 }
-
-module.exports = Channel

@@ -5,20 +5,20 @@ import useSocketInfo from '../hooks/useSocketInfo'
 import useMixerInfo from '../hooks/useMixerInfo'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import Channel from '../domain/Channel'
+import {channelFromValueObject} from '../domain/Channel'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
 import ChannelSelector from '../components/ChannelSelector'
 import useProgramPreview from '../hooks/useProgramPreview'
 
 
-const Tally = require('../domain/Tally')
+const {Tally, tallyFromValueObject} = require('../domain/Tally')
 
 const countConnectedTallies = tallies =>
-  tallies.reduce((count, tally) => count + (Tally.fromValueObject(tally).isConnected() ? 1 : 0), 0)
+  tallies.reduce((count, tally) => count + (tallyFromValueObject(tally).isConnected() ? 1 : 0), 0)
 
 const createTallyList = (tallies, showDisconnected, showUnpatched) => {
   return tallies.map(
-    tally => Tally.fromValueObject(tally)
+    tally => tallyFromValueObject(tally)
   ).filter(
     tally => (tally.isActive() || showDisconnected) && (tally.isPatched() || showUnpatched)
   ).sort(
@@ -47,7 +47,7 @@ const IndexPage = props => {
     setTallies(tallies)
   })
   useSocket('config', config => {
-    setChannels(config.channels.map(c => Channel.fromValueObject(c)))
+    setChannels(config.channels.map(c => channelFromValueObject(c)))
   })
 
   const patchTally = function(tally, channel) {
@@ -75,7 +75,17 @@ const IndexPage = props => {
   const format = tally => {
     let classPatched = "card "
 
-    if(tally.state === Tally.DISCONNECTED) {
+    if(tally.isActive()) {
+      if(!tally.isPatched()) {
+        classPatched += "bg-light "
+      } else if(tally.isIn(programs)) {
+        classPatched += "bg-danger "
+      } else if(tally.isIn(previews)) {
+        classPatched += "bg-success "
+      } else {
+        classPatched += "bg-secondary "
+      }
+    } else {
       classPatched += "bg-dark "
       if(!tally.isPatched()) {
         classPatched += "border-light "
@@ -85,16 +95,6 @@ const IndexPage = props => {
         classPatched += "border-success "
       } else {
         classPatched += "border-secondary "
-      }
-    } else {
-      if(!tally.isPatched()) {
-        classPatched += "bg-light "
-      } else if(tally.isIn(programs)) {
-        classPatched += "bg-danger "
-      } else if(tally.isIn(previews)) {
-        classPatched += "bg-success "
-      } else {
-        classPatched += "bg-secondary "
       }
     }
     return (
@@ -109,23 +109,23 @@ const IndexPage = props => {
               <ChannelSelector className="form-control" defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
             </div>
           </form>
-          {tally.state !== Tally.DISCONNECTED ? (
+          {tally.isActive() ? (
             <a href="#" className="card-link" onClick={e => handleHighlightTally(e, tally)}>Highlight</a>
           ) : ""}
-          {tally.state !== Tally.CONNECTED ? (
+          {!tally.isConnected() ? (
             <a href="#" className="card-link" onClick={e => handleRemoveTally(e, tally)}>Remove</a>
           ) : ""}
           <Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
             <a className="card-link">Logs</a>
           </Link>
         </div>
-        {tally.state === Tally.DISCONNECTED ? (
-          <div className="card-footer">disconnected</div>
-        ) : (         
-          <div className={tally.state === Tally.MISSING ? "card-footer bg-warning" : "card-footer"}>
-            <div className="card-footer-left">{tally.state === Tally.CONNECTED ? "connected" : "missing"}</div>
+        {tally.isActive() ? (
+          <div className={tally.isMissing() ? "card-footer bg-warning" : "card-footer"}>
+            <div className="card-footer-left">{tally.isMissing() ? "missing" : "connected"}</div>
             <div className="card-footer-right text-muted">{tally.address}:{tally.port}</div>
           </div>
+        ):(
+          <div className="card-footer">disconnected</div>
         )}
       </div>
     )
@@ -171,7 +171,7 @@ IndexPage.getInitialProps = async (context) => {
   // @TODO: use asynchronous calls
   const config = await fetch(baseUrl + '/atem')
   const configJson = await config.json()
-  info.channels = configJson.channels.map(c => Channel.fromValueObject(c))
+  info.channels = configJson.channels.map(c => channelFromValueObject(c))
 
   return info
 }

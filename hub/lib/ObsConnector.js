@@ -1,5 +1,5 @@
 const OBSWebSocket = require('obs-websocket-js')
-const Channel = require('../domain/Channel')
+const {Channel} = require('../domain/Channel')
 
 const reconnectTimeoutMs = 1000
 

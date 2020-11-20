@@ -1,6 +1,6 @@
 /* helper so that video mixer connectors do not need to implement events */
 
-const Channel = require("../domain/Channel")
+const {Channel} = require("../domain/Channel")
 
 const haveValuesChanged = (lastArray, newArray) => {
     if(Array.isArray(lastArray) && Array.isArray(newArray)) {

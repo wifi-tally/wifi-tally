@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const Configuration = require('./Configuration')
 const EventEmitter = require('events')
-const Channel = require('../domain/Channel')
+const {Channel} = require('../domain/Channel')
 
 describe('Configuration', () => {
     describe('load()', () => {

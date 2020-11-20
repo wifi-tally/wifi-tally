@@ -12,7 +12,7 @@ const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const next = require('next')
-const Log = require('./domain/Log')
+const {Log, Severity, logFromValueObject} = require('./domain/Log')
 
 const EventEmitter = require('events')
 const SocketAwareEventPipe = require('./lib/SocketAwareEventPipe')
@@ -62,12 +62,13 @@ myEmitter.on('tally.changed', (tally) => {
 })
 myEmitter.on('tally.missing', sendTalliesToBrowser)
 myEmitter.on('tally.missing', (tally, diff) => {
-  const log = tally.addLog(new Date(), Log.STATUS, `Tally got missing. It has not reported for ${diff}ms`)
+  // @TODO: Logging should be the job of Tally Driver
+  const log = tally.addLog(new Date(), Severity.STATUS, `Tally got missing. It has not reported for ${diff}ms`)
   sendLogToTally(tally, log)
 })
 myEmitter.on('tally.timedout', sendTalliesToBrowser)
 myEmitter.on('tally.timedout', (tally, diff) => {
-  const log = tally.addLog(new Date(), Log.STATUS, `Tally got disconnected after not reporting for ${diff}ms`)
+  const log = tally.addLog(new Date(), Severity.STATUS, `Tally got disconnected after not reporting for ${diff}ms`)
   sendLogToTally(tally, log)
 })
 myEmitter.on('tally.removed', sendTalliesToBrowser)

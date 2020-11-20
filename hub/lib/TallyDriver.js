@@ -1,4 +1,4 @@
-const Tally = require('../domain/Tally')
+const {ConnectionState, Tally, tallyFromValueObject} = require('../domain/Tally')
 const dgram = require('dgram');
 
 const tallyHighlightTime = 1000 // ms
@@ -38,7 +38,7 @@ class TallyDriver {
     constructor(tallies, emitter) {
         this.tallies = new Map();
         (tallies || []).forEach(tally => {
-            tally = Tally.fromValueObject(tally)
+            tally = tallyFromValueObject(tally)
             this.tallies.set(tally.name, tally)
         })
         this.emitter = emitter
@@ -85,24 +85,24 @@ class TallyDriver {
         const lastTallyReport = new Map();
         this.emitter.on('tally.reported', tally => {
             lastTallyReport.set(tally.name, new Date())
-            tally.state = Tally.CONNECTED
+            tally.state = ConnectionState.CONNECTED
         })
 
         setInterval(() => {
             const now = new Date()
             this.tallies.forEach(tally => {
                 if(!lastTallyReport.has(tally.name)) {
-                    tally.state = Tally.DISCONNECTED
+                    tally.state = ConnectionState.DISCONNECTED
                 } else {
                     const diff = now - lastTallyReport.get(tally.name) // milliseconds
                     if(diff > 30000) {
-                        if(tally.state !== Tally.DISCONNECTED) {
-                            tally.state = Tally.DISCONNECTED
+                        if(tally.state !== ConnectionState.DISCONNECTED) {
+                            tally.state = ConnectionState.DISCONNECTED
                             this.emitter.emit('tally.timedout', tally, diff)
                         }
                     } else if(diff > 3000) {
-                        if(tally.state !== Tally.MISSING) {
-                            tally.state = Tally.MISSING
+                        if(tally.state !== ConnectionState.MISSING) {
+                            tally.state = ConnectionState.MISSING
                             this.emitter.emit('tally.missing', tally, diff)
                         }
                     }
@@ -123,8 +123,8 @@ class TallyDriver {
             this.tallies.set(tallyName, tally)
         }
         const tally = this.tallies.get(tallyName)
-        if(tally.state !== Tally.CONNECTED) {
-            tally.state = Tally.CONNECTED
+        if(tally.state !== ConnectionState.CONNECTED) {
+            tally.state = ConnectionState.CONNECTED
             tally.address = rinfo.address;
             tally.port = rinfo.port;
             this.emitter.emit('tally.connected', tally)
