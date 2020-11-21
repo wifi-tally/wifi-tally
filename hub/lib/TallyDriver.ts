@@ -1,6 +1,7 @@
 import { ConnectionState, Tally } from '../domain/Tally'
 import dgram from 'dgram'
-import { EventEmitter } from 'events'
+import ServerEventEmitter from './ServerEventEmitter'
+import { ChannelList } from './MixerCommunicator'
 
 const tallyHighlightTime = 1000 // ms
 // the more keep alives you send the less likely it is that
@@ -8,7 +9,7 @@ const tallyHighlightTime = 1000 // ms
 // over the network.
 const keepAlivesPerSecond = 10
 
-const updateTally = function(tally: Tally, io: dgram.Socket, programs: string[] | null, previews: string[] | null) {
+const updateTally = function(tally: Tally, io: dgram.Socket, programs: ChannelList, previews: ChannelList) {
     if(tally.isActive()) {
         let command = "release"
         if(tally.isHighlighted()) {
@@ -38,11 +39,11 @@ class InvalidCommandError extends Error {
 export class TallyDriver {
     io: dgram.Socket
     tallies: Map<string, Tally>
-    emitter: EventEmitter
-    lastPrograms: string[] | null
-    lastPreviews: string[] | null
+    emitter: ServerEventEmitter
+    lastPrograms: ChannelList
+    lastPreviews: ChannelList
 
-    constructor(tallies: object[], emitter: EventEmitter) {
+    constructor(tallies: object[], emitter: ServerEventEmitter) {
         this.tallies = new Map();
         (tallies || []).forEach(tally => {
             const theTally = Tally.fromValueObject(tally)
@@ -69,7 +70,7 @@ export class TallyDriver {
                     const tally = this.tallyReported(tallyName, rinfo)
                     if (tally) {
                         const log = tally.addLog(new Date(), severity, message)
-                        this.emitter.emit('tally.logged', tally, log)
+                        this.emitter.emit('tally.logged', {tally, log})
                     }
                 } else {
                     throw new InvalidCommandError(theMsg)
@@ -108,12 +109,12 @@ export class TallyDriver {
                     if(diff > 30000) {
                         if(tally.state !== ConnectionState.DISCONNECTED) {
                             tally.state = ConnectionState.DISCONNECTED
-                            this.emitter.emit('tally.timedout', tally, diff)
+                            this.emitter.emit('tally.timedout', {tally, diff})
                         }
                     } else if(diff > 3000) {
                         if(tally.state !== ConnectionState.MISSING) {
                             tally.state = ConnectionState.MISSING
-                            this.emitter.emit('tally.missing', tally, diff)
+                            this.emitter.emit('tally.missing', {tally, diff})
                         }
                     }
                 }
@@ -144,7 +145,7 @@ export class TallyDriver {
             tally.port = rinfo.port;
             this.emitter.emit('tally.changed', tally)
         }
-        this.emitter.emit('tally.reported', this.tallies.get(tallyName))
+        this.emitter.emit('tally.reported', tally)
         return tally
     }
     highlight(tallyName) {
@@ -159,27 +160,27 @@ export class TallyDriver {
             this.updateTally(tallyName)
         }
     }
-    setState(programs, previews) {
+    setState(programs: ChannelList, previews: ChannelList) {
         this.lastPrograms = programs
         this.lastPreviews = previews
 
         this.updateTallies()
     }
-    patchTally(tallyName, channelId) {
+    patchTally(tallyName: string, channelId: string) {
         const tally = this.tallies.get(tallyName)
         if (tally) {
             tally.channelId = channelId
             this.emitter.emit('tally.changed', tally)
         }
     }
-    removeTally(tallyName) {
-        if(this.tallies.has(tallyName)) {
-            const tally = this.tallies.get(tallyName)
+    removeTally(tallyName: string) {
+        const tally = this.tallies.get(tallyName)
+        if(tally) {
             this.tallies.delete(tallyName)
             this.emitter.emit('tally.removed', tally)
         }
     }
-    updateTally(tallyName) {
+    updateTally(tallyName: string) {
         const tally = this.tallies.get(tallyName)
         if (tally) {
             updateTally(tally, this.io, this.lastPrograms, this.lastPreviews)

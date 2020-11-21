@@ -1,9 +1,9 @@
-const tmp = require('tmp')
+import tmp from 'tmp'
 tmp.setGracefulCleanup()
-const fs = require('fs')
+import fs from 'fs'
 
 import { Configuration } from './Configuration'
-const EventEmitter = require('events')
+import { EventEmitter } from 'events'
 import Channel from '../domain/Channel'
 
 describe('Configuration', () => {

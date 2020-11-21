@@ -3,8 +3,8 @@ import fetch from 'isomorphic-unfetch'
 import {useSocket} from '../../hooks/useSocket'
 import Layout from '../../components/Layout'
 
-const {Tally} = require('../../domain/Tally')
-const {Log} = require('../../domain/Log')
+import Tally from '../../domain/Tally'
+import Log from '../../domain/Log'
 
 const TallyDetails = props => {
   const [tally, setTally] = useState(Tally.fromValueObject(props.tally))

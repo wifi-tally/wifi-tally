@@ -9,9 +9,7 @@ import Channel from '../domain/Channel'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
 import ChannelSelector from '../components/ChannelSelector'
 import useProgramPreview from '../hooks/useProgramPreview'
-
-
-const {Tally} = require('../domain/Tally')
+import Tally from '../domain/Tally'
 
 const countConnectedTallies = tallies =>
   tallies.reduce((count, tally) => count + (Tally.fromValueObject(tally).isConnected() ? 1 : 0), 0)

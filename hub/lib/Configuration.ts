@@ -6,11 +6,11 @@ import ObsConnector from '../mixer/obs/ObsConnector'
 import VmixConnector from '../mixer/vmix/VmixConnector'
 import MockConnector from '../mixer/mock/MockConnector'
 import Channel from '../domain/Channel'
-import {EventEmitter} from 'events'
 import { TallyDriver } from './TallyDriver'
+import ServerEventEmitter from './ServerEventEmitter'
 
 export class Configuration {
-    emitter: EventEmitter
+    emitter: ServerEventEmitter
     atemIp?: string // @TODO: it it possible to make a checked type out of it?
     atemPort?: number
     obsIp?: string
@@ -25,7 +25,7 @@ export class Configuration {
     mixerSelection?: string
     configFileName: string
     
-    constructor(emitter: EventEmitter) {
+    constructor(emitter: ServerEventEmitter) {
         this.emitter = emitter
         this.tallies = []
         this.channels = MixerDriver.defaultChannels

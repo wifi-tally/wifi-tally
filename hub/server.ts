@@ -1,7 +1,11 @@
 // set NODE_ENV from argument to enable portability to windows
-const yargs = require('yargs').argv
-if (yargs.env !== undefined) {
-  process.env.NODE_ENV = yargs.env
+import yargs from 'yargs'
+
+const argv = yargs.argv
+if (argv.env !== undefined) {
+  // @ts-ignore @TODO: setting the env is not nice, but the easiest way to be cross-platform compatible
+  // @see https://github.com/wifi-tally/wifi-tally/issues/18
+  process.env.NODE_ENV = argv.env
 }
 
 import { TallyDriver } from './lib/TallyDriver'
@@ -9,28 +13,19 @@ import { Configuration } from './lib/Configuration'
 import { MixerDriver } from './lib/MixerDriver'
 import express from 'express'
 const app = express()
-const server = require('http').Server(app)
-const io = require('socket.io')(server)
+import { Server } from 'http'
+const server = new Server(app)
+import socketIo from 'socket.io'
+const io = socketIo(server)
 import next from 'next'
-import { Severity } from './domain/Log'
+import Log, { Severity } from './domain/Log'
 
-import { EventEmitter } from 'events'
 import { SocketAwareEvent } from './lib/SocketAwareEvent'
+import ServerEventEmitter from './lib/ServerEventEmitter'
+import Tally from './domain/Tally'
+import { ServerSideSocket } from './lib/SocketEvents'
 
-// - program.changed
-// - tally.connected
-// - tally.changed
-// - tally.reported
-// - tally.missing
-// - tally.timedout
-// - tally.removed
-// - tally.logged
-// - atem.connected
-// - atem.disconnected
-// - config.changed.mixer
-// - config.changed.atem
-// - config.changed.mock
-const myEmitter = new EventEmitter()
+const myEmitter = new ServerEventEmitter()
 myEmitter.setMaxListeners(99)
 const myConfiguration = new Configuration(myEmitter)
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
@@ -48,7 +43,7 @@ myEmitter.on('tally.connected', updateTallies)
 myEmitter.on('tally.changed', updateTallies)
 myEmitter.on('tally.removed', updateTallies)
 
-const sendLogToTally = (tally, log) => {
+const sendLogToTally = (tally: Tally, log: Log) => {
   io.emit(`tally.logged.${tally.name}`, log)
 }
 const sendTalliesToBrowser = function() {
@@ -56,19 +51,19 @@ const sendTalliesToBrowser = function() {
 }
 myEmitter.on('tally.connected', sendTalliesToBrowser)
 myEmitter.on('tally.changed', sendTalliesToBrowser)
-myEmitter.on('tally.logged', sendLogToTally)
+myEmitter.on('tally.logged', ({tally, log}) => sendLogToTally(tally, log))
 myEmitter.on('tally.changed', (tally) => {
   io.emit(`tally.changed.${tally.name}`, myTallyDriver.toValueObjects())
 })
 myEmitter.on('tally.missing', sendTalliesToBrowser)
-myEmitter.on('tally.missing', (tally, diff) => {
+myEmitter.on('tally.missing', ({tally, diff}) => {
   // @TODO: Logging should be the job of Tally Driver
-  const log = tally.addLog(new Date(), Severity.STATUS, `Tally got missing. It has not reported for ${diff}ms`)
+  const log = tally.addLog(new Date(), null, `Tally got missing. It has not reported for ${diff}ms`)
   sendLogToTally(tally, log)
 })
 myEmitter.on('tally.timedout', sendTalliesToBrowser)
-myEmitter.on('tally.timedout', (tally, diff) => {
-  const log = tally.addLog(new Date(), Severity.STATUS, `Tally got disconnected after not reporting for ${diff}ms`)
+myEmitter.on('tally.timedout', ({tally, diff}) => {
+  const log = tally.addLog(new Date(), null, `Tally got disconnected after not reporting for ${diff}ms`)
   sendLogToTally(tally, log)
 })
 myEmitter.on('tally.removed', sendTalliesToBrowser)
@@ -91,16 +86,16 @@ myEmitter.on('tally.connected', tally => {
 myEmitter.on('tally.changed', tally => {
     console.debug(`Tally ${tally.name} changed configuration`)
 })
-myEmitter.on('tally.missing', tally => {
+myEmitter.on('tally.missing', ({tally}) => {
     console.warn(`Tally ${tally.name} went missing`)
 })
-myEmitter.on('tally.timedout', tally => {
+myEmitter.on('tally.timedout', ({tally}) => {
     console.warn(`Tally ${tally.name} timed out`)
 })
 myEmitter.on('tally.removed', tally => {
     console.debug(`Tally ${tally.name} removed from configuration`)
 })
-myEmitter.on('tally.logged', (tally, log) => {
+myEmitter.on('tally.logged', ({tally, log}) => {
     let fn = console.info
     if(log.isError()) { 
       fn = console.error 
@@ -109,43 +104,35 @@ myEmitter.on('tally.logged', (tally, log) => {
     }
     fn(`${tally.name}: ${log.message}`)
 })
-myEmitter.on('config.changed.mixer', mixerSelection => {
-    console.info(`configured mixer was changed to "${mixerSelection}"`)
-})
-myEmitter.on('config.changed.atem', () => {
-    console.info("configuration of ATEM was changed")
-})
-myEmitter.on('config.changed.mock', () => {
-    console.info("configuration of Mock was changed")
-})
 myEmitter.on('program.changed', ({programs, previews}) => {
     console.info("Program/Preview was changed to ", programs, previews)
 })
 
 // socket.io server
-io.on('connection', socket => {
+io.on('connection', (socket: ServerSideSocket) => {
+  
   socket.emit('tallies', myTallyDriver.toValueObjects())
 
   const mixerEvents = [
     // @TODO: use event objects instead of repeating the same structure again and again
     new SocketAwareEvent(myEmitter, 'mixer.connected', socket, (socket) => {
       socket.emit('mixer.state', {
-        isMixerConnected: true
+        isConnected: true
       })
     }),
     new SocketAwareEvent(myEmitter, 'mixer.disconnected', socket, (socket) => {
       socket.emit('mixer.state', {
-        isMixerConnected: false
+        isConnected: false
       })
     }),
   ]
   socket.on('events.mixer.subscribe', () => {
     mixerEvents.forEach(pipe => pipe.register())
     socket.emit('mixer.state', {
-      isMixerConnected: myMixerDriver.isConnected()
+      isConnected: myMixerDriver.isConnected()
     })
   })
-  socket.off('events.mixer.unsubscribe', () => {
+  socket.on('events.mixer.unsubscribe', () => {
     // @TODO: not used yet
     mixerEvents.forEach(pipe => pipe.unregister())
   })
@@ -227,8 +214,7 @@ nextApp.prepare().then(() => {
     return nextHandler(req, res)
   })
 
-  server.listen(myConfiguration.getHttpPort(), err => {
-    if (err) throw err
+  server.listen(myConfiguration.getHttpPort(), () => {
     console.log(`Web Server available on http://localhost:${myConfiguration.getHttpPort()}`)
   })
 })

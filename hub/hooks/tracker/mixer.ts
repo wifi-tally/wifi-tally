@@ -1,14 +1,15 @@
 import {EventEmitter} from 'events'
+import { ClientSideSocket } from '../../lib/SocketEvents'
 
 class MixerTracker extends EventEmitter{
     connectionState: boolean | null
 
-    constructor(socket: SocketIOClient.Socket) {
+    constructor(socket: ClientSideSocket) {
         super()
         this.connectionState = null
         
-        socket.on('mixer.state', (data) => {
-            this.connectionState = data.isMixerConnected
+        socket.on('mixer.state', ({isConnected}) => {
+            this.connectionState = isConnected
             this.emit('connection', this.connectionState)
         })
         socket.emit('events.mixer.subscribe')

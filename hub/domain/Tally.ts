@@ -45,7 +45,7 @@ export class Tally {
     isHighlighted() : boolean {
         return this.highlight
     }
-    addLog(dateTime: Date | string | null, severity: string, message: string) {
+    addLog(dateTime: Date | string | null, severity: string | null, message: string) {
         const log = new Log(dateTime, severity, message)
         this.logs.push(log)
         return log

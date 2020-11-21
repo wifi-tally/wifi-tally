@@ -5,14 +5,12 @@ export enum Severity {
     STATUS = 3,
 }
 
-export type SeverityType = typeof Severity
-
 export class Log {
     severity: Severity
     dateTime: Date
     message: string
 
-    constructor(dateTime: Date | string | null, severity: string, message: string) {
+    constructor(dateTime: Date | string | null, severity: string | null, message: string) {
         if(typeof dateTime === "string") {
             this.dateTime = new Date(dateTime)
         } else if (dateTime instanceof Date) {

@@ -2,7 +2,7 @@
 
 import Channel from "../domain/Channel"
 import { Configuration } from "./Configuration"
-import {EventEmitter} from "events"
+import ServerEventEmitter from "./ServerEventEmitter"
 
 const haveValuesChanged = (lastArray: any, newArray: any) => {
     if(Array.isArray(lastArray) && Array.isArray(newArray)) {
@@ -12,14 +12,16 @@ const haveValuesChanged = (lastArray: any, newArray: any) => {
     }
 }
 
+export type ChannelList = string[] | null
+
 export class MixerCommunicator {
     configuration: Configuration
-    emitter: EventEmitter
-    currentPrograms: string[] | null
-    currentPreviews: string[] | null
+    emitter: ServerEventEmitter
+    currentPrograms: ChannelList
+    currentPreviews: ChannelList
     isConnected: boolean | null
     
-    constructor(configuration: Configuration, emitter: EventEmitter) {
+    constructor(configuration: Configuration, emitter: ServerEventEmitter) {
         this.configuration = configuration
         this.emitter = emitter
 
@@ -28,7 +30,7 @@ export class MixerCommunicator {
         this.isConnected = null
     }
 
-    private changeProgramsIfNecessary(programs: string[] | null) {
+    private changeProgramsIfNecessary(programs: ChannelList) {
         programs = programs ? programs.map(v => v.toString()) : null
         if (haveValuesChanged(programs, this.currentPrograms)) {
             this.currentPrograms = programs
@@ -38,7 +40,7 @@ export class MixerCommunicator {
         }
     }
 
-    private changePreviewsIfNecessary(previews: string[] | null) {
+    private changePreviewsIfNecessary(previews: ChannelList) {
         previews = previews ? previews.map(v => v.toString()) : null
         if (haveValuesChanged(previews, this.currentPreviews)) {
             this.currentPreviews = previews
@@ -48,7 +50,7 @@ export class MixerCommunicator {
         }
     }
 
-    notifyProgramPreviewChanged(programs: string[] | null, previews: string[] | null) {
+    notifyProgramPreviewChanged(programs: ChannelList, previews: ChannelList) {
         const programChanged = this.changeProgramsIfNecessary(programs)
         const previewChanged = this.changePreviewsIfNecessary(previews)
         if (previewChanged || programChanged) {
@@ -56,14 +58,14 @@ export class MixerCommunicator {
         }
     }
 
-    notifyProgramChanged(programs: string[] | null) {
+    notifyProgramChanged(programs: ChannelList) {
         const programChanged = this.changeProgramsIfNecessary(programs)
         if (programChanged) {
             this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 
-    notifyPreviewChanged(previews: string[] | null) {
+    notifyPreviewChanged(previews: ChannelList) {
         const previewChanged = this.changePreviewsIfNecessary(previews)
         if (previewChanged) {
             this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })

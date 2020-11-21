@@ -1,20 +1,16 @@
 import {EventEmitter} from 'events'
+import { ChannelList } from '../../lib/MixerCommunicator'
+import { ClientSideSocket } from '../../lib/SocketEvents'
 
 class ProgramTracker extends EventEmitter{
-    programs: string[] | null
-    previews: string[] | null
+    programs: ChannelList
+    previews: ChannelList
     
-    constructor(socket: SocketIOClient.Socket, socketEventEmitter: EventEmitter) {
+    constructor(socket: ClientSideSocket, socketEventEmitter: EventEmitter) {
         super()
         this.programs = null
         this.previews = null
 
-        socket.on('program.changed', ({programs, previews}) => {
-            console.log("program.changed", programs, previews)
-            this.programs = programs
-            this.previews = previews
-            this.emit('program', this.programs, this.previews)
-        })
         socket.on('program.state', ({programs, previews}) => {
             console.log("program.state", programs, previews)
             this.programs = programs

@@ -6,20 +6,21 @@ import ObsConnector from '../mixer/obs/ObsConnector'
 import { MixerCommunicator } from './MixerCommunicator'
 import Channel from '../domain/Channel'
 import type { Configuration } from './Configuration'
-import type { EventEmitter } from 'events'
+import ServerEventEmitter from './ServerEventEmitter'
+import { Connector } from '../mixer/interfaces'
 
 // Takes care of connecting to one of the supported mixers
 export class MixerDriver {
     currentMixerId?: string
-    currentMixerInstance?: any // @TODO
-    currentMixerSettings: any[]
+    currentMixerInstance?: Connector
+    currentMixerSettings: unknown[]
     getCurrentMixerSettings?: Function
     configuration: Configuration
     communicator: MixerCommunicator
-    emitter: EventEmitter
+    emitter: ServerEventEmitter
     isChangingMixer: boolean
     
-    constructor(configuration: Configuration, emitter: EventEmitter) {
+    constructor(configuration: Configuration, emitter: ServerEventEmitter) {
         this.currentMixerSettings = []
         this.configuration = configuration
         this.communicator = new MixerCommunicator(configuration, emitter)
@@ -102,7 +103,7 @@ export class MixerDriver {
             this.currentMixerId = newMixerId
             this.currentMixerSettings = this.getCurrentMixerSettings()
             this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.communicator)
-            const ret = this.currentMixerInstance.connect()
+            const ret = this.currentMixerInstance?.connect()
             await Promise.resolve(ret)
         }
         finally {
@@ -118,7 +119,7 @@ export class MixerDriver {
         return this.communicator.getCurrentPreviews()
     }
     isConnected() {
-        return this.currentMixerInstance && this.currentMixerInstance.isConnected()
+        return this.currentMixerInstance !== undefined && this.currentMixerInstance.isConnected()
     }
 
 
