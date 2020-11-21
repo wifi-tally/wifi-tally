@@ -1,7 +1,9 @@
-import EventEmitter from 'events'
+import {EventEmitter} from 'events'
 
 class MixerTracker extends EventEmitter{
-    constructor(socket) {
+    connectionState: boolean | null
+
+    constructor(socket: SocketIOClient.Socket) {
         super()
         this.connectionState = null
         
@@ -13,4 +15,4 @@ class MixerTracker extends EventEmitter{
     }
 }
 
-module.exports = MixerTracker;
+export default MixerTracker

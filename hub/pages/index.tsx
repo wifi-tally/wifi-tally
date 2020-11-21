@@ -5,20 +5,20 @@ import useSocketInfo from '../hooks/useSocketInfo'
 import useMixerInfo from '../hooks/useMixerInfo'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import {channelFromValueObject} from '../domain/Channel'
+import Channel from '../domain/Channel'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
 import ChannelSelector from '../components/ChannelSelector'
 import useProgramPreview from '../hooks/useProgramPreview'
 
 
-const {Tally, tallyFromValueObject} = require('../domain/Tally')
+const {Tally} = require('../domain/Tally')
 
 const countConnectedTallies = tallies =>
-  tallies.reduce((count, tally) => count + (tallyFromValueObject(tally).isConnected() ? 1 : 0), 0)
+  tallies.reduce((count, tally) => count + (Tally.fromValueObject(tally).isConnected() ? 1 : 0), 0)
 
 const createTallyList = (tallies, showDisconnected, showUnpatched) => {
   return tallies.map(
-    tally => tallyFromValueObject(tally)
+    tally => Tally.fromValueObject(tally)
   ).filter(
     tally => (tally.isActive() || showDisconnected) && (tally.isPatched() || showUnpatched)
   ).sort(
@@ -47,7 +47,7 @@ const IndexPage = props => {
     setTallies(tallies)
   })
   useSocket('config', config => {
-    setChannels(config.channels.map(c => channelFromValueObject(c)))
+    setChannels(config.channels.map(c => Channel.fromValueObject(c)))
   })
 
   const patchTally = function(tally, channel) {
@@ -171,7 +171,7 @@ IndexPage.getInitialProps = async (context) => {
   // @TODO: use asynchronous calls
   const config = await fetch(baseUrl + '/atem')
   const configJson = await config.json()
-  info.channels = configJson.channels.map(c => channelFromValueObject(c))
+  info.channels = configJson.channels.map(c => Channel.fromValueObject(c))
 
   return info
 }

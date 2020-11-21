@@ -1,3 +1,6 @@
+import { EventEmitter } from 'events'
+import { Socket } from 'socket.io'
+
 /* Takes care that an event on the server is passed through
  * a socket to the browser.
  * 
@@ -5,8 +8,14 @@
  * and unregistered accordingly. This should prevent dangling event
  * listeners as much as possible.
  */
-class SocketAwareEvent {
-    constructor(eventEmitter, eventName, socket, fnc) {
+export class SocketAwareEvent {
+    eventEmitter: EventEmitter
+    socket: Socket
+    eventName: string
+    eventListener: (...args: any[]) => void
+    isRegistered: boolean
+    
+    constructor(eventEmitter: EventEmitter, eventName, socket, fnc) {
         this.eventEmitter = eventEmitter
         this.socket = socket
         this.eventName = eventName
@@ -36,5 +45,3 @@ class SocketAwareEvent {
         this.isRegistered = false
     }
 }
-
-module.exports = SocketAwareEvent

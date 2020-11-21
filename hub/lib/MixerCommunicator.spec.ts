@@ -1,6 +1,6 @@
-const MixerCommunicator = require('./MixerCommunicator.js')
-const Configuration = require('./Configuration.js')
-const EventEmitter = require('events')
+import { MixerCommunicator } from './MixerCommunicator'
+import { Configuration } from './Configuration'
+import { EventEmitter } from 'events'
 
 describe('MixerCommunicator', () => {
     describe('notifyProgramPreviewChanged', () => {
@@ -15,12 +15,12 @@ describe('MixerCommunicator', () => {
                 expect(programs).toEqual(expectedPrograms)
                 expect(previews).toEqual(expectedPreviews)
             })
-            const config = new Configuration("does_not_exist.json", emitter)
+            const config = new Configuration(emitter)
 
             const communicator = new MixerCommunicator(config, emitter)
 
             expect(eventSeen).toEqual(0)
-            communicator.notifyProgramPreviewChanged([1], [2])
+            communicator.notifyProgramPreviewChanged(["1"], ["2"])
             expect(eventSeen).toEqual(1)
             expect(communicator.getCurrentPrograms()).toEqual(["1"])
             expect(communicator.getCurrentPreviews()).toEqual(["2"])
@@ -36,33 +36,33 @@ describe('MixerCommunicator', () => {
             const emitter = new EventEmitter()
             let eventSeen = 0
             emitter.on("program.changed", _ => eventSeen++)
-            const config = new Configuration("does_not_exist.json", emitter)
+            const config = new Configuration(emitter)
 
             const communicator = new MixerCommunicator(config, emitter)
 
             expect(eventSeen).toEqual(0)
-            communicator.notifyProgramPreviewChanged([1], [2])
+            communicator.notifyProgramPreviewChanged(["1"], ["2"])
             expect(eventSeen).toEqual(1)
             // same settings again
-            communicator.notifyProgramPreviewChanged([1], [2])
+            communicator.notifyProgramPreviewChanged(["1"], ["2"])
             expect(eventSeen).toEqual(1)
             // preview has changed
-            communicator.notifyProgramPreviewChanged([1], [3])
+            communicator.notifyProgramPreviewChanged(["1"], ["3"])
             expect(eventSeen).toEqual(2)
             // program has changed
-            communicator.notifyProgramPreviewChanged([2], [3])
+            communicator.notifyProgramPreviewChanged(["2"], ["3"])
             expect(eventSeen).toEqual(3)
             // preview added
-            communicator.notifyProgramPreviewChanged([2], [3,4])
+            communicator.notifyProgramPreviewChanged(["2"], ["3","4"])
             expect(eventSeen).toEqual(4)
             // same settings again
-            communicator.notifyProgramPreviewChanged([2], [3,4])
+            communicator.notifyProgramPreviewChanged(["2"], ["3","4"])
             expect(eventSeen).toEqual(4)
             // program removed
-            communicator.notifyProgramPreviewChanged([], [3,4])
+            communicator.notifyProgramPreviewChanged([], ["3","4"])
             expect(eventSeen).toEqual(5)
             // same settings again
-            communicator.notifyProgramPreviewChanged([], [3,4])
+            communicator.notifyProgramPreviewChanged([], ["3","4"])
             expect(eventSeen).toEqual(5)
         })
     })
@@ -72,8 +72,8 @@ describe('MixerCommunicator', () => {
             let eventSeen = 0
 
             emitter.on("config.changed", () => eventSeen++)
-            const config = new Configuration("does_not_exist.json", emitter)
-            config.save = () => {} // mock it away
+            const config = new Configuration(emitter)
+            config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
 
@@ -99,8 +99,8 @@ describe('MixerCommunicator', () => {
             let eventSeen = 0
 
             emitter.on("config.changed", () => eventSeen++)
-            const config = new Configuration("does_not_exist.json", emitter)
-            config.save = () => {} // mock it away
+            const config = new Configuration(emitter)
+            config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
 
@@ -139,8 +139,8 @@ describe('MixerCommunicator', () => {
 
             emitter.on("mixer.connected", () => connectEventSeen++)
             emitter.on("mixer.disconnected", () => disconnectEventSeen++)
-            const config = new Configuration("does_not_exist.json", emitter)
-            config.save = () => {} // mock it away
+            const config = new Configuration(emitter)
+            config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
 
@@ -162,8 +162,8 @@ describe('MixerCommunicator', () => {
 
             emitter.on("mixer.connected", () => connectEventSeen++)
             emitter.on("mixer.disconnected", () => disconnectEventSeen++)
-            const config = new Configuration("does_not_exist.json", emitter)
-            config.save = () => {} // mock it away
+            const config = new Configuration(emitter)
+            config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
 

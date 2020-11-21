@@ -1,4 +1,4 @@
-import {LogType} from './Log'
+import Log from './Log'
 
 export enum ConnectionState {
     DISCONNECTED = 0,
@@ -13,7 +13,7 @@ export class Tally {
     port?: number
     state: ConnectionState
     highlight: boolean
-    logs: LogType[]
+    logs: Log[]
 
     constructor(name: string, channelId?: string, address?: string, port?: number, state: ConnectionState = ConnectionState.DISCONNECTED) {
         this.name = name
@@ -64,20 +64,21 @@ export class Tally {
     }
     isIn(channelNames: string[] = []) : boolean {
         if (channelNames === null) return false
+        if (this.channelId === undefined) return false
 
         return channelNames.indexOf(this.channelId) !== -1
     }
+
+    static fromValueObject = function(valueObject: any) {
+        const tally = new Tally(
+            valueObject.name,
+            valueObject.channelId,
+            valueObject.address,
+            valueObject.port,
+            valueObject.state
+        )
+        return tally
+    }
 }
 
-export const tallyFromValueObject = function(valueObject: any) {
-    const tally = new Tally(
-        valueObject.name,
-        valueObject.channelId,
-        valueObject.address,
-        valueObject.port,
-        valueObject.state
-    )
-    return tally
-}
-
-
+export default Tally

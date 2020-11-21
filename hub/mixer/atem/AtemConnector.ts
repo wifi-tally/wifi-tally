@@ -1,26 +1,37 @@
+import { MixerCommunicator } from '../../lib/MixerCommunicator'
+import {Connector} from '../interfaces'
 // atem-connection v2.0.0 is needed to monitor status of the connection
-const { Atem, AtemConnectionStatus } = require('atem-connection')
+import { Atem } from 'atem-connection'
+import { InternalPortType } from 'atem-connection/dist/enums'
+import Channel from '../../domain/Channel'
 
-class AtemConnector {
-    constructor(ip, port, communicator) {
+class AtemConnector implements Connector {
+    ip: string
+    port: number
+    communicator: MixerCommunicator
+    isAtemConnected: boolean
+    myAtem: Atem | null
+    
+    constructor(ip: string, port: number, communicator: MixerCommunicator) {
         this.ip = ip
         this.port = port
         this.communicator = communicator
         this.isAtemConnected = false
     }
-    onStateChange() {
-        const programs = this.myAtem.listVisibleInputs("program").sort()
-        const previews = this.myAtem.listVisibleInputs("preview").sort()
-        this.communicator.notifyProgramPreviewChanged(programs, previews)
+    private onStateChange() {
+        if (this.myAtem) {
+            const programs = this.myAtem.listVisibleInputs("program").sort().map(i => i.toString())
+            const previews = this.myAtem.listVisibleInputs("preview").sort().map(i => i.toString())
+            this.communicator.notifyProgramPreviewChanged(programs, previews)
 
-        const channelNames = Object.values(this.myAtem.state.inputs).reduce((map, input) => {
-            if (input.isExternal) {
-                map[input.inputId] = input.longName
-            }
-            return map
-        }, {})
-        const channelCount = Object.keys(channelNames).length
-        this.communicator.notifyChannelNames(channelCount, channelNames)
+            const channels = Object.values(this.myAtem.state?.inputs || {}).reduce((channels: Channel[], input) => {
+                if (input && input.internalPortType === InternalPortType.External) {
+                    channels.push(new Channel(input.inputId.toString(), input.longName))
+                }
+                return channels
+            }, [])
+            this.communicator.notifyChannels(channels)
+        }
     }
     connect() {
         this.myAtem = new Atem({
@@ -68,10 +79,10 @@ class AtemConnector {
         // @TODO: is there an API function so that we do not need to track state?
         return this.isAtemConnected
     }
+
+    static ID = "atem"
+    static defaultIp = "127.0.0.1"
+    static defaultPort = 9910
 }
 
-AtemConnector.ID = "atem"
-AtemConnector.defaultIp = "127.0.0.1"
-AtemConnector.defaultPort = 9910
-
-module.exports = AtemConnector;
+export default AtemConnector

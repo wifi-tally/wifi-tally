@@ -1,6 +1,5 @@
-const VmixConnector = require('./VmixConnector')
-const net = require('net')
-const EventEmitter = require('events')
+import VmixConnector from './VmixConnector'
+import { Server } from 'net'
 
 const waitUntil = (fn) => {
     return new Promise((resolve, _) => {
@@ -48,7 +47,7 @@ describe('VmixConnector', () => {
                 tallies: "012",
                 xml: '<vmix><version>{version}</version><edition>Trial</edition><inputs><input key="44bcd391-0f5e-433f-8a45-d5960a973a75" number="1" type="Blank" title="Blank" shortTitle="Blank" state="Paused" position="0" duration="0" loop="False">Blank</input><input key="5c6147a9-398b-4013-969f-6b372b0be254" number="2" type="Blank" title="Blank" shortTitle="Blank" state="Paused" position="0" duration="0" loop="False">Blank</input></inputs><overlays><overlay number="1" /><overlay number="2" /><overlay number="3" /><overlay number="4" /><overlay number="5" /><overlay number="6" /></overlays><preview>1</preview><active>1</active><fadeToBlack>False</fadeToBlack><transitions><transition number="1" effect="VerticalSlide" duration="500" /><transition number="2" effect="Merge" duration="1000" /><transition number="3" effect="Wipe" duration="1000" /><transition number="4" effect="CubeZoom" duration="1000" /></transitions><recording>False</recording><external>False</external><streaming>False</streaming><playList>False</playList><multiCorder>False</multiCorder><fullscreen>False</fullscreen><audio><master volume="100" muted="False" meterF1="0" meterF2="0" headphonesVolume="100" /></audio></vmix>'
             }
-            const server = net.Server((sck) => {
+            const server = Server((sck) => {
                 sck.on('data', data => {
                     data = data.toString()
                     data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
@@ -139,8 +138,8 @@ describe('VmixConnector', () => {
             try {
                 vmix.connect()
                 await waitUntil(() => communicator.programs !== undefined).then(() => {
-                    expect(communicator.programs).toEqual([2])
-                    expect(communicator.previews).toEqual([3])
+                    expect(communicator.programs).toEqual(["2"])
+                    expect(communicator.previews).toEqual(["3"])
                 })
             } finally {
                 await vmix.disconnect()
@@ -155,8 +154,8 @@ describe('VmixConnector', () => {
             try {
                 vmix.connect()
                 await waitUntil(() => communicator.programs !== undefined).then(() => {
-                    expect(communicator.programs).toEqual([2, 5])
-                    expect(communicator.previews).toEqual([3, 4])
+                    expect(communicator.programs).toEqual(["2", "5"])
+                    expect(communicator.previews).toEqual(["3", "4"])
                 })
             } finally {
                 await vmix.disconnect()

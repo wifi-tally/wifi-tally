@@ -4,18 +4,18 @@ if (yargs.env !== undefined) {
   process.env.NODE_ENV = yargs.env
 }
 
-const TallyDriver = require('./lib/TallyDriver')
-const Configuration = require('./lib/Configuration')
-const MixerDriver = require('./lib/MixerDriver')
-const express = require('express')
+import { TallyDriver } from './lib/TallyDriver'
+import { Configuration } from './lib/Configuration'
+import { MixerDriver } from './lib/MixerDriver'
+import express from 'express'
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-const next = require('next')
-const {Log, Severity, logFromValueObject} = require('./domain/Log')
+import next from 'next'
+import { Severity } from './domain/Log'
 
-const EventEmitter = require('events')
-const SocketAwareEventPipe = require('./lib/SocketAwareEventPipe')
+import { EventEmitter } from 'events'
+import { SocketAwareEvent } from './lib/SocketAwareEvent'
 
 // - program.changed
 // - tally.connected
@@ -128,12 +128,12 @@ io.on('connection', socket => {
 
   const mixerEvents = [
     // @TODO: use event objects instead of repeating the same structure again and again
-    new SocketAwareEventPipe(myEmitter, 'mixer.connected', socket, (socket) => {
+    new SocketAwareEvent(myEmitter, 'mixer.connected', socket, (socket) => {
       socket.emit('mixer.state', {
         isMixerConnected: true
       })
     }),
-    new SocketAwareEventPipe(myEmitter, 'mixer.disconnected', socket, (socket) => {
+    new SocketAwareEvent(myEmitter, 'mixer.disconnected', socket, (socket) => {
       socket.emit('mixer.state', {
         isMixerConnected: false
       })
@@ -151,7 +151,7 @@ io.on('connection', socket => {
   })
 
   const programEvents = [
-    new SocketAwareEventPipe(myEmitter, 'program.changed', socket, (socket, {programs, previews}) => {
+    new SocketAwareEvent(myEmitter, 'program.changed', socket, (socket, {programs, previews}) => {
       socket.emit('program.state', {
         programs: programs,
         previews: previews,
@@ -198,14 +198,24 @@ nextApp.prepare().then(() => {
     })
   })
   app.get('/tally', (req, res) => {
-    const tally = myTallyDriver.getTally(req.query.tallyName)
-    res.json({
-      tally: tally.toValueObject(),
-      logs: tally.getLogs().map(log => log.toValueObject()),
-    })
+    const tallyName = req.query.tallyName?.toString()
+    if (!tallyName) {
+      res.status(404)
+    } else {
+      const tally = myTallyDriver.getTally(tallyName)
+      if (!tally) {
+        res.status(404)
+      } else {
+        res.json({
+          tally: tally.toValueObject(),
+          logs: tally.getLogs().map(log => log.toValueObject()),
+        })
+      }
+    }
   })
   app.get('/atem', (req, res) => {
-    const data = myConfiguration.mixerConfigToObject()
+    // @TODO: "any" is not nice here, but this should be removed soon anyways
+    const data: any = myConfiguration.mixerConfigToObject()
     data.allowedMixers = MixerDriver.getAllowedMixers(myConfiguration.isDev())
     res.json(data)
   })

@@ -1,6 +1,5 @@
-const ObsConnector = require('./ObsConnector')
-const WebSocket = require('ws')
-const EventEmitter = require('events')
+import ObsConnector from './ObsConnector'
+import WebSocket from 'ws'
 
 const waitUntil = (fn) => {
     return new Promise((resolve, _) => {
@@ -65,7 +64,7 @@ describe('ObsConnector', () => {
                     global.obsServer.currentScene = newScene
                     socket.send(JSON.stringify({
                         'update-type': "SwitchScenes",
-                        sceneName: newScene
+                        'scene-name': newScene
                         // sources left out in mock
                     }))
                 },
@@ -75,14 +74,14 @@ describe('ObsConnector', () => {
                         global.obsServer.currentScene = newScene
                         socket.send(JSON.stringify({
                             'update-type': "TransitionBegin",
-                            toScene: newScene,
+                            'to-scene': newScene,
                         }))
                         isTransitionRunning = false
                     } else {
                         socket.send(JSON.stringify({
                             'update-type': "TransitionBegin",
-                            fromScene: global.obsServer.currentScene,
-                            toScene: newScene,
+                            'from-scene': global.obsServer.currentScene,
+                            'to-scene': newScene,
                         }))
                         isTransitionRunning = true
                     }
@@ -93,7 +92,7 @@ describe('ObsConnector', () => {
                     global.obsServer.currentScene = newScene
                     socket.send(JSON.stringify({
                         'update-type': "TransitionEnd",
-                        toScene: newScene,
+                        'to-scene': newScene,
                     }))
                     isTransitionRunning = false
                 },
@@ -101,7 +100,7 @@ describe('ObsConnector', () => {
                     global.obsServer.previewScene = scene
                     socket.send(JSON.stringify({
                         'update-type': "PreviewSceneChanged",
-                        sceneName: scene
+                        'scene-name': scene
                         // sources left out in mock
                     }))
                 },
@@ -109,7 +108,7 @@ describe('ObsConnector', () => {
                     global.obsServer.previewScene = previewScene
                     socket.send(JSON.stringify({
                         'update-type': "StudioModeSwitched",
-                        newState: true,
+                        'new-state': true,
                     }))
 
                 },
@@ -117,7 +116,7 @@ describe('ObsConnector', () => {
                     global.obsServer.previewScene = null
                     socket.send(JSON.stringify({
                         'update-type': "StudioModeSwitched",
-                        newState: false,
+                        'new-stat': false,
                     }))
 
                 },

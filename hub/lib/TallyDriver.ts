@@ -1,5 +1,6 @@
-const {ConnectionState, Tally, tallyFromValueObject} = require('../domain/Tally')
-const dgram = require('dgram');
+import { ConnectionState, Tally } from '../domain/Tally'
+import dgram from 'dgram'
+import { EventEmitter } from 'events'
 
 const tallyHighlightTime = 1000 // ms
 // the more keep alives you send the less likely it is that
@@ -7,7 +8,7 @@ const tallyHighlightTime = 1000 // ms
 // over the network.
 const keepAlivesPerSecond = 10
 
-const updateTally = function(tally, io, programs, previews) {
+const updateTally = function(tally: Tally, io: dgram.Socket, programs: string[] | null, previews: string[] | null) {
     if(tally.isActive()) {
         let command = "release"
         if(tally.isHighlighted()) {
@@ -34,12 +35,18 @@ class InvalidCommandError extends Error {
 
 // - handles connections with Tallies.
 // - emits signals when tallies connect, go missing or disconnect
-class TallyDriver {
-    constructor(tallies, emitter) {
+export class TallyDriver {
+    io: dgram.Socket
+    tallies: Map<string, Tally>
+    emitter: EventEmitter
+    lastPrograms: string[] | null
+    lastPreviews: string[] | null
+
+    constructor(tallies: object[], emitter: EventEmitter) {
         this.tallies = new Map();
         (tallies || []).forEach(tally => {
-            tally = tallyFromValueObject(tally)
-            this.tallies.set(tally.name, tally)
+            const theTally = Tally.fromValueObject(tally)
+            this.tallies.set(theTally.name, theTally)
         })
         this.emitter = emitter
         this.lastPrograms = null
@@ -53,17 +60,19 @@ class TallyDriver {
         
         this.io.on('message', (msg, rinfo) => {
             try {
-                msg = msg.toString().trim()
-                if (msg.startsWith("tally-ho")) {
-                    const tallyName = TallyDriver.parseTallyHo(msg)
-                    this._tallyReported(tallyName, rinfo)
-                } else if (msg.startsWith("log")) {
-                    const [tallyName, severity, message] = TallyDriver.parseLog(msg)
-                    const tally = this._tallyReported(tallyName, rinfo)
-                    const log = tally.addLog(new Date(), severity, message)
-                    this.emitter.emit('tally.logged', tally, log)
+                const theMsg = msg.toString().trim()
+                if (theMsg.startsWith("tally-ho")) {
+                    const tallyName = TallyDriver.parseTallyHo(theMsg)
+                    this.tallyReported(tallyName, rinfo)
+                } else if (theMsg.startsWith("log")) {
+                    const [tallyName, severity, message] = TallyDriver.parseLog(theMsg)
+                    const tally = this.tallyReported(tallyName, rinfo)
+                    if (tally) {
+                        const log = tally.addLog(new Date(), severity, message)
+                        this.emitter.emit('tally.logged', tally, log)
+                    }
                 } else {
-                    throw new InvalidCommandError(msg)
+                    throw new InvalidCommandError(theMsg)
                 }
             } catch (e) {
                 if (e instanceof InvalidCommandError) {
@@ -82,7 +91,7 @@ class TallyDriver {
         this.io.bind(7411)
 
         // watchdog to check if a tally disconnected
-        const lastTallyReport = new Map();
+        const lastTallyReport: Map<string, Date> = new Map();
         this.emitter.on('tally.reported', tally => {
             lastTallyReport.set(tally.name, new Date())
             tally.state = ConnectionState.CONNECTED
@@ -91,10 +100,11 @@ class TallyDriver {
         setInterval(() => {
             const now = new Date()
             this.tallies.forEach(tally => {
-                if(!lastTallyReport.has(tally.name)) {
+                const lastTallyReportDate = lastTallyReport.get(tally.name)
+                if(!lastTallyReportDate) {
                     tally.state = ConnectionState.DISCONNECTED
                 } else {
-                    const diff = now - lastTallyReport.get(tally.name) // milliseconds
+                    const diff = now.getTime() - lastTallyReportDate.getTime() // milliseconds
                     if(diff > 30000) {
                         if(tally.state !== ConnectionState.DISCONNECTED) {
                             tally.state = ConnectionState.DISCONNECTED
@@ -117,12 +127,12 @@ class TallyDriver {
             this.updateTallies()
         }, 1000 / keepAlivesPerSecond)
     }
-    _tallyReported(tallyName, rinfo) {
-        if (!this.tallies.has(tallyName)) {
-            const tally = new Tally(tallyName)
+    private tallyReported(tallyName, rinfo) {
+        let tally = this.tallies.get(tallyName)
+        if (!tally) {
+            tally = new Tally(tallyName)
             this.tallies.set(tallyName, tally)
         }
-        const tally = this.tallies.get(tallyName)
         if(tally.state !== ConnectionState.CONNECTED) {
             tally.state = ConnectionState.CONNECTED
             tally.address = rinfo.address;
@@ -139,8 +149,8 @@ class TallyDriver {
     }
     highlight(tallyName) {
         console.log("highlight", tallyName)
-        if(this.tallies.has(tallyName)) {
-            const tally = this.tallies.get(tallyName)
+        const tally = this.tallies.get(tallyName)
+        if (tally) {
             setTimeout(() => {
                 tally.setHighlight(false)
                 this.updateTally(tallyName)
@@ -156,8 +166,8 @@ class TallyDriver {
         this.updateTallies()
     }
     patchTally(tallyName, channelId) {
-        if(this.tallies.has(tallyName)) {
-            const tally = this.tallies.get(tallyName)
+        const tally = this.tallies.get(tallyName)
+        if (tally) {
             tally.channelId = channelId
             this.emitter.emit('tally.changed', tally)
         }
@@ -171,7 +181,9 @@ class TallyDriver {
     }
     updateTally(tallyName) {
         const tally = this.tallies.get(tallyName)
-        updateTally(tally, this.io, this.lastPrograms, this.lastPreviews)
+        if (tally) {
+            updateTally(tally, this.io, this.lastPrograms, this.lastPreviews)
+        }
     }
     updateTallies() {
         this.tallies.forEach(tally => updateTally(tally, this.io, this.lastPrograms, this.lastPreviews))
@@ -180,46 +192,42 @@ class TallyDriver {
         return Array.from(this.tallies.values()).map(tally => tally.toValueObject())
     }
     toValueObjectsForSave() {
-        return Array.from(this.tallies.values()).map(tally => {
-            tally = tally.toValueObject()
-            delete tally.state
-            delete tally.address
-            delete tally.port
-            return tally
-        })
+        return this.toValueObjects().map(tally => { return {
+            name: tally.name,
+            channelId: tally.channelId,
+        }})
     }
-    getTally(tallyName) {
+    getTally(tallyName: string) {
         if(this.tallies.has(tallyName)) {
             const tally = this.tallies.get(tallyName)
             return tally
         }
     }
-}
 
-TallyDriver.parseTallyHo = function(cmd) {
-    const result = cmd.match(/^([^ ]+) "(.+)"/)
-    if (result === null) {
-        throw new InvalidCommandError(cmd)
-    } else {
-        const [_, command, name] = result
-        if (command !== "tally-ho") {
-            throw new InvalidCommandError(command)
+    static parseTallyHo = function(cmd: string) {
+        const result = cmd.match(/^([^ ]+) "(.+)"/)
+        if (result === null) {
+            throw new InvalidCommandError(cmd)
+        } else {
+            const [_, command, name] = result
+            if (command !== "tally-ho") {
+                throw new InvalidCommandError(command)
+            }
+            return name
         }
-        return name
+    }
+
+    static parseLog = function(cmd: string) : [string, string, string] {
+        const result = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
+    
+        if (result === null) {
+            throw new InvalidCommandError(cmd)
+        } else {
+            const [_, command, name, severity, message] = result
+            if (command !== "log") {
+                throw  new InvalidCommandError(command)
+            }
+            return [name, severity, message]
+        }
     }
 }
-TallyDriver.parseLog = function(cmd) {
-    const result = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
-
-    if (result === null) {
-        throw new InvalidCommandError(cmd)
-    } else {
-        const [_, command, name, severity, message] = result
-        if (command !== "log") {
-            throw  new InvalidCommandError(command)
-        }
-        return [name, severity, message]
-    }
-}
-
-module.exports = TallyDriver;

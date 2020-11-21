@@ -14,11 +14,12 @@ export class Log {
 
     constructor(dateTime: Date | string | null, severity: string, message: string) {
         if(typeof dateTime === "string") {
-            dateTime = new Date(dateTime)
-        } else if (typeof dateTime !== "object") {
-            dateTime = new Date()
+            this.dateTime = new Date(dateTime)
+        } else if (dateTime instanceof Date) {
+            this.dateTime = dateTime
+        } else {
+            this.dateTime = new Date()
         }
-        this.dateTime = dateTime
 
         if (severity === "INFO") {
             this.severity = Severity.INFO
@@ -51,14 +52,14 @@ export class Log {
             message: this.message
         }
     }
+    
+    static fromValueObject = function(valueObject: any) {
+        return new Log(
+            valueObject.date,
+            valueObject.severity,
+            valueObject.message
+        )
+    }
 }
 
-export type LogType = typeof Log
-
-export const logFromValueObject = function(valueObject: any) {
-    return new Log(
-        valueObject.date,
-        valueObject.severity,
-        valueObject.message
-    )
-}
+export default Log

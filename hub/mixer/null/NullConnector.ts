@@ -1,7 +1,11 @@
 // a connector that does not do anything
 
-class NullConnector {
-    constructor(communicator) {
+import { MixerCommunicator } from "../../lib/MixerCommunicator"
+import { Connector } from "../interfaces"
+
+class NullConnector implements Connector {
+    communicator: MixerCommunicator
+    constructor(communicator: MixerCommunicator) {
         this.communicator = communicator
     }
     connect() {
@@ -14,8 +18,7 @@ class NullConnector {
         // it is never supposed to be connected
         return false
     }
+    static ID = "null"
 }
 
-NullConnector.ID = "null"
-
-module.exports = NullConnector;
+export default NullConnector

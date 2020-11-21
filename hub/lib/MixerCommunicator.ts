@@ -1,8 +1,10 @@
 /* helper so that video mixer connectors do not need to implement events */
 
-const {Channel} = require("../domain/Channel")
+import Channel from "../domain/Channel"
+import { Configuration } from "./Configuration"
+import {EventEmitter} from "events"
 
-const haveValuesChanged = (lastArray, newArray) => {
+const haveValuesChanged = (lastArray: any, newArray: any) => {
     if(Array.isArray(lastArray) && Array.isArray(newArray)) {
         return lastArray.length !== newArray.length || lastArray.some((value, index) => value !== newArray[index])
     } else {
@@ -10,37 +12,23 @@ const haveValuesChanged = (lastArray, newArray) => {
     }
 }
 
-const isSame = (one, two) => {
-    if (typeof one !== typeof two) {
-        return false
-    } else if (typeof one === "object") {
-        const keyOne = Object.keys(one)
-        const keyTwo = Object.keys(two)
-        if (keyOne.length !== keyTwo.length) {
-            return false
-        }
-        for (const [k, v] of Object.entries(one)) {
-            if (two[k] !== v) {
-                return false
-            }
-        }
-        return true
-    } else {
-        return one === two
-    }
-}
-
-class MixerCommunicator {
-    constructor(configuration, emitter) {
+export class MixerCommunicator {
+    configuration: Configuration
+    emitter: EventEmitter
+    currentPrograms: string[] | null
+    currentPreviews: string[] | null
+    isConnected: boolean | null
+    
+    constructor(configuration: Configuration, emitter: EventEmitter) {
         this.configuration = configuration
         this.emitter = emitter
 
         this.currentPrograms = null
         this.currentPreviews = null
-        this.currentConnection = null
+        this.isConnected = null
     }
 
-    _changeProgramsIfNecessary(programs) {
+    private changeProgramsIfNecessary(programs: string[] | null) {
         programs = programs ? programs.map(v => v.toString()) : null
         if (haveValuesChanged(programs, this.currentPrograms)) {
             this.currentPrograms = programs
@@ -50,7 +38,7 @@ class MixerCommunicator {
         }
     }
 
-    _changePreviewsIfNecessary(previews) {
+    private changePreviewsIfNecessary(previews: string[] | null) {
         previews = previews ? previews.map(v => v.toString()) : null
         if (haveValuesChanged(previews, this.currentPreviews)) {
             this.currentPreviews = previews
@@ -60,48 +48,46 @@ class MixerCommunicator {
         }
     }
 
-    notifyProgramPreviewChanged(programs, previews) {
-        const programChanged = this._changeProgramsIfNecessary(programs)
-        const previewChanged = this._changePreviewsIfNecessary(previews)
+    notifyProgramPreviewChanged(programs: string[] | null, previews: string[] | null) {
+        const programChanged = this.changeProgramsIfNecessary(programs)
+        const previewChanged = this.changePreviewsIfNecessary(previews)
         if (previewChanged || programChanged) {
             this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 
-    notifyProgramChanged(programs) {
-        const programChanged = this._changeProgramsIfNecessary(programs)
+    notifyProgramChanged(programs: string[] | null) {
+        const programChanged = this.changeProgramsIfNecessary(programs)
         if (programChanged) {
             this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 
-    notifyPreviewChanged(previews) {
-        const previewChanged = this._changePreviewsIfNecessary(previews)
+    notifyPreviewChanged(previews: string[] | null) {
+        const previewChanged = this.changePreviewsIfNecessary(previews)
         if (previewChanged) {
             this.emitter.emit('program.changed', { programs: this.currentPrograms, previews: this.currentPreviews })
         }
     }
 
-    notifyChannelNames(count, names) {
+    notifyChannelNames(count?: number, names?: object) {
         if (count === null) {
             this.notifyChannels(null)
         } else {
-            names = names || {}
-            
             // empty array with `count` elements.
             // `fill` is necessary, because Array() does not fill the array with anything - not even `undefined` ¯\_(ツ)_/¯
             const range = Array(count).fill(null)
             
             const channels = range.map((_,i) => {
-                const name = names[i+1]
-                return new Channel(i+1, name)
+                const name = names && names[i+1]
+                return new Channel((i+1).toString(), name)
             })
 
             this.notifyChannels(channels)
         }
     }
 
-    notifyChannels(channels) {
+    notifyChannels(channels : Channel[] | null) {
         channels = channels || []
         if (JSON.stringify(channels.map(c => c.toValueObject())) !== JSON.stringify(this.configuration.getChannels().map(c => c.toValueObject()))) {
             this.configuration.setChannels(channels)
@@ -112,15 +98,15 @@ class MixerCommunicator {
     }
 
     notifyMixerIsConnected() {
-        if (this.currentConnection !== true) {
-            this.currentConnection = true
+        if (this.isConnected !== true) {
+            this.isConnected = true
             this.emitter.emit('mixer.connected')
         }
     }
 
     notifyMixerIsDisconnected() {
-        if (this.currentConnection !== false) {
-            this.currentConnection = false
+        if (this.isConnected !== false) {
+            this.isConnected = false
             this.emitter.emit('mixer.disconnected')
         }
     }
@@ -133,5 +119,3 @@ class MixerCommunicator {
         return this.currentPreviews
     }
 }
-
-module.exports = MixerCommunicator

@@ -2,9 +2,9 @@ const tmp = require('tmp')
 tmp.setGracefulCleanup()
 const fs = require('fs')
 
-const Configuration = require('./Configuration')
+import { Configuration } from './Configuration'
 const EventEmitter = require('events')
-const {Channel} = require('../domain/Channel')
+import Channel from '../domain/Channel'
 
 describe('Configuration', () => {
     describe('load()', () => {
@@ -82,19 +82,19 @@ describe('Configuration', () => {
         const mockChannelCount = 42
         const mockChannelNames = "foobar, baz"
         const mixerSelection = "mock"
-        const mockTallyData = {
-            foobar: {
+        const mockTallyData = [
+            {
                 name: "foobar",
-                channelId: 2
+                channelId: "2",
             },
-            baz: {
+            {
                 name: "baz",
-                channelId: 3
+                channelId: "3", 
             }
-        }
+        ]
 
         const mockChannels = [
-            new Channel(5, "Chanel No 5"),
+            new Channel("5", "Chanel No 5"),
             new Channel("foobar", "Baz"),
         ]
 

@@ -1,4 +1,4 @@
-export class Channel {
+class Channel {
     id: string
     name?: string
 
@@ -16,14 +16,14 @@ export class Channel {
     toString() {
         return this.name || this.id
     }
+
+    static fromValueObject = function(valueObject: any) {
+        const channel = new Channel(
+            valueObject.id,
+            valueObject.name,
+        )
+        return channel
+    }
 }
 
-export type ChannelType = typeof Channel
-
-export const channelFromValueObject = function(valueObject: any) {
-    const channel = new Channel(
-        valueObject.id,
-        valueObject.name,
-    )
-    return channel
-}
+export default Channel

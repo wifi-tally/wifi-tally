@@ -1,7 +1,10 @@
-import EventEmitter from 'events'
+import {EventEmitter} from 'events'
 
 class ProgramTracker extends EventEmitter{
-    constructor(socket, socketEventEmitter) {
+    programs: string[] | null
+    previews: string[] | null
+    
+    constructor(socket: SocketIOClient.Socket, socketEventEmitter: EventEmitter) {
         super()
         this.programs = null
         this.previews = null
@@ -25,4 +28,4 @@ class ProgramTracker extends EventEmitter{
     }
 }
 
-module.exports = ProgramTracker;
+export default ProgramTracker

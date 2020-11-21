@@ -1,18 +1,26 @@
-const AtemConnector = require('./AtemConnector.js')
-const VmixConnector = require('./VmixConnector.js')
-const MockConnector = require('./MockConnector.js')
-const NullConnector = require('./NullConnector.js')
-const ObsConnector = require('./ObsConnector.js')
-const MixerCommunicator = require('./MixerCommunicator.js')
-const {Channel} = require('../domain/Channel')
+import AtemConnector from '../mixer/atem/AtemConnector'
+import VmixConnector from '../mixer/vmix/VmixConnector'
+import MockConnector from '../mixer/mock/MockConnector'
+import NullConnector from '../mixer/null/NullConnector'
+import ObsConnector from '../mixer/obs/ObsConnector'
+import { MixerCommunicator } from './MixerCommunicator'
+import Channel from '../domain/Channel'
+import type { Configuration } from './Configuration'
+import type { EventEmitter } from 'events'
 
-class MixerDriver {
-    constructor(configuration, emitter) {
-        this.currentMixerId
-        this.currentMixerInstance
-        this.currentMixerSettings
-        this.getCurrentMixerSettings
-
+// Takes care of connecting to one of the supported mixers
+export class MixerDriver {
+    currentMixerId?: string
+    currentMixerInstance?: any // @TODO
+    currentMixerSettings: any[]
+    getCurrentMixerSettings?: Function
+    configuration: Configuration
+    communicator: MixerCommunicator
+    emitter: EventEmitter
+    isChangingMixer: boolean
+    
+    constructor(configuration: Configuration, emitter: EventEmitter) {
+        this.currentMixerSettings = []
         this.configuration = configuration
         this.communicator = new MixerCommunicator(configuration, emitter)
         this.emitter = emitter
@@ -65,7 +73,7 @@ class MixerDriver {
             if(this.currentMixerInstance) {
                 const ret = this.currentMixerInstance.disconnect()
                 this.communicator.notifyProgramPreviewChanged(null, null)
-                this.communicator.notifyChannelNames(MixerDriver.defaultChannelCount, MixerDriver.defaultChannelNames)
+                this.communicator.notifyChannels(MixerDriver.defaultChannels)
                 await Promise.resolve(ret)
             }
 
@@ -112,33 +120,32 @@ class MixerDriver {
     isConnected() {
         return this.currentMixerInstance && this.currentMixerInstance.isConnected()
     }
-}
 
-MixerDriver.getAllowedMixers = function(isDev) {
-    const mixers = [
-        NullConnector.ID,
-        AtemConnector.ID,
-        ObsConnector.ID,
-        VmixConnector.ID,
-    ]
 
-    if (isDev) {
-        mixers.unshift(MockConnector.ID)
+    static getAllowedMixers = function(isDev: boolean) {
+        const mixers = [
+            NullConnector.ID,
+            AtemConnector.ID,
+            ObsConnector.ID,
+            VmixConnector.ID,
+        ]
+    
+        if (isDev) {
+            mixers.unshift(MockConnector.ID)
+        }
+    
+        return mixers
     }
 
-    return mixers
+    static getDefaultMixerId = function(isDev: boolean) {
+        return this.getAllowedMixers(isDev)[0];
+    }
+
+    static isValidMixerId = function(name: string, isDev: boolean) {
+        return this.getAllowedMixers(isDev).includes(name)
+    }
+
+    static defaultChannels = Array(8).fill(null).map((_,i) => {
+        return new Channel((i+1).toString())
+    })
 }
-
-MixerDriver.getDefaultMixerId = function(isDev) {
-    return MixerDriver.getAllowedMixers(isDev)[0];
-}
-
-MixerDriver.isValidMixerId = function(name, isDev) {
-    return MixerDriver.getAllowedMixers(isDev).includes(name)
-}
-
-MixerDriver.defaultChannels = Array(8).fill(null).map((_,i) => {
-    return new Channel(i+1)
-})
-
-module.exports = MixerDriver

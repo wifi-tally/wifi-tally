@@ -1,27 +1,34 @@
-const fs = require('fs')
-const os = require('os')
-const MixerDriver = require('./MixerDriver')
-const AtemConnector = require('./AtemConnector')
-const ObsConnector = require('./ObsConnector')
-const VmixConnector = require('./VmixConnector')
-const MockConnector = require('./MockConnector')
-const {channelFromValueObject} = require('../domain/Channel')
+import fs from 'fs'
+import os from 'os'
+import {MixerDriver} from './MixerDriver'
+import AtemConnector from '../mixer/atem/AtemConnector'
+import ObsConnector from '../mixer/obs/ObsConnector'
+import VmixConnector from '../mixer/vmix/VmixConnector'
+import MockConnector from '../mixer/mock/MockConnector'
+import Channel from '../domain/Channel'
+import {EventEmitter} from 'events'
+import { TallyDriver } from './TallyDriver'
 
-class Configuration {
-    constructor(emitter) {
+export class Configuration {
+    emitter: EventEmitter
+    atemIp?: string // @TODO: it it possible to make a checked type out of it?
+    atemPort?: number
+    obsIp?: string
+    obsPort?: number
+    vmixIp?: string
+    vmixPort?: number
+    mockTickTime?: number
+    mockChannelCount?: number
+    mockChannelNames?: string[]
+    tallies: object[]
+    channels: Channel[]
+    mixerSelection?: string
+    configFileName: string
+    
+    constructor(emitter: EventEmitter) {
         this.emitter = emitter
-        this.atemIp
-        this.atemPort
-        this.obsIp
-        this.obsPort
-        this.vmixIp
-        this.vmixPort
-        this.mockTickTime
-        this.mockChannelCount
-        this.mockChannelNames
         this.tallies = []
         this.channels = MixerDriver.defaultChannels
-        this.mixerSelection = null
         this.configFileName = this.getConfigFilePath()
         this.load()
     }
@@ -34,7 +41,7 @@ class Configuration {
         if(fs.existsSync(this.configFileName)) {
             const rawdata = fs.readFileSync(this.configFileName)
             try {
-                const config = JSON.parse(rawdata)
+                const config = JSON.parse(rawdata.toString())
                 if(config.tallies) {
                     this.tallies = config.tallies
                 }
@@ -69,7 +76,7 @@ class Configuration {
                     this.mockChannelNames = config.mock.channelNames
                 }
                 if(Array.isArray(config.channels)) {
-                    this.channels = config.channels.map(vo => channelFromValueObject(vo))
+                    this.channels = config.channels.map(vo => Channel.fromValueObject(vo))
                 }
             } catch (e) {
                 if (e instanceof SyntaxError && rawdata.byteLength === 0) {
@@ -112,9 +119,9 @@ class Configuration {
             }, null, '\t'), err => {
                 if(err) {
                     console.error(err)
-                    reject()
+                    reject(err)
                 } else {
-                    resolve()
+                    resolve(null)
                 }
             })
         })
@@ -135,7 +142,7 @@ class Configuration {
         this.vmixPort = parseInt(vmixPort, 10)
     }
 
-    updateTallies(tallyDriver) {
+    updateTallies(tallyDriver: TallyDriver) {
         this.tallies = tallyDriver.toValueObjectsForSave()
     }
 
@@ -154,7 +161,7 @@ class Configuration {
     }
 
     getHttpPort() {
-        return parseInt(process.env.PORT, 10) || 3000
+        return (typeof process.env.PORT === "string" && parseInt(process.env.PORT, 10)) || 3000
     }
 
     getTallies() {
@@ -237,5 +244,3 @@ class Configuration {
         }
     }
 }
-
-module.exports = Configuration;

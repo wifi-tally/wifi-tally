@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import io from 'socket.io-client'
-const EventEmitter = require('events')
+import {EventEmitter} from 'events'
 const socketEventEmitter = new EventEmitter()
 
 const socket = io()
@@ -23,7 +23,7 @@ if (typeof window !== 'undefined') {
   socket.on("reconnect_failed", onDisconnection)
 }
 
-const useSocket = function (eventName, cb) {
+const useSocket = function (eventName: string, cb: (...args: any[]) => void) {
   useEffect(() => {
     socket.on(eventName, cb)
 

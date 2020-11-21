@@ -1,16 +1,25 @@
-let net = require('net')
-let xml2js = require('xml2js');
+import net from 'net'
+import xml2js from 'xml2js'
+import { MixerCommunicator } from '../../lib/MixerCommunicator'
+import { Connector } from '../interfaces'
 
 // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
-class VmixConnector {
-    constructor(ip, port, communicator) {
+class VmixConnector implements Connector {
+    ip: string
+    port: number
+    communicator: MixerCommunicator
+    client?: net.Socket
+    wasHelloReceived: boolean
+    wasSubcribeOkReceived: boolean
+    intervalHandle: any
+    xmlQueryInterval: number
+
+    constructor(ip: string, port: number, communicator: MixerCommunicator) {
         this.ip = ip
         this.port = port
         this.communicator = communicator
-        this.client
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
-        this.intervalHandle
         this.xmlQueryInterval = 5000
     }
     connect() {
@@ -25,7 +34,7 @@ class VmixConnector {
         }
 
         const queryXml = () => {
-            if(!client.connecting && !client.pending && !client.destroyed) {
+            if(!client.connecting && !client.destroyed) {
                 client.write("XML\r\n")
             }
         }
@@ -72,7 +81,7 @@ class VmixConnector {
         })
 
     }
-    onData(data) {
+    private onData(data: Buffer) {
         data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
             console.debug(`> ${command}`)
             if (command.startsWith("VERSION OK")) {
@@ -90,15 +99,15 @@ class VmixConnector {
             }
         }, this)
     }
-    handleTallyCommand(command) {
+    private handleTallyCommand(command: string) {
         const result = command.match(/^TALLY OK (\d*)$/)
 
         if (result === null) {
             console.error("Tally OK command was ill formed")
         } else {
             const [_, state] = result
-            let programs = []
-            let previews = []
+            let programs: string[] = []
+            let previews: string[] = []
             // vMix encodes tally states as numbers:
             // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
             // 0 = off
@@ -106,16 +115,16 @@ class VmixConnector {
             // 2 = preview
             state.split('').forEach((val, idx) => {
                 if (val === "1") {
-                    programs.push(idx + 1)
+                    programs.push(`${idx + 1}`)
                 } else if (val === "2") {
-                    previews.push(idx + 1)
+                    previews.push(`${idx + 1}`)
                 }
             })
 
             this.communicator.notifyProgramPreviewChanged(programs, previews)
         }
     }
-    handleXmlCommand(command) {
+    private handleXmlCommand(command: string) {
         xml2js.parseString(command, (error, result) => {
             if (error) {
                 console.error(`Error parsing XML response from vMix: ${error}`)
@@ -143,31 +152,32 @@ class VmixConnector {
                 this.intervalHandle = undefined;
             }
             if (this.client && ! this.client.destroyed) {
-                if (this.client.isConnected) {
-                    // if we are connected: try to be nice
-                    this.client.end(() => {
-                        console.log("Disconnected from vMix")
-                        resolve()
-                    })
-                } else {
-                    // if not: be rude
-                    this.client.destroy()
-                    resolve()
-                }
+                // @TODO: check if client is still connected and disconnect gracefully
+                // if (this.client.isConnected) {
+                //     // if we are connected: try to be nice
+                //     this.client.end(() => {
+                //         console.log("Disconnected from vMix")
+                //         resolve(null)
+                //     })
+                // } else {
+                // if not: be rude
+                this.client.destroy()
+                resolve(null)
+                // }
             } else {
-                resolve()
+                resolve(null)
             }
         })
-        this.client = null
+        this.client = undefined
         return promise
     }
     isConnected() {
-        return this.client && !this.client.destroyed && this.wasHelloReceived && this.wasSubcribeOkReceived
+        return this.client !== undefined && !this.client.destroyed && this.wasHelloReceived && this.wasSubcribeOkReceived
     }
+    
+    static readonly ID = "vmix"
+    static readonly defaultIp = "127.0.0.1"
+    static readonly defaultPort = 8099
 }
 
-VmixConnector.ID = "vmix"
-VmixConnector.defaultIp = "127.0.0.1"
-VmixConnector.defaultPort = 8099
-
-module.exports = VmixConnector;
+export default VmixConnector

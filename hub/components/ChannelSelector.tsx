@@ -1,6 +1,14 @@
 import React, { useState } from "react";
+import Channel from '../domain/Channel'
 
-const ChannelSelector = ({className, channels, defaultSelect, onChange}) => {
+type ChannelSelectorProps = {
+    className?: string
+    channels?: Channel[]
+    defaultSelect?: string
+    onChange?: (value: string|null) => void
+}
+
+const ChannelSelector = ({className, channels, defaultSelect, onChange} : ChannelSelectorProps) => {
     channels = channels || []
     const [value, setValue] = useState(defaultSelect || null)
 

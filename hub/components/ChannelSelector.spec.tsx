@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import ChannelSelector from './ChannelSelector';
-import {Channel} from '../domain/Channel';
+import Channel from '../domain/Channel';
 import '@testing-library/jest-dom';
 
 test('it only renders the unpatched option by default', () => {
@@ -16,9 +16,9 @@ test('it only renders the unpatched option by default', () => {
 test('it displays labels correctly', () => {
     const root = document.createElement('div')
     const channels = [
-        new Channel(1, "Channel One"),
+        new Channel("1", "Channel One"),
         new Channel("2", "Channel Two"),
-        new Channel(3),
+        new Channel("3"),
         new Channel("foobar"),
         new Channel("baz", "Channel 42"),
     ]
@@ -52,9 +52,9 @@ test('it displays labels correctly', () => {
 test('it calls onChange with the right value', () => {
     const root = document.createElement('div')
     const channels = [
-        new Channel(1, "Channel One"),
+        new Channel("1", "Channel One"),
         new Channel("2", "Channel Two"),
-        new Channel(3),
+        new Channel("3"),
         new Channel("foobar"),
         new Channel("baz", "Channel 42"),
     ]
