@@ -1,6 +1,12 @@
+import { string } from 'yargs'
 import ipAddress, {IpAddress} from '../../domain/IpAddress'
 import ipPort, {IpPort} from '../../domain/IpPort'
 import {Configuration} from '../interfaces'
+
+export type AtemConfigurationSaveType = {
+    ip: string
+    port: number
+}
 
 class AtemConfiguration extends Configuration {
     ip: IpAddress
@@ -12,11 +18,11 @@ class AtemConfiguration extends Configuration {
         this.port = AtemConfiguration.defaultPort
     }
 
-    fromSave(data: object): void {
+    fromSave(data: AtemConfigurationSaveType): void {
         this.loadIpAddress("ip", this.setIp.bind(this), data)
         this.loadIpPort("port", this.setPort.bind(this), data)
     }
-    toSave(): object {
+    toSave(): AtemConfigurationSaveType {
         return {
             ip: this.ip.toString(),
             port: this.port.toNumber(),

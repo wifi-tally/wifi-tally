@@ -2,6 +2,8 @@ import { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
 import {useSocket} from '../hooks/useSocket'
 import Layout from '../components/Layout'
+import AtemSettings from '../mixer/atem/react/AtemSettings'
+import MixerSelection from '../components/config/MixerSelection'
 
 const mixerLabels = {
   mock: "Built-In Mock for testing",
@@ -48,6 +50,13 @@ const Config = props => {
       <option key={id} value={id}>{label}</option>
     )
   }
+
+  return (
+    <Layout>
+      <MixerSelection mixerId={currentMixerId} />
+      <AtemSettings />
+    </Layout>
+  )
 
   return (
     <Layout>

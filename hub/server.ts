@@ -156,6 +156,21 @@ io.on('connection', (socket: ServerSideSocket) => {
     programEvents.forEach(pipe => pipe.unregister())
   })
 
+  const configEvents = [
+    new SocketAwareEvent(myEmitter, 'config.changed.atem', socket, (socket, atemConfiguration) => {
+      socket.emit('config.state.atem', atemConfiguration.toSave())
+    })
+  ]
+  socket.on('events.config.subscribe', () => {
+    configEvents.forEach(pipe => pipe.register())
+
+    socket.emit('config.state.atem', myConfiguration.getAtemConfiguration().toSave())
+  })
+  socket.on('events.program.unsubscribe', () => {
+    // @TODO: not used yet
+    configEvents.forEach(pipe => pipe.unregister())
+  })
+
   socket.on('tally.patch', (tallyName, channelId) => {
     myTallyDriver.patchTally(tallyName, channelId)
   })
@@ -180,6 +195,11 @@ io.on('connection', (socket: ServerSideSocket) => {
     myConfiguration.setMockConfiguration(mock)
 
     myConfiguration.setMixerSelection(selectedMixer)
+  })
+  socket.on('config.change.atem', newAtemConfiguration => {
+    const atem = new AtemConfiguration()
+    atem.fromSave(newAtemConfiguration)
+    myConfiguration.setAtemConfiguration(atem)
   })
 })
 

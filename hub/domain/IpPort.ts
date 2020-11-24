@@ -1,11 +1,14 @@
 function isValidPort(port: number): boolean {
-    return port > 0 && port <= 65535
+    return Number.isInteger(port) && port > 0 && port <= 65535
 }
 
 export class IpPort {
     port: number
 
-    constructor(port: number) {
+    constructor(port: number|string) {
+        if (typeof port === "string") {
+            port = parseInt(port, 10)
+        }
         if (!isValidPort(port)) {
             throw `Invalid Port: ${port}`
         } else {
@@ -17,4 +20,6 @@ export class IpPort {
     }
 }
 
-export default (port: number) => new IpPort(port)
+const ipPort = (port: number|string) => new IpPort(port)
+
+export default ipPort

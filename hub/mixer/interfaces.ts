@@ -1,3 +1,4 @@
+import { Atem } from "atem-connection"
 import ipAddress, {IpAddress} from "../domain/IpAddress"
 import ipPort, { IpPort } from "../domain/IpPort"
 

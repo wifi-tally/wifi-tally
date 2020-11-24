@@ -26,4 +26,6 @@ export class IpAddress {
     }
 }
 
-export default (address: string) => new IpAddress(address)
+const ipAddress = (address: string) => new IpAddress(address)
+
+export default ipAddress

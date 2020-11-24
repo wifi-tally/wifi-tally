@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import io from 'socket.io-client'
 import {EventEmitter} from 'events'
+import { ClientSentEvents, ClientSideSocket } from '../lib/SocketEvents'
 const socketEventEmitter = new EventEmitter()
 
-const socket = io()
+const socket = <ClientSideSocket>io()
 
 const onConnection = function() {
   socketEventEmitter.emit("connected")
@@ -23,11 +24,14 @@ if (typeof window !== 'undefined') {
   socket.on("reconnect_failed", onDisconnection)
 }
 
-const useSocket = function (eventName: string, cb: (...args: any[]) => void) {
+/** @deprecated */
+const useSocket = function<EventName extends keyof ClientSentEvents>(eventName: EventName, cb: (...args: any[]) => void) {
   useEffect(() => {
+    //@ts-ignore
     socket.on(eventName, cb)
 
     return function useSocketCleanup() {
+      // @ts-ignore
       socket.off(eventName, cb)
     }
   }, [eventName, cb])
