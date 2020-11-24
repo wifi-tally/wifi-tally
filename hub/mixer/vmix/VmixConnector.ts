@@ -13,6 +13,7 @@ class VmixConnector implements Connector {
     wasSubcribeOkReceived: boolean
     intervalHandle: any
     xmlQueryInterval: number
+    reconnectTimeout?: NodeJS.Timeout
 
     constructor(configuration: VmixConfiguration, communicator: MixerCommunicator) {
         this.configuration = configuration
@@ -73,8 +74,10 @@ class VmixConnector implements Connector {
 
             if (hadError) {
                 console.debug("Connection to vMix is reconnected after an error")
-                setTimeout(() => {
-                    // @TODO: make sure this is not called if the communicator is disconnected
+                this.reconnectTimeout = setTimeout(() => {
+                    if (this.reconnectTimeout) {
+                        clearTimeout(this.reconnectTimeout)
+                    }
                     client.connect(this.configuration.getPort().toNumber(), this.configuration.getIp().toString())
                 }, 200)
             }
@@ -150,6 +153,10 @@ class VmixConnector implements Connector {
             if(this.intervalHandle) {
                 clearInterval(this.intervalHandle);
                 this.intervalHandle = undefined;
+            }
+            if (this.reconnectTimeout) {
+                clearTimeout(this.reconnectTimeout)
+                this.reconnectTimeout = undefined;
             }
             if (this.client && ! this.client.destroyed) {
                 // @TODO: check if client is still connected and disconnect gracefully
