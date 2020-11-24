@@ -2,6 +2,11 @@ import ipAddress, {IpAddress} from '../../domain/IpAddress'
 import ipPort, {IpPort} from '../../domain/IpPort'
 import {Configuration} from '../interfaces'
 
+export type ObsConfigurationSaveType = {
+    ip: string
+    port: number
+}
+
 class ObsConfiguration extends Configuration {
     ip: IpAddress
     port: IpPort
@@ -12,11 +17,11 @@ class ObsConfiguration extends Configuration {
         this.port = ObsConfiguration.defaultPort
     }
 
-    fromSave(data: object): void {
+    fromSave(data: ObsConfigurationSaveType): void {
         this.loadIpAddress("ip", this.setIp.bind(this), data)
         this.loadIpPort("port", this.setPort.bind(this), data)
     }
-    toSave(): object {
+    toSave(): ObsConfigurationSaveType {
         return {
             ip: this.ip.toString(),
             port: this.port.toNumber(),

@@ -159,12 +159,28 @@ io.on('connection', (socket: ServerSideSocket) => {
   const configEvents = [
     new SocketAwareEvent(myEmitter, 'config.changed.atem', socket, (socket, atemConfiguration) => {
       socket.emit('config.state.atem', atemConfiguration.toSave())
-    })
+    }),
+    new SocketAwareEvent(myEmitter, 'config.changed.mock', socket, (socket, mockConfiguration) => {
+      socket.emit('config.state.mock', mockConfiguration.toSave())
+    }),
+    new SocketAwareEvent(myEmitter, 'config.changed.obs', socket, (socket, obsConfiguration) => {
+      socket.emit('config.state.obs', obsConfiguration.toSave())
+    }),
+    new SocketAwareEvent(myEmitter, 'config.changed.vmix', socket, (socket, vmixConfiguration) => {
+      socket.emit('config.state.vmix', vmixConfiguration.toSave())
+    }),
+    new SocketAwareEvent(myEmitter, 'config.changed.mixer', socket, (socket, mixerName) => {
+      socket.emit('config.state.mixer', mixerName)
+    }),
   ]
   socket.on('events.config.subscribe', () => {
     configEvents.forEach(pipe => pipe.register())
 
     socket.emit('config.state.atem', myConfiguration.getAtemConfiguration().toSave())
+    socket.emit('config.state.mixer', myConfiguration.getMixerSelection() || "")
+    socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toSave())
+    socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toSave())
+    socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toSave())
   })
   socket.on('events.program.unsubscribe', () => {
     // @TODO: not used yet
@@ -180,26 +196,46 @@ io.on('connection', (socket: ServerSideSocket) => {
   socket.on('tally.remove', tallyName => {
     myTallyDriver.removeTally(tallyName)
   })
-  socket.on('config.changeRequest', (selectedMixer, atemIp, atemPort, vmixIp, vmixPort, obsIp, obsPort, mockTickTime, mockChannelCount, mockChannelNames) => {
-    // @TODO: break this up into a smaller event
-    const atem = (new AtemConfiguration()).setIp(atemIp).setPort(atemPort)
-    myConfiguration.setAtemConfiguration(atem)
-
-    const vmix = (new VmixConfiguration()).setIp(vmixIp).setPort(vmixPort)
-    myConfiguration.setVmixConfiguration(vmix)
-
-    const obs = (new ObsConfiguration()).setIp(obsIp).setPort(obsPort)
-    myConfiguration.setObsConfiguration(obs)
-
-    const mock = (new MockConfiguration()).setTickTime(mockTickTime).setChannelCount(mockChannelCount).setChannelNames(mockChannelNames)
-    myConfiguration.setMockConfiguration(mock)
-
-    myConfiguration.setMixerSelection(selectedMixer)
-  })
-  socket.on('config.change.atem', newAtemConfiguration => {
+  socket.on('config.change.atem', (newAtemConfiguration, newMixerName) => {
     const atem = new AtemConfiguration()
     atem.fromSave(newAtemConfiguration)
     myConfiguration.setAtemConfiguration(atem)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.mock', (newMockConfiguration, newMixerName) => {
+    const mock = new MockConfiguration()
+    mock.fromSave(newMockConfiguration)
+    myConfiguration.setMockConfiguration(mock)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.null', newMixerName => {
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.obs', (newObsConfiguration, newMixerName) => {
+    const obs = new ObsConfiguration()
+    obs.fromSave(newObsConfiguration)
+    myConfiguration.setObsConfiguration(obs)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.vmix', (newVmixConfiguration, newMixerName) => {
+    const vmix = new VmixConfiguration()
+    vmix.fromSave(newVmixConfiguration)
+    myConfiguration.setVmixConfiguration(vmix)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
   })
 })
 
@@ -224,12 +260,6 @@ nextApp.prepare().then(() => {
         })
       }
     }
-  })
-  app.get('/atem', (req, res) => {
-    // @TODO: "any" is not nice here, but this should be removed soon anyways
-    const data: any = myConfiguration.mixerConfigToObject()
-    data.allowedMixers = MixerDriver.getAllowedMixers(myConfiguration.isDev())
-    res.json(data)
   })
 
   app.use('/lato', express.static(__dirname + '/node_modules/lato-font/css/'));

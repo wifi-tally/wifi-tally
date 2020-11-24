@@ -1,6 +1,12 @@
 import Channel from '../../domain/Channel'
 import {Configuration} from '../interfaces'
 
+export type MockConfigurationSaveType = {
+    channelCount: number
+    channelNames: string[]
+    tickTime: number
+}
+
 class MockConfiguration extends Configuration {
     channelCount: number
     channelNames: string[]
@@ -36,12 +42,12 @@ class MockConfiguration extends Configuration {
         }
     }
 
-    fromSave(data: object): void {
+    fromSave(data: MockConfigurationSaveType): void {
         this.loadNumber("channelCount", this.setChannelCount.bind(this), data)
         this.loadStringArray("channelNames", this.setChannelNames.bind(this), data)
         this.loadNumber("tickTime", this.setTickTime.bind(this), data)
     }
-    toSave(): object {
+    toSave(): MockConfigurationSaveType {
         return {
             channelCount: this.channelCount,
             channelNames: this.channelNames,

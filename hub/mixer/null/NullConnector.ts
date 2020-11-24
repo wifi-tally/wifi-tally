@@ -19,7 +19,7 @@ class NullConnector implements Connector {
         // it is never supposed to be connected
         return false
     }
-    static ID = "null"
+    static readonly ID: "null" = "null"
 }
 
 export default NullConnector

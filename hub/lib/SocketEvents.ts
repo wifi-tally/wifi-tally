@@ -1,4 +1,7 @@
 import { AtemConfigurationSaveType } from "../mixer/atem/AtemConfiguration";
+import { MockConfigurationSaveType } from "../mixer/mock/MockConfiguration";
+import { ObsConfigurationSaveType } from "../mixer/obs/ObsConfiguration";
+import { VmixConfigurationSaveType } from "../mixer/vmix/VmixConfiguration";
 import { ChannelList } from "./MixerCommunicator";
 
 // events the server sends to the client
@@ -8,6 +11,10 @@ export interface ServerSentEvents {
     'program.state': (data: {programs: ChannelList, previews: ChannelList}) => void
 
     'config.state.atem': (atemConfiguration: AtemConfigurationSaveType) => void
+    'config.state.mock': (mockConfiguration: MockConfigurationSaveType) => void
+    'config.state.obs': (obsConfiguration: ObsConfigurationSaveType) => void
+    'config.state.vmix': (vmixConfiguration: VmixConfigurationSaveType) => void
+    'config.state.mixer': (mixerName: string) => void
 }
 
 // events the client sends to the server
@@ -23,9 +30,11 @@ export interface ClientSentEvents {
     'tally.highlight': (tallyName: string) => void
     'tally.remove': (tallyName: string) => void
 
-    // @TODO: this one is insane. Change it!
-    'config.changeRequest': (selectedMixer: string, atemIp: string, atemPort: number, vmixIp: string, vmixPort: number, obsIp: string, obsPort: number, mockTickTime: number, mockChannelCount: number, mockChannelNames: string) => void
-    'config.change.atem': (atemConfiguration: AtemConfigurationSaveType) => void
+    'config.change.atem': (atemConfiguration: AtemConfigurationSaveType, newMixer?: "atem") => void
+    'config.change.mock': (mockConfiguration: MockConfigurationSaveType, newMixer?: "mock") => void
+    'config.change.null': (newMixer?: "null") => void
+    'config.change.obs': (obsConfiguration: ObsConfigurationSaveType, newMixer?: "obs") => void
+    'config.change.vmix': (vmixConfiguration: VmixConfigurationSaveType, newMixer?: "vmix") => void
 }
 
 export interface ServerSideSocket extends SocketIO.Socket {

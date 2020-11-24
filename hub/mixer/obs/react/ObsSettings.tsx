@@ -4,16 +4,17 @@ import InputPort from '../../../components/config/InputPort'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
 import { IpAddress } from '../../../domain/IpAddress'
 import { IpPort } from '../../../domain/IpPort'
-import { useAtemConfiguration } from '../../../hooks/useConfiguration'
+import { useObsConfiguration } from '../../../hooks/useConfiguration'
 import { socket } from '../../../hooks/useSocket'
+import ObsConnector from '../ObsConnector'
 
-type AtemSettingsProps = {
-    id: "atem", // @TODO: use the constant. But for now it makes the frontend build crash with ("Module not found: Can't resolve 'child_process'" - and no stack trace). WTF?
+type ObsSettingsProps = {
+    id: typeof ObsConnector.ID,
     label: string,
 }
 
-function AtemSettings(props: AtemSettingsProps) {
-    const configuration = useAtemConfiguration()
+function ObsSettings(props: ObsSettingsProps) {
+    const configuration = useObsConfiguration()
     const [ip, setIp] = useState<IpAddress|null|undefined>(null)
     const [port, setPort] = useState<IpPort|null|undefined>(null)
 
@@ -23,34 +24,34 @@ function AtemSettings(props: AtemSettingsProps) {
     const handleSave = () => {
         if (configuration === undefined || ip === undefined || port === undefined) {
             console.error("Not saving, because there is an invalid value in the form.")
-        } else if (props.id !== "atem") {
-            console.warn(`Changing id prop of AtemSettings is not supported. But got ${props.id}.`)
+        } else if (props.id !== ObsConnector.ID) {
+            console.warn(`Changing id prop of ObsSettings is not supported. But got ${props.id}.`)
         } else {
             const config = configuration.clone()
             config.setIp(ip)
             config.setPort(port)
 
-            socket.emit('config.change.atem', config.toSave(), props.id)
+            socket.emit('config.change.obs', config.toSave(), props.id)
         }
     }
 
     return (
         <MixerSettingsWrapper 
-            title="ATEM Configuration"
-            description="Connects to any ATEM device over network."
+            title="OBS Studio Configuration"
+            description={<>Connects to OBS Studio over network. The <a href="https://github.com/Palakis/obs-websocket" target="_blank">obs-websocket plugin</a> has to be installed.</>}
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
         >
-            <InputIp label="ATEM IP" default={configuration?.getIp()} onChange={(newIp) => { setIp(newIp) }} />
-            <InputPort label="ATEM Port" default={configuration?.getPort()} onChange={(newPort) => { setPort(newPort) }} />
+            <InputIp label="OBS IP" default={configuration?.getIp()} onChange={(newIp) => { setIp(newIp) }} />
+            <InputPort label="OBS Port" default={configuration?.getPort()} onChange={(newPort) => { setPort(newPort) }} />
         </MixerSettingsWrapper>
     )
 }
 
-AtemSettings.defaultProps = {
-    id: "atem",
-    label: "ATEM by Blackmagic Design",
+ObsSettings.defaultProps = {
+    id: ObsConnector.ID,
+    label: "OBS Studio",
 }
 
-export default AtemSettings
+export default ObsSettings

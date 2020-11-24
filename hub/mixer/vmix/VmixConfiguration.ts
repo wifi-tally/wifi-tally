@@ -2,6 +2,11 @@ import ipAddress, {IpAddress} from '../../domain/IpAddress'
 import ipPort, {IpPort} from '../../domain/IpPort'
 import {Configuration} from '../interfaces'
 
+export type VmixConfigurationSaveType = {
+    ip: string
+    port: number
+}
+
 class VmixConfiguration extends Configuration {
     ip: IpAddress
     port: IpPort
@@ -12,11 +17,11 @@ class VmixConfiguration extends Configuration {
         this.port = VmixConfiguration.defaultPort
     }
 
-    fromSave(data: object): void {
+    fromSave(data: VmixConfigurationSaveType): void {
         this.loadIpAddress("ip", this.setIp.bind(this), data)
         this.loadIpPort("port", this.setPort.bind(this), data)
     }
-    toSave(): object {
+    toSave(): VmixConfigurationSaveType {
         return {
             ip: this.ip.toString(),
             port: this.port.toNumber(),
