@@ -2,11 +2,11 @@ import net from 'net'
 import xml2js from 'xml2js'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
+import VmixConfiguration from './VmixConfiguration'
 
 // @see https://www.vmix.com/help20/index.htm?TCPAPI.html
 class VmixConnector implements Connector {
-    ip: string
-    port: number
+    configuration: VmixConfiguration
     communicator: MixerCommunicator
     client?: net.Socket
     wasHelloReceived: boolean
@@ -14,9 +14,8 @@ class VmixConnector implements Connector {
     intervalHandle: any
     xmlQueryInterval: number
 
-    constructor(ip: string, port: number, communicator: MixerCommunicator) {
-        this.ip = ip
-        this.port = port
+    constructor(configuration: VmixConfiguration, communicator: MixerCommunicator) {
+        this.configuration = configuration
         this.communicator = communicator
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
@@ -29,8 +28,8 @@ class VmixConnector implements Connector {
         const connectClient = () => {
             this.wasHelloReceived = false
             this.wasSubcribeOkReceived = false
-            console.log(this.port, this.ip)
-            client.connect(this.port, this.ip)
+            console.log(`Connecting to Vmix at ${this.configuration.getIp().toString()}:${this.configuration.getPort().toNumber()}`)
+            client.connect(this.configuration.getPort().toNumber(), this.configuration.getIp().toString())
         }
 
         const queryXml = () => {
@@ -75,7 +74,8 @@ class VmixConnector implements Connector {
             if (hadError) {
                 console.debug("Connection to vMix is reconnected after an error")
                 setTimeout(() => {
-                    client.connect(this.port, this.ip)
+                    // @TODO: make sure this is not called if the communicator is disconnected
+                    client.connect(this.configuration.getPort().toNumber(), this.configuration.getIp().toString())
                 }, 200)
             }
         })
@@ -176,8 +176,6 @@ class VmixConnector implements Connector {
     }
     
     static readonly ID = "vmix"
-    static readonly defaultIp = "127.0.0.1"
-    static readonly defaultPort = 8099
 }
 
 export default VmixConnector

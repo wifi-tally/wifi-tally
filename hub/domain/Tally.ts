@@ -6,6 +6,11 @@ export enum ConnectionState {
     MISSING = 2,
 }
 
+export type TallySaveObject = {
+    name: string
+    channelId?: string
+}
+
 export class Tally {
     name: string
     channelId?: string
@@ -37,7 +42,7 @@ export class Tally {
         return this.address !== null && this.port !== null && this.state !== ConnectionState.DISCONNECTED
     }
     isMissing() : boolean {
-        return this.address !== null && this.port !== null && this.state !== ConnectionState.MISSING
+        return this.address !== null && this.port !== null && this.state === ConnectionState.MISSING
     }
     setHighlight(highlight: boolean) : void {
         this.highlight = highlight
@@ -53,7 +58,7 @@ export class Tally {
     getLogs() {
         return this.logs
     }
-    toValueObject() {
+    toValueObject(): any {
         return {
             name: this.name,
             channelId: this.channelId,
@@ -69,7 +74,18 @@ export class Tally {
         return channelNames.indexOf(this.channelId) !== -1
     }
 
-    static fromValueObject = function(valueObject: any) {
+    toSave(): TallySaveObject {
+        return {
+            name: this.name,
+            channelId: this.channelId,
+        }
+    }
+
+    static fromSave(valueObject: TallySaveObject) {
+        return new Tally(valueObject.name, valueObject.channelId)
+    }
+
+    static fromValueObject(valueObject: any) {
         const tally = new Tally(
             valueObject.name,
             valueObject.channelId,

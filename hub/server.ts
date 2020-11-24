@@ -9,7 +9,7 @@ if (argv.env !== undefined) {
 }
 
 import { TallyDriver } from './lib/TallyDriver'
-import { Configuration } from './lib/Configuration'
+import { AppConfiguration } from './lib/AppConfiguration'
 import { MixerDriver } from './lib/MixerDriver'
 import express from 'express'
 const app = express()
@@ -24,24 +24,22 @@ import { SocketAwareEvent } from './lib/SocketAwareEvent'
 import ServerEventEmitter from './lib/ServerEventEmitter'
 import Tally from './domain/Tally'
 import { ServerSideSocket } from './lib/SocketEvents'
+import AppConfigurationPersistence from './lib/AppConfigurationPersistence'
+import AtemConfiguration from './mixer/atem/AtemConfiguration'
+import VmixConfiguration from './mixer/vmix/VmixConfiguration'
+import ObsConfiguration from './mixer/obs/ObsConfiguration'
+import MockConfiguration from './mixer/mock/MockConfiguration'
 
 const myEmitter = new ServerEventEmitter()
 myEmitter.setMaxListeners(99)
-const myConfiguration = new Configuration(myEmitter)
+const myConfiguration = new AppConfiguration(myEmitter)
+const myConfigurationPersistence = new AppConfigurationPersistence(myConfiguration, myEmitter)
+
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
-const myTallyDriver = new TallyDriver(myConfiguration.getTallies(), myEmitter)
+const myTallyDriver = new TallyDriver(myConfiguration, myEmitter)
 
 const nextApp = next({ dev: myConfiguration.isDev() })
 const nextHandler = nextApp.getRequestHandler()
-
-// keep configruation up to date
-const updateTallies = function() {
-  myConfiguration.updateTallies(myTallyDriver)
-  myConfiguration.save()
-}
-myEmitter.on('tally.connected', updateTallies)
-myEmitter.on('tally.changed', updateTallies)
-myEmitter.on('tally.removed', updateTallies)
 
 const sendLogToTally = (tally: Tally, log: Log) => {
   io.emit(`tally.logged.${tally.name}`, log)
@@ -168,13 +166,20 @@ io.on('connection', (socket: ServerSideSocket) => {
     myTallyDriver.removeTally(tallyName)
   })
   socket.on('config.changeRequest', (selectedMixer, atemIp, atemPort, vmixIp, vmixPort, obsIp, obsPort, mockTickTime, mockChannelCount, mockChannelNames) => {
-    myConfiguration.updateAtemConfig(atemIp, atemPort)
-    myConfiguration.updateVmixConfig(vmixIp, vmixPort)
-    myConfiguration.updateObsConfig(obsIp, obsPort)
-    myConfiguration.updateMockConfig(mockTickTime, mockChannelCount, mockChannelNames)
-    myConfiguration.updateMixerSelection(selectedMixer)
-    myConfiguration.save()
-    myEmitter.emit("config.changed")
+    // @TODO: break this up into a smaller event
+    const atem = (new AtemConfiguration()).setIp(atemIp).setPort(atemPort)
+    myConfiguration.setAtemConfiguration(atem)
+
+    const vmix = (new VmixConfiguration()).setIp(vmixIp).setPort(vmixPort)
+    myConfiguration.setVmixConfiguration(vmix)
+
+    const obs = (new ObsConfiguration()).setIp(obsIp).setPort(obsPort)
+    myConfiguration.setObsConfiguration(obs)
+
+    const mock = (new MockConfiguration()).setTickTime(mockTickTime).setChannelCount(mockChannelCount).setChannelNames(mockChannelNames)
+    myConfiguration.setMockConfiguration(mock)
+
+    myConfiguration.setMixerSelection(selectedMixer)
   })
 })
 

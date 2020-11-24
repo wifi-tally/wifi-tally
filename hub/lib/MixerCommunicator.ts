@@ -1,7 +1,7 @@
 /* helper so that video mixer connectors do not need to implement events */
 
 import Channel from "../domain/Channel"
-import { Configuration } from "./Configuration"
+import { AppConfiguration } from "./AppConfiguration"
 import ServerEventEmitter from "./ServerEventEmitter"
 
 const haveValuesChanged = (lastArray: any, newArray: any) => {
@@ -15,13 +15,13 @@ const haveValuesChanged = (lastArray: any, newArray: any) => {
 export type ChannelList = string[] | null
 
 export class MixerCommunicator {
-    configuration: Configuration
+    configuration: AppConfiguration
     emitter: ServerEventEmitter
     currentPrograms: ChannelList
     currentPreviews: ChannelList
     isConnected: boolean | null
     
-    constructor(configuration: Configuration, emitter: ServerEventEmitter) {
+    constructor(configuration: AppConfiguration, emitter: ServerEventEmitter) {
         this.configuration = configuration
         this.emitter = emitter
 
@@ -91,11 +91,8 @@ export class MixerCommunicator {
 
     notifyChannels(channels : Channel[] | null) {
         channels = channels || []
-        if (JSON.stringify(channels.map(c => c.toValueObject())) !== JSON.stringify(this.configuration.getChannels().map(c => c.toValueObject()))) {
+        if (JSON.stringify(channels.map(c => c.toSave())) !== JSON.stringify(this.configuration.getChannels().map(c => c.toSave()))) {
             this.configuration.setChannels(channels)
-            this.configuration.save()
-
-            this.emitter.emit("config.changed")
         }
     }
 

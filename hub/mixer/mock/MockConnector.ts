@@ -2,37 +2,31 @@
 
 import { MixerCommunicator } from "../../lib/MixerCommunicator"
 import { Connector } from "../interfaces"
+import MockConfiguration from "./MockConfiguration"
 
 class MockConnector implements Connector {
+    configuration: MockConfiguration
     communicator: MixerCommunicator
-    tickTime: number
-    channelCount: number
-    channelNames: string // comma-separated
     isActive: boolean
     intervalHandle?: NodeJS.Timeout
 
-    constructor(tickTime: number, channelCount: number, channelNames: string, communicator: MixerCommunicator) {
+    constructor(configuration: MockConfiguration, communicator: MixerCommunicator) {
+        this.configuration = configuration
         this.communicator = communicator
-        this.tickTime = tickTime
-        this.channelCount = channelCount
-        this.channelNames = channelNames
         this.isActive = false
     }
     connect() {
-        console.log(`Simulating a mock video mixer with ${this.channelCount} channels that changes programs every ${this.tickTime}ms`)
+        console.log(`Simulating a mock video mixer with ${this.configuration.getChannelCount()} channels that changes programs every ${this.configuration.getTickTime()}ms`)
         this.isActive = true
         this.communicator.notifyMixerIsConnected()
-        this.communicator.notifyChannelNames(this.channelCount, this.channelNames.split(",").map(name => name.trim()).reduce((map, name, idx) => {
-            map[idx + 1] = name
-            return map
-        }, new Map()))
+        this.communicator.notifyChannels(this.configuration.getChannels())
 
         const fn = () => {
-            const mockCurrentPrograms = [Math.floor(Math.random() * (this.channelCount + 1)).toString()]
-            const mockCurrentPreviews = [Math.floor(Math.random() * (this.channelCount + 1)).toString()]
+            const mockCurrentPrograms = [Math.floor(Math.random() * (this.configuration.getChannelCount() + 1)).toString()]
+            const mockCurrentPreviews = [Math.floor(Math.random() * (this.configuration.getChannelCount() + 1)).toString()]
             this.communicator.notifyProgramPreviewChanged(mockCurrentPrograms, mockCurrentPreviews)
         }
-        this.intervalHandle = setInterval(fn, this.tickTime)
+        this.intervalHandle = setInterval(fn, this.configuration.getTickTime())
         fn()
     }
     disconnect() {
@@ -49,9 +43,6 @@ class MockConnector implements Connector {
     }
 
     static ID = "mock"
-    static defaultTickTime = 3000
-    static defaultChannelCount = 8
-    static defaultChannelNames = ""
 }
 
 export default MockConnector

@@ -5,23 +5,27 @@ import NullConnector from '../mixer/null/NullConnector'
 import ObsConnector from '../mixer/obs/ObsConnector'
 import { MixerCommunicator } from './MixerCommunicator'
 import Channel from '../domain/Channel'
-import type { Configuration } from './Configuration'
+import type { AppConfiguration } from './AppConfiguration'
 import ServerEventEmitter from './ServerEventEmitter'
-import { Connector } from '../mixer/interfaces'
+import { Configuration, Connector } from '../mixer/interfaces'
+
+const haveValuesChanged = (one: any, two: any) => {
+    //@TODO: this could probably be more performant
+    return JSON.stringify(one) !== JSON.stringify(two)
+}
 
 // Takes care of connecting to one of the supported mixers
 export class MixerDriver {
     currentMixerId?: string
     currentMixerInstance?: Connector
-    currentMixerSettings: unknown[]
-    getCurrentMixerSettings?: Function
-    configuration: Configuration
+    currentMixerSettings?: Configuration
+    getCurrentMixerSettings?: () => Configuration
+    configuration: AppConfiguration
     communicator: MixerCommunicator
     emitter: ServerEventEmitter
     isChangingMixer: boolean
     
-    constructor(configuration: Configuration, emitter: ServerEventEmitter) {
-        this.currentMixerSettings = []
+    constructor(configuration: AppConfiguration, emitter: ServerEventEmitter) {
         this.configuration = configuration
         this.communicator = new MixerCommunicator(configuration, emitter)
         this.emitter = emitter
@@ -39,20 +43,11 @@ export class MixerDriver {
                 // a different mixer was selected
                 console.debug("A different mixer was selected")
                 needsRefresh = true
-            } else if (this.getCurrentMixerSettings) {
+            } else if (this.getCurrentMixerSettings && this.currentMixerSettings) {
                 const mixerSettings = this.getCurrentMixerSettings()
-                if (this.currentMixerSettings.length !== mixerSettings.length) {
-                    // a new setting was added (not sure why this would happen, but definitely a reason to restart)
-                    console.debug("mixer connection is restarted, because number of settings were changed")
+                if (haveValuesChanged(mixerSettings.toSave(), this.currentMixerSettings.toSave()) ){
+                    console.debug("mixer connection is restarted, because settings were changed")
                     needsRefresh = true
-                } else {
-                    const anyChanges = this.currentMixerSettings.some((value, idx) => {
-                        return value !== mixerSettings[idx]
-                    })
-                    if (anyChanges) {
-                        console.debug("mixer connection is restarted, because settings were changed")
-                        needsRefresh = true
-                    }
                 }
             }
             if (needsRefresh) {
@@ -81,28 +76,29 @@ export class MixerDriver {
             console.log(`Using mixer configuration "${newMixerId}"`)
 
             let MixerClass
+            // @TODO: make it better extensible
             if(newMixerId === AtemConnector.ID) {
-                this.getCurrentMixerSettings = () => [this.configuration.getAtemIp(), this.configuration.getAtemPort()]
                 MixerClass = AtemConnector
+                this.getCurrentMixerSettings = this.configuration.getAtemConfiguration.bind(this.configuration)
             } else if(newMixerId === VmixConnector.ID) {
-                this.getCurrentMixerSettings = () => [this.configuration.getVmixIp(), this.configuration.getVmixPort()]
                 MixerClass = VmixConnector
+                this.getCurrentMixerSettings = this.configuration.getVmixConfiguration.bind(this.configuration)
             } else if(newMixerId === ObsConnector.ID) {
-                this.getCurrentMixerSettings = () => [this.configuration.getObsIp(), this.configuration.getObsPort()]
                 MixerClass = ObsConnector
+                this.getCurrentMixerSettings = this.configuration.getObsConfiguration.bind(this.configuration)
             } else if(newMixerId === MockConnector.ID) {
-                this.getCurrentMixerSettings = () => [this.configuration.getMockTickTime(), this.configuration.getMockChannelCount(), this.configuration.getMockChannelNames()]
                 MixerClass = MockConnector
+                this.getCurrentMixerSettings = this.configuration.getMockConfiguration.bind(this.configuration)
             } else if(newMixerId === NullConnector.ID) {
-                this.getCurrentMixerSettings = () => []
                 MixerClass = NullConnector
+                this.getCurrentMixerSettings = this.configuration.getNullConfiguration.bind(this.configuration)
             } else {
                 console.error(`Someone(TM) forgot to implement the ${newMixerId} mixer in MixerDriver.js.`)
                 return
             }
             this.currentMixerId = newMixerId
-            this.currentMixerSettings = this.getCurrentMixerSettings()
-            this.currentMixerInstance = new MixerClass(...this.currentMixerSettings, this.communicator)
+            this.currentMixerSettings = this.getCurrentMixerSettings ? this.getCurrentMixerSettings() : undefined
+            this.currentMixerInstance = new MixerClass(this.currentMixerSettings, this.communicator)
             const ret = this.currentMixerInstance?.connect()
             await Promise.resolve(ret)
         }

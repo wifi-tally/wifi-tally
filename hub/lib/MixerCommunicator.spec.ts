@@ -1,5 +1,5 @@
 import { MixerCommunicator } from './MixerCommunicator'
-import { Configuration } from './Configuration'
+import { AppConfiguration } from './AppConfiguration'
 import { EventEmitter } from 'events'
 
 describe('MixerCommunicator', () => {
@@ -15,7 +15,7 @@ describe('MixerCommunicator', () => {
                 expect(programs).toEqual(expectedPrograms)
                 expect(previews).toEqual(expectedPreviews)
             })
-            const config = new Configuration(emitter)
+            const config = new AppConfiguration(emitter)
 
             const communicator = new MixerCommunicator(config, emitter)
 
@@ -36,7 +36,7 @@ describe('MixerCommunicator', () => {
             const emitter = new EventEmitter()
             let eventSeen = 0
             emitter.on("program.changed", _ => eventSeen++)
-            const config = new Configuration(emitter)
+            const config = new AppConfiguration(emitter)
 
             const communicator = new MixerCommunicator(config, emitter)
 
@@ -72,7 +72,7 @@ describe('MixerCommunicator', () => {
             let eventSeen = 0
 
             emitter.on("config.changed", () => eventSeen++)
-            const config = new Configuration(emitter)
+            const config = new AppConfiguration(emitter)
             config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
@@ -99,7 +99,7 @@ describe('MixerCommunicator', () => {
             let eventSeen = 0
 
             emitter.on("config.changed", () => eventSeen++)
-            const config = new Configuration(emitter)
+            const config = new AppConfiguration(emitter)
             config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
@@ -139,7 +139,7 @@ describe('MixerCommunicator', () => {
 
             emitter.on("mixer.connected", () => connectEventSeen++)
             emitter.on("mixer.disconnected", () => disconnectEventSeen++)
-            const config = new Configuration(emitter)
+            const config = new AppConfiguration(emitter)
             config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)
@@ -162,7 +162,7 @@ describe('MixerCommunicator', () => {
 
             emitter.on("mixer.connected", () => connectEventSeen++)
             emitter.on("mixer.disconnected", () => disconnectEventSeen++)
-            const config = new Configuration(emitter)
+            const config = new AppConfiguration(emitter)
             config.save = async () => {} // mock it away
 
             const communicator = new MixerCommunicator(config, emitter)

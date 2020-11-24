@@ -4,17 +4,16 @@ import {Connector} from '../interfaces'
 import { Atem } from 'atem-connection'
 import { InternalPortType } from 'atem-connection/dist/enums'
 import Channel from '../../domain/Channel'
+import AtemConfiguration from './AtemConfiguration'
 
 class AtemConnector implements Connector {
-    ip: string
-    port: number
+    configuration: AtemConfiguration
     communicator: MixerCommunicator
     isAtemConnected: boolean
     myAtem: Atem | null
     
-    constructor(ip: string, port: number, communicator: MixerCommunicator) {
-        this.ip = ip
-        this.port = port
+    constructor(configuration: AtemConfiguration, communicator: MixerCommunicator) {
+        this.configuration = configuration
         this.communicator = communicator
         this.isAtemConnected = false
     }
@@ -40,9 +39,9 @@ class AtemConnector implements Connector {
         this.myAtem.on('info', console.log)
         this.myAtem.on('error', console.error)
 
-        console.log(`Connecting to ATEM at ${this.ip}:${this.port}`)
+        console.log(`Connecting to ATEM at ${this.configuration.getIp().toString()}:${this.configuration.getPort().toNumber()}`)
 
-        this.myAtem.connect(this.ip, this.port)
+        this.myAtem.connect(this.configuration.getIp().toString(), this.configuration.getPort().toNumber())
         this.myAtem.on('connected', () => {
             this.isAtemConnected = true
             console.log("Connected to ATEM")
@@ -81,8 +80,6 @@ class AtemConnector implements Connector {
     }
 
     static ID = "atem"
-    static defaultIp = "127.0.0.1"
-    static defaultPort = 9910
 }
 
 export default AtemConnector

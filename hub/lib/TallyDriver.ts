@@ -2,6 +2,7 @@ import { ConnectionState, Tally } from '../domain/Tally'
 import dgram from 'dgram'
 import ServerEventEmitter from './ServerEventEmitter'
 import { ChannelList } from './MixerCommunicator'
+import { AppConfiguration } from './AppConfiguration'
 
 const tallyHighlightTime = 1000 // ms
 // the more keep alives you send the less likely it is that
@@ -42,12 +43,13 @@ export class TallyDriver {
     emitter: ServerEventEmitter
     lastPrograms: ChannelList
     lastPreviews: ChannelList
+    configuration: AppConfiguration
 
-    constructor(tallies: object[], emitter: ServerEventEmitter) {
+    constructor(configuration: AppConfiguration, emitter: ServerEventEmitter) {
+        this.configuration = configuration
         this.tallies = new Map();
-        (tallies || []).forEach(tally => {
-            const theTally = Tally.fromValueObject(tally)
-            this.tallies.set(theTally.name, theTally)
+        (configuration.getTallies() || []).forEach(tally => {
+            this.tallies.set(tally.name, tally)
         })
         this.emitter = emitter
         this.lastPrograms = null
@@ -133,6 +135,7 @@ export class TallyDriver {
         if (!tally) {
             tally = new Tally(tallyName)
             this.tallies.set(tallyName, tally)
+            this.configuration.setTallies(Array.from(this.tallies.values()))
         }
         if(tally.state !== ConnectionState.CONNECTED) {
             tally.state = ConnectionState.CONNECTED
@@ -170,6 +173,8 @@ export class TallyDriver {
         const tally = this.tallies.get(tallyName)
         if (tally) {
             tally.channelId = channelId
+            this.configuration.setTallies(Array.from(this.tallies.values()))
+
             this.emitter.emit('tally.changed', tally)
         }
     }
@@ -177,6 +182,7 @@ export class TallyDriver {
         const tally = this.tallies.get(tallyName)
         if(tally) {
             this.tallies.delete(tallyName)
+            this.configuration.setTallies(Array.from(this.tallies.values()))
             this.emitter.emit('tally.removed', tally)
         }
     }
@@ -189,15 +195,11 @@ export class TallyDriver {
     updateTallies() {
         this.tallies.forEach(tally => updateTally(tally, this.io, this.lastPrograms, this.lastPreviews))
     }
+    /** @deprecated */
     toValueObjects() {
         return Array.from(this.tallies.values()).map(tally => tally.toValueObject())
     }
-    toValueObjectsForSave() {
-        return this.toValueObjects().map(tally => { return {
-            name: tally.name,
-            channelId: tally.channelId,
-        }})
-    }
+
     getTally(tallyName: string) {
         if(this.tallies.has(tallyName)) {
             const tally = this.tallies.get(tallyName)

@@ -2,23 +2,22 @@ import OBSWebSocket from 'obs-websocket-js'
 import Channel from '../../domain/Channel'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
+import ObsConfiguration from './ObsConfiguration'
 
 const reconnectTimeoutMs = 1000
 
 // uses obs-websockets
 // @see https://github.com/Palakis/obs-websocket
 class ObsConnector implements Connector{
-    ip: string
-    port: number
+    configuration: ObsConfiguration
     communicator: MixerCommunicator
     embeddedScenes: {}
     reconnectTimeout: NodeJS.Timeout | null
     obs: OBSWebSocket | null
     connected: boolean
     
-    constructor(ip: string, port: number, communicator: MixerCommunicator) {
-        this.ip = ip
-        this.port = port
+    constructor(configuration: ObsConfiguration, communicator: MixerCommunicator) {
+        this.configuration = configuration
         this.communicator = communicator
         // tracks which scenes are embedded into other scenes
         this.embeddedScenes = {}
@@ -75,8 +74,8 @@ class ObsConnector implements Connector{
             if (this.reconnectTimeout) { 
                 clearTimeout(this.reconnectTimeout)
             }
-            console.log(`Connecting to OBS at ${this.ip}:${this.port}`)
-            this.obs.connect({address: `${this.ip}:${this.port}`}).then(() => {
+            console.log(`Connecting to OBS at ${this.configuration.getIp().toString()}:${this.configuration.getPort().toNumber()}`)
+            this.obs.connect({address: `${this.configuration.getIp().toString()}:${this.configuration.getPort().toNumber()}`}).then(() => {
                 this.connected = true
                 this.communicator.notifyMixerIsConnected()
                 this.updateScenes()
@@ -165,8 +164,6 @@ class ObsConnector implements Connector{
         return this.obs !== undefined && this.connected
     }
     static readonly ID = "obs"
-    static readonly defaultIp = "127.0.0.1"
-    static readonly defaultPort = 4444
 }
 
 export default ObsConnector

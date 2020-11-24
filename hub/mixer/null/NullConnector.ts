@@ -2,10 +2,11 @@
 
 import { MixerCommunicator } from "../../lib/MixerCommunicator"
 import { Connector } from "../interfaces"
+import NullConfiguration from "./NullConfiguration"
 
 class NullConnector implements Connector {
     communicator: MixerCommunicator
-    constructor(communicator: MixerCommunicator) {
+    constructor(_: NullConfiguration, communicator: MixerCommunicator) {
         this.communicator = communicator
     }
     connect() {

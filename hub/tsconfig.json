@@ -22,7 +22,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx", "mixer/obs/ObsConnector.spec.js"
+    "**/*.tsx", "mixer/obs/ObsConnector.spec.js", "domain/IpAddress.spec.js"
   ],
   "exclude": [
     "node_modules"

@@ -45,7 +45,7 @@ const IndexPage = props => {
     setTallies(tallies)
   })
   useSocket('config', config => {
-    setChannels(config.channels.map(c => Channel.fromValueObject(c)))
+    setChannels(config.channels.map(c => Channel.fromSave(c)))
   })
 
   const patchTally = function(tally, channel) {
@@ -169,7 +169,7 @@ IndexPage.getInitialProps = async (context) => {
   // @TODO: use asynchronous calls
   const config = await fetch(baseUrl + '/atem')
   const configJson = await config.json()
-  info.channels = configJson.channels.map(c => Channel.fromValueObject(c))
+  info.channels = configJson.channels.map(c => Channel.fromSave(c))
 
   return info
 }

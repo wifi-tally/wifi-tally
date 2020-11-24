@@ -1,3 +1,10 @@
+import { string } from "yargs"
+
+export type ChannelSaveObject = {
+    id: string
+    name?: string
+}
+
 class Channel {
     id: string
     name?: string
@@ -7,7 +14,7 @@ class Channel {
         this.name = name
     }
 
-    toValueObject() {
+    toSave(): ChannelSaveObject {
         return {
             id: this.id,
             name: this.name,
@@ -17,7 +24,7 @@ class Channel {
         return this.name || this.id
     }
 
-    static fromValueObject = function(valueObject: any) {
+    static fromSave = function(valueObject: ChannelSaveObject) {
         const channel = new Channel(
             valueObject.id,
             valueObject.name,

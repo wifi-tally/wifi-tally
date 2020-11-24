@@ -1,5 +1,6 @@
 import ObsConnector from './ObsConnector'
 import WebSocket from 'ws'
+import ObsConfiguration from './ObsConfiguration'
 
 const waitUntil = (fn) => {
     return new Promise((resolve, _) => {
@@ -48,6 +49,16 @@ class MockCommunicator {
 const defaultScene = {
     name: null,
     sources: [],
+}
+
+function createObsCommunicator(ip, port) {
+    const communicator = new MockCommunicator()
+    const configuration = new ObsConfiguration()
+    configuration.setIp(ip)
+    configuration.setPort(port)
+    const obs = new ObsConnector(configuration, communicator)
+
+    return [obs, communicator]
 }
 
 describe('ObsConnector', () => {
@@ -206,9 +217,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it correctly determines the initial state without studio mode', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Scene 1" },
@@ -234,9 +244,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it correctly determines the initial state with studio mode', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Scene 1" },
@@ -262,9 +271,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it cuts', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Scene 1" },
@@ -285,9 +293,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it handles scenes inside scenes', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Cam 1" },
@@ -322,9 +329,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it handles transitions', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Cam 1" },
@@ -350,9 +356,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it does not crash when a transition is aborted', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Cam 1" },
@@ -375,9 +380,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it handles modifications in the scenes', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Scene 1" },
@@ -406,9 +410,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it handles changing the scene collection', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Collection 1 / Scene 1" },
@@ -437,9 +440,8 @@ describe('ObsConnector', () => {
             }
         })
         test('it correctly switches preview when changing in and out of studio mode', async () => {
-            const communicator = new MockCommunicator()
             const server = global.obsServer
-            const obs = new ObsConnector(server.serverIp, server.serverPort, communicator)
+            const [obs, communicator] = createObsCommunicator(server.serverIp, server.serverPort)
 
             server.scenes = [
                 { name: "Scene 1" },

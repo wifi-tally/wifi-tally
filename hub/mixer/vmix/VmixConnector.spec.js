@@ -1,4 +1,5 @@
 import VmixConnector from './VmixConnector'
+import VmixConfiguration from './VmixConfiguration'
 import { Server } from 'net'
 
 const waitUntil = (fn) => {
@@ -37,6 +38,16 @@ class MockCommunicator {
     notifyMixerIsDisconnected() {
         this.isConnected = false
     }
+}
+
+function createVmixCommunicator(ip, port) {
+    const communicator = new MockCommunicator()
+    const configuration = new VmixConfiguration()
+    configuration.setIp(ip)
+    configuration.setPort(port)
+    const vmix = new VmixConnector(configuration, communicator)
+
+    return [vmix, communicator]
 }
 
 describe('VmixConnector', () => {
@@ -103,9 +114,8 @@ describe('VmixConnector', () => {
             }
         })
         test('recognizes VERSION OK', async () => {
-            const communicator = new MockCommunicator()
             const server = global.vMixServerConfig
-            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
+            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
             try {
                 expect(vmix.wasHelloReceived).toBe(false)
                 vmix.connect()
@@ -117,9 +127,8 @@ describe('VmixConnector', () => {
             }
         })
         test('recognizes SUBSCRIBE OK TALLY', async () => {
-            const communicator = new MockCommunicator()
             const server = global.vMixServerConfig
-            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
+            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
             try {
                 expect(vmix.wasSubcribeOkReceived).toBe(false)
                 vmix.connect()
@@ -131,10 +140,9 @@ describe('VmixConnector', () => {
             }
         })
         test('parses TALLY OK command', async () => {
-            const communicator = new MockCommunicator()
             const server = global.vMixServerConfig
             server.tallies = "012"
-            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
+            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
             try {
                 vmix.connect()
                 await waitUntil(() => communicator.programs !== undefined).then(() => {
@@ -146,10 +154,9 @@ describe('VmixConnector', () => {
             }
         })
         test('parses complex TALLY OK command', async () => {
-            const communicator = new MockCommunicator()
             const server = global.vMixServerConfig
             server.tallies = "012210"
-            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
+            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
 
             try {
                 vmix.connect()
@@ -162,10 +169,9 @@ describe('VmixConnector', () => {
             }
         })
         test('recognizes XML response', async () => {
-            const communicator = new MockCommunicator()
             const server = global.vMixServerConfig
             server.xml = '<vmix><version>{version}</version><edition>Trial</edition><inputs><input key="0182ffa0-9fa9-4514-91af-37ef60240c87" number="1" type="Colour" title="Foobar" shortTitle="Foobar" state="Paused" position="0" duration="0" loop="False">Foobar</input><input key="a108d01e-26f4-466f-a37d-d8f91f3fd6eb" number="2" type="Colour" title="Tolle rote Farbe" shortTitle="Tolle rote Farbe" state="Paused" position="0" duration="0" loop="False">Tolle rote Farbe</input><input key="3f6e4c1b-a13f-46b0-9537-676a4fb17ea3" number="3" type="Colour" title="Colour Bars" shortTitle="Colour Bars" state="Paused" position="0" duration="0" loop="False">Colour Bars</input></inputs><overlays><overlay number="1" /><overlay number="2" /><overlay number="3" /><overlay number="4" /><overlay number="5" /><overlay number="6" /></overlays><preview>2</preview><active>3</active><fadeToBlack>False</fadeToBlack><transitions><transition number="1" effect="VerticalSlide" duration="500" /><transition number="2" effect="Merge" duration="1000" /><transition number="3" effect="Wipe" duration="1000" /><transition number="4" effect="CubeZoom" duration="1000" /></transitions><recording>False</recording><external>False</external><streaming>False</streaming><playList>False</playList><multiCorder>False</multiCorder><fullscreen>False</fullscreen><audio><master volume="100" muted="False" meterF1="0" meterF2="0" headphonesVolume="100" /></audio></vmix>'
-            const vmix = new VmixConnector(server.serverIp, server.serverPort, communicator)
+            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
             try {
                 vmix.connect()
                 await waitUntil(() => communicator.channelCount !== undefined).then(() => {
