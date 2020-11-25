@@ -2,9 +2,14 @@ import { useEffect } from 'react'
 import io from 'socket.io-client'
 import {EventEmitter} from 'events'
 import { ClientSentEvents, ClientSideSocket } from '../lib/SocketEvents'
+import DisconnectedClientSideSocket from '../lib/DisconnectedClientSideSocket'
+
+// @TODO: remove socket event emitter. It does not have any purpose apart from announcing connection and disconnection
 const socketEventEmitter = new EventEmitter()
 
-const socket = <ClientSideSocket>io()
+const isTestEnvironment = process.env.JEST_WORKER_ID !== undefined
+
+const socket: ClientSideSocket = isTestEnvironment ? new DisconnectedClientSideSocket() : io()
 
 const onConnection = function() {
   socketEventEmitter.emit("connected")
@@ -40,3 +45,4 @@ const useSocket = function<EventName extends keyof ClientSentEvents>(eventName: 
 }
 
 export {useSocket, socketEventEmitter, socket}
+  

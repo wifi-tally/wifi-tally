@@ -37,7 +37,7 @@ export interface ClientSentEvents {
     'config.change.vmix': (vmixConfiguration: VmixConfigurationSaveType, newMixer?: "vmix") => void
 }
 
-export interface ServerSideSocket extends SocketIO.Socket {
+export interface ServerSideSocket {
     emit<EventName extends keyof ServerSentEvents>(
         event: EventName,
         ...args: Parameters<ServerSentEvents[EventName]>
@@ -55,7 +55,7 @@ export interface ServerSideSocket extends SocketIO.Socket {
     ): this
 }
 
-export interface ClientSideSocket extends SocketIOClient.Socket {
+export interface ClientSideSocket {
     emit<EventName extends keyof ClientSentEvents>(
         event: EventName,
         ...args: Parameters<ClientSentEvents[EventName]>

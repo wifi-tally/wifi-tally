@@ -3,9 +3,9 @@ import Layout from '../components/Layout'
 import AtemSettings from '../mixer/atem/react/AtemSettings'
 import MixerSelection from '../components/config/MixerSelection'
 import NullSettings from '../mixer/null/react/NullSettings'
-import MockSettings from '../mixer/mock/mock/MockSettings'
+import MockSettings from '../mixer/mock/react/MockSettings'
 import ObsSettings from '../mixer/obs/react/ObsSettings'
-import VmixSettings from '../mixer/vmix/vmix/VmixSettings'
+import VmixSettings from '../mixer/vmix/react/VmixSettings'
 
 const Config = props => {
   return (
