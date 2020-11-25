@@ -63,11 +63,12 @@ class MockConfiguration extends Configuration {
     setTickTime(time: number|string|null) {
         let theTime: number
         if (typeof time === "string") {
-            theTime = parseInt(time, 10)
-            if(!Number.isFinite(theTime)) {
+            time = parseInt(time, 10)
+            if(!Number.isFinite(time)) {
                 throw `Could not parse "${time}" into a number.`
             }
-        } else if (typeof time === "number") {
+        }
+        if (typeof time === "number") {
             theTime = time
         } else {
             theTime = MockConfiguration.defaultTickTime
@@ -84,7 +85,13 @@ class MockConfiguration extends Configuration {
         return this.tickTime
     }
 
-    setChannelCount(count: number|null) {
+    setChannelCount(count: number|string|null) {
+        if (typeof count === "string") {
+            count = parseInt(count, 10)
+            if(!Number.isFinite(count)) {
+                throw `Could not parse "${count}" into a number.`
+            }
+        }
         if (typeof count === "number") {
             if (count < 0) {
                 throw `channel count needs to be a positive integer, but got ${count}`

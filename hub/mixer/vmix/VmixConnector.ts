@@ -182,7 +182,7 @@ class VmixConnector implements Connector {
         return this.client !== undefined && !this.client.destroyed && this.wasHelloReceived && this.wasSubcribeOkReceived
     }
     
-    static readonly ID = "vmix"
+    static readonly ID: "vmix" = "vmix"
 }
 
 export default VmixConnector

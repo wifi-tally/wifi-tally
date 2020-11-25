@@ -5,27 +5,30 @@ type InputProps = {
     label: string
     default?: string
     errorMessage?: string
-    onChange?: (value: string) => void
+    onChange?: (value: string) => boolean
 }
+
 
 function Input(props: InputProps) {
     // @TODO: check with someone who has experience if this is the right way to check for defaults
     const [oldDefault, setOldDefault] = useState(props.default || "")
     const [value, setValue] = useState(props.default || "")
     const [id] = useState(uniqueId())
+    const [isValid, setIsValid] = useState(true)
 
+    console.log(props)
     if (props.default !== undefined && props.default !== oldDefault) {
-        setValue(props.default)
         setOldDefault(props.default)
+        setValue(props.default)
+        setIsValid(true)
     }
-
-    const isValid = !props.errorMessage
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value
         setValue(newValue)
         if (props.onChange) {
-            props.onChange(newValue)
+            const valid = props.onChange(newValue)
+            setIsValid(valid)
         }
     }
 
@@ -33,7 +36,7 @@ function Input(props: InputProps) {
         <div className="form-group">
             <label htmlFor={id}>{props.label}</label>
             <input className={"form-control " + (isValid ? "" : "is-invalid")} id={id} type="text" value={value} onChange={handleChange} />
-            { props.errorMessage ? (<div className="invalid-feedback">{props.errorMessage}</div>) : "" }
+            { !isValid ? (<div className="invalid-feedback">{props.errorMessage || "invalid"}</div>) : "" }
         </div>
     )
 }

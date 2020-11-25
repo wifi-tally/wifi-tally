@@ -163,7 +163,7 @@ class ObsConnector implements Connector{
     isConnected() {
         return this.obs !== undefined && this.connected
     }
-    static readonly ID = "obs"
+    static readonly ID: "obs" = "obs"
 }
 
 export default ObsConnector

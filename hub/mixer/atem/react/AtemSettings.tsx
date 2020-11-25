@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Input from '../../../components/config/Input'
 import InputIp from '../../../components/config/InputIp'
 import InputPort from '../../../components/config/InputPort'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'

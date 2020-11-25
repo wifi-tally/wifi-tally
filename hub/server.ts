@@ -261,6 +261,12 @@ nextApp.prepare().then(() => {
       }
     }
   })
+  app.get('/atem', (req, res) => {
+    // @TODO: "any" is not nice here, but this should be removed soon anyways
+    const data: any = myConfiguration.mixerConfigToObject()
+    data.allowedMixers = MixerDriver.getAllowedMixers(myConfiguration.isDev())
+    res.json(data)
+  })
 
   app.use('/lato', express.static(__dirname + '/node_modules/lato-font/css/'));
   app.use('/fonts', express.static(__dirname + '/node_modules/lato-font/fonts/'));

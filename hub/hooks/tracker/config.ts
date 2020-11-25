@@ -38,7 +38,6 @@ class ConfigTracker extends EventEmitter{
             this.emit('obs', this.obsConfiguration)
         })
         socket.on('config.state.vmix', (vmix) => {
-            console.log(vmix)
             this.vmixConfiguration = new VmixConfiguration()
             this.vmixConfiguration.fromSave(vmix)
             this.emit('vmix', this.vmixConfiguration)

@@ -77,6 +77,17 @@ describe("setChannel*/getChannels/getChannelCount", () => {
         expect(channels[1].name).toEqual("two")
         expect(channels[2].name).toEqual("three")
     })
+    it("removes all channel names with empty string", () => {
+        const conf = createDefaultMockConfiguration()
+        conf.setChannelCount(3)
+        conf.setChannelNames("")
+        const channels = conf.getChannels()
+        expect(channels.length).toEqual(3)
+        expect(conf.getChannelCount()).toEqual(3)
+        expect(channels[0].name).toBeFalsy()
+        expect(channels[1].name).toBeFalsy()
+        expect(channels[2].name).toBeFalsy()
+    })
 })
 
 describe('fromSave/toSave', () => {

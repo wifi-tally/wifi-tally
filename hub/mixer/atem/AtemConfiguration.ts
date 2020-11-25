@@ -48,8 +48,8 @@ class AtemConfiguration extends Configuration {
         return this.ip
     }
 
-    setPort(port: IpPort | number | null) {
-        if (typeof port === "number") {
+    setPort(port: IpPort | string | number | null) {
+        if (typeof port === "number" || typeof port === "string") {
             port = ipPort(port)
         } else if (port === null) {
             port = AtemConfiguration.defaultPort

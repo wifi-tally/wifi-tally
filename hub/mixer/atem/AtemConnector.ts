@@ -79,7 +79,7 @@ class AtemConnector implements Connector {
         return this.isAtemConnected
     }
 
-    static ID = "atem"
+    static readonly ID: "atem" = "atem"
 }
 
 export default AtemConnector

@@ -42,7 +42,7 @@ class MockConnector implements Connector {
         return this.isActive
     }
 
-    static ID = "mock"
+    static readonly ID: "mock" = "mock"
 }
 
 export default MockConnector
