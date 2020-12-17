@@ -105,9 +105,6 @@ myEmitter.on('program.changed', ({programs, previews}) => {
 
 // socket.io server
 io.on('connection', (socket: ServerSideSocket) => {
-  
-  socket.emit('tallies', myTallyDriver.toValueObjects())
-
   const mixerEvents = [
     // @TODO: use event objects instead of repeating the same structure again and again
     new SocketAwareEvent(myEmitter, 'mixer.connected', socket, (socket) => {
@@ -184,6 +181,33 @@ io.on('connection', (socket: ServerSideSocket) => {
     configEvents.forEach(pipe => pipe.unregister())
   })
 
+  const tallyEvents = [
+    new SocketAwareEvent(myEmitter, 'tally.connected', socket, (socket, tally) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    }),
+    new SocketAwareEvent(myEmitter, 'tally.changed', socket, (socket, tally) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    }),
+    new SocketAwareEvent(myEmitter, 'tally.missing', socket, (socket, tally) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    }),
+    new SocketAwareEvent(myEmitter, 'tally.timedout', socket, (socket, tally) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    }),
+    new SocketAwareEvent(myEmitter, 'tally.removed', socket, (socket, tally) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    }),
+  ]
+  socket.on('events.tally.subscribe', () => {
+    tallyEvents.forEach(pipe => pipe.register())
+
+    socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+  })
+  socket.on('events.tally.unsubscribe', () => {
+    // @TODO: not used yet
+    tallyEvents.forEach(pipe => pipe.unregister())
+  })
+  
   socket.on('tally.patch', (tallyName, channelId) => {
     myTallyDriver.patchTally(tallyName, channelId)
   })
@@ -193,6 +217,23 @@ io.on('connection', (socket: ServerSideSocket) => {
   socket.on('tally.remove', tallyName => {
     myTallyDriver.removeTally(tallyName)
   })
+
+  const channelEvents = [
+    new SocketAwareEvent(myEmitter, 'config.changed.channels', socket, (socket, channels) => {
+      socket.emit('channel.state', {channels: channels.map(channel => channel.toJson())})
+    }),
+  ]
+  socket.on('events.channel.subscribe', () => {
+    channelEvents.forEach(pipe => pipe.register())
+
+    socket.emit('channel.state', {channels: myConfiguration.getChannelsAsJson()})
+  })
+  socket.on('events.channel.unsubscribe', () => {
+    // @TODO: not used yet
+    channelEvents.forEach(pipe => pipe.unregister())
+  })
+
+
   socket.on('config.change.atem', (newAtemConfiguration, newMixerName) => {
     const atem = new AtemConfiguration()
     atem.fromJson(newAtemConfiguration)
@@ -252,7 +293,7 @@ nextApp.prepare().then(() => {
         res.status(404)
       } else {
         res.json({
-          tally: tally.toValueObject(),
+          tally: tally.toJson(),
           logs: tally.getLogs().map(log => log.toValueObject()),
         })
       }

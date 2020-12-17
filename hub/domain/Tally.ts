@@ -6,9 +6,17 @@ export enum ConnectionState {
     MISSING = 2,
 }
 
-export type TallySaveObject = {
+export type TallySaveObjectType = {
     name: string
     channelId?: string
+}
+
+export type TallyObjectType = {
+    name: string
+    channelId?: string
+    address?: string
+    port?: number,
+    state: ConnectionState
 }
 
 export class Tally {
@@ -58,7 +66,25 @@ export class Tally {
     getLogs() {
         return this.logs
     }
-    toValueObject(): any {
+    isIn(channelNames: string[] = []) : boolean {
+        if (channelNames === null) return false
+        if (this.channelId === undefined) return false
+
+        return channelNames.indexOf(this.channelId) !== -1
+    }
+
+    toJsonForSave(): TallySaveObjectType {
+        return {
+            name: this.name,
+            channelId: this.channelId,
+        }
+    }
+
+    static fromJsonForSave(valueObject: TallySaveObjectType) {
+        return new Tally(valueObject.name, valueObject.channelId)
+    }
+
+    toJson(): TallyObjectType {
         return {
             name: this.name,
             channelId: this.channelId,
@@ -67,25 +93,7 @@ export class Tally {
             state: this.state,
         }
     }
-    isIn(channelNames: string[] = []) : boolean {
-        if (channelNames === null) return false
-        if (this.channelId === undefined) return false
-
-        return channelNames.indexOf(this.channelId) !== -1
-    }
-
-    toJson(): TallySaveObject {
-        return {
-            name: this.name,
-            channelId: this.channelId,
-        }
-    }
-
-    static fromJson(valueObject: TallySaveObject) {
-        return new Tally(valueObject.name, valueObject.channelId)
-    }
-
-    static fromValueObject(valueObject: any) {
+    static fromJson(valueObject: TallyObjectType) {
         const tally = new Tally(
             valueObject.name,
             valueObject.channelId,

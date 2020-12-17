@@ -56,7 +56,7 @@ export class AppConfiguration extends Configuration {
             return
         } else if (Array.isArray(value)) {
             try {
-                setter(value.map(t => Tally.fromJson(t)))
+                setter(value.map(t => Tally.fromJsonForSave(t)))
             } catch (err) {
                 console.error(`error loading property "${fieldName}" of configuration: ${err}`)
                 return
@@ -94,7 +94,7 @@ export class AppConfiguration extends Configuration {
             "null": this.nullConfiguration.toJson(),
             obs: this.obsConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
-            tallies: this.tallies.map(tally => tally.toJson()),
+            tallies: this.tallies.map(tally => tally.toJsonForSave()),
             channels: this.channels.map(channel => channel.toJson()),
         }
     }
@@ -163,6 +163,9 @@ export class AppConfiguration extends Configuration {
     getChannels() {
         return this.channels
     }
+    getChannelsAsJson() {
+        return this.channels.map(channel => channel.toJson())
+    }
 
     setTallies(tallies: Tally[]) {
         this.tallies = tallies
@@ -197,7 +200,7 @@ export class AppConfiguration extends Configuration {
         return {
             currentMixerId: this.getMixerSelection(),
             atem: this.atemConfiguration.toJson(),
-            channels: this.channels.map(channel => channel.toJson()),
+            channels: this.getChannelsAsJson(),
             obs: this.obsConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
             mock: this.mockConfiguration.toJson(),

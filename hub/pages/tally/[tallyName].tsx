@@ -7,7 +7,7 @@ import Tally from '../../domain/Tally'
 import Log from '../../domain/Log'
 
 const TallyDetails = props => {
-  const [tally, setTally] = useState(Tally.fromValueObject(props.tally))
+  const [tally, setTally] = useState(Tally.fromJson(props.tally))
   const [logs, setLogs] = useState(props.logs.map(log => Log.fromValueObject(log)))
 
   const socket = useSocket('tally.logged.' + tally.name, log => {

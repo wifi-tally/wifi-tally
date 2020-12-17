@@ -1,23 +1,24 @@
 import { useState } from 'react'
-import fetch from 'isomorphic-unfetch'
-import {useSocket, socketEventEmitter, socket} from '../hooks/useSocket'
+import {socket} from '../hooks/useSocket'
 import useSocketInfo from '../hooks/useSocketInfo'
 import useMixerInfo from '../hooks/useMixerInfo'
 import Layout from '../components/Layout'
 import Link from 'next/link'
-import Channel from '../domain/Channel'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
 import ChannelSelector from '../components/ChannelSelector'
 import useProgramPreview from '../hooks/useProgramPreview'
 import Tally from '../domain/Tally'
+import useTallies from '../hooks/useTallies'
+import useChannels from '../hooks/useChannels'
 
-const countConnectedTallies = tallies =>
-  tallies.reduce((count, tally) => count + (Tally.fromValueObject(tally).isConnected() ? 1 : 0), 0)
+const countConnectedTallies = tallies => {
+  if(!tallies) { return null }
+  return tallies.reduce((count, tally) => count + (Tally.fromJson(tally).isConnected() ? 1 : 0), 0)
+}
 
 const createTallyList = (tallies, showDisconnected, showUnpatched) => {
-  return tallies.map(
-    tally => Tally.fromValueObject(tally)
-  ).filter(
+  if(!tallies) { return null }
+  return tallies.filter(
     tally => (tally.isActive() || showDisconnected) && (tally.isPatched() || showUnpatched)
   ).sort(
     (one, two) => {
@@ -30,20 +31,16 @@ const createTallyList = (tallies, showDisconnected, showUnpatched) => {
   )
 }
 
-const IndexPage = props => {
-  const [talliesData, setTallies] = useState(props.tallies || new Array())
-  const [showDisconnected, setShowDisconnected] = useState(props.showDisconnected !== undefined ? props.showDisconnected : true)
-  const [showUnpatched, setShowUnpatched] = useState(props.showUnpatched !== undefined ? props.showUnpatched : true)
-  const [channels, setChannels] = useState(props.channels !== undefined ? props.channels : [])
+const IndexPage = () => {
+  const rawTallies = useTallies()
+  const [showDisconnected, setShowDisconnected] = useState(true)
+  const [showUnpatched, setShowUnpatched] = useState(true)
+  const channels = useChannels()
   const isMixerConnected = useMixerInfo()
   const isHubConnected = useSocketInfo()
   const [programs, previews] = useProgramPreview()
 
-  const tallies = createTallyList(talliesData, showDisconnected, showUnpatched)
-
-  useSocket('tallies', tallies => {
-    setTallies(tallies)
-  })
+  const tallies = createTallyList(rawTallies, showDisconnected, showUnpatched)
 
   const patchTally = function(tally, channel) {
     socket.emit('tally.patch', tally.name, channel)
@@ -141,7 +138,7 @@ const IndexPage = props => {
           <button type="button" className={"btn btn-sm " + (showUnpatched ? "btn-primary" : "btn-dark")} onClick={toggleUnpatched}>Show Unpatched</button>
           <button type="button" className={"btn btn-secondary disabled"} title={"Hub " + (isHubConnected ? "connected" : "disconnected")}><DeviceDesktopIcon /> {isHubConnected ? 1 : 0}</button>
           <button type="button" className={"btn btn-secondary disabled"} title={"Video Mixer " + (isMixerConnected ? "connected" : "disconnected")}><ServerIcon /> {isMixerConnected ? 1 : 0}</button>
-          <button type="button" className={"btn btn-secondary disabled"} title={nrConnectedTallies + " connected tallies"}><BroadcastIcon /> {nrConnectedTallies}</button>
+          <button type="button" className={"btn btn-secondary disabled"} title={nrConnectedTallies + " connected tallies"}><BroadcastIcon /> {nrConnectedTallies === null ? "?" : nrConnectedTallies}</button>
         </div>
         { isHubConnected ? "" : (
           <div className="alert alert-danger">
@@ -150,25 +147,12 @@ const IndexPage = props => {
             <p>We will try to reconnect automatically, but you might also try to <a href="#" onClick={refreshPage}>reload the page</a>.</p>
           </div>
         )}
-
         <div id="tallies">
-          {tallies.map(format)}
+          {tallies ? tallies.map(format) : "" /* @TODO: loading */}
         </div>
       </div>
     </Layout>
   )
-}
-
-IndexPage.getInitialProps = async (context) => {
-  const baseUrl = context && context.req ? `${context.req.protocol}://${context.req.get('Host')}` : '';
-  const response = await fetch(baseUrl + '/tallies')
-  const info = await response.json()
-  // @TODO: use asynchronous calls
-  const config = await fetch(baseUrl + '/atem')
-  const configJson = await config.json()
-  info.channels = configJson.channels.map(c => Channel.fromJson(c))
-
-  return info
 }
 
 export default IndexPage;

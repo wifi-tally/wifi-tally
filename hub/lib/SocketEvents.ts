@@ -3,12 +3,15 @@ import { MockConfigurationSaveType } from "../mixer/mock/MockConfiguration";
 import { ObsConfigurationSaveType } from "../mixer/obs/ObsConfiguration";
 import { VmixConfigurationSaveType } from "../mixer/vmix/VmixConfiguration";
 import { ChannelList } from "./MixerCommunicator";
+import { TallyObjectType } from "../domain/Tally";
+import { ChannelSaveObject } from "../domain/Channel";
 
 // events the server sends to the client
 export interface ServerSentEvents {
-    'tallies': (tallies: object[]) => void //@TODO: event should be better typed
+    'tally.state': (data: {tallies: TallyObjectType[]}) => void
     'mixer.state': (data: {isConnected: boolean}) => void
     'program.state': (data: {programs: ChannelList, previews: ChannelList}) => void
+    'channel.state': (data: {channels: ChannelSaveObject[]}) => void
 
     'config.state.atem': (atemConfiguration: AtemConfigurationSaveType) => void
     'config.state.mock': (mockConfiguration: MockConfigurationSaveType) => void
@@ -25,6 +28,10 @@ export interface ClientSentEvents {
     'events.program.unsubscribe': () => void
     'events.config.subscribe': () => void
     'events.config.unsubscribe': () => void
+    'events.tally.subscribe': () => void
+    'events.tally.unsubscribe': () => void
+    'events.channel.subscribe': () => void
+    'events.channel.unsubscribe': () => void
 
     'tally.patch': (tallyName: string, channelId: string) => void
     'tally.highlight': (tallyName: string) => void
