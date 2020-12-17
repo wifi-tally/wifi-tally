@@ -5,12 +5,18 @@ export enum Severity {
     STATUS = 3,
 }
 
+export type LogObjectType = {
+    severity: Severity
+    date: string
+    message: string
+}
+
 export class Log {
     severity: Severity
     dateTime: Date
     message: string
 
-    constructor(dateTime: Date | string | null, severity: string | null, message: string) {
+    constructor(dateTime: Date | string | null, severity: Severity | string | null, message: string) {
         if(typeof dateTime === "string") {
             this.dateTime = new Date(dateTime)
         } else if (dateTime instanceof Date) {
@@ -19,7 +25,9 @@ export class Log {
             this.dateTime = new Date()
         }
 
-        if (severity === "INFO") {
+        if (typeof severity === "number") {
+            this.severity = severity
+        } else if (severity === "INFO") {
             this.severity = Severity.INFO
         } else if (severity === "ERROR") {
             this.severity = Severity.ERROR
@@ -43,7 +51,7 @@ export class Log {
     isStatus() {
         return this.severity === Severity.STATUS
     }
-    toValueObject() {
+    toJson(): LogObjectType {
         return {
             date: this.dateTime.toISOString(),
             severity: this.severity,
@@ -51,7 +59,7 @@ export class Log {
         }
     }
     
-    static fromValueObject = function(valueObject: any) {
+    static fromJson = function(valueObject: LogObjectType) {
         return new Log(
             valueObject.date,
             valueObject.severity,

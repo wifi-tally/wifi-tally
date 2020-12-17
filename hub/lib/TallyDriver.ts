@@ -199,6 +199,9 @@ export class TallyDriver {
     updateTallies() {
         this.tallies.forEach(tally => updateTally(tally, this.io, this.lastPrograms, this.lastPreviews))
     }
+    getTallies() {
+        return Array.from(this.tallies.values())
+    }
     /** @deprecated */
     toValueObjects() {
         return Array.from(this.tallies.values()).map(tally => tally.toJson())

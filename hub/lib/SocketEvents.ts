@@ -5,10 +5,14 @@ import { VmixConfigurationSaveType } from "../mixer/vmix/VmixConfiguration";
 import { ChannelList } from "./MixerCommunicator";
 import { TallyObjectType } from "../domain/Tally";
 import { ChannelSaveObject } from "../domain/Channel";
+import { LogObjectType } from "../domain/Log";
 
 // events the server sends to the client
 export interface ServerSentEvents {
     'tally.state': (data: {tallies: TallyObjectType[]}) => void
+    'tally.log': (data: {tallyName: string, log: LogObjectType}) => void
+    'tally.log.state': (data: {tallyName: string, logs: LogObjectType[]}[]) => void
+
     'mixer.state': (data: {isConnected: boolean}) => void
     'program.state': (data: {programs: ChannelList, previews: ChannelList}) => void
     'channel.state': (data: {channels: ChannelSaveObject[]}) => void
@@ -32,6 +36,8 @@ export interface ClientSentEvents {
     'events.tally.unsubscribe': () => void
     'events.channel.subscribe': () => void
     'events.channel.unsubscribe': () => void
+    'events.tallyLog.subscribe': () => void
+    'events.tallyLog.unsubscribe': () => void
 
     'tally.patch': (tallyName: string, channelId: string) => void
     'tally.highlight': (tallyName: string) => void

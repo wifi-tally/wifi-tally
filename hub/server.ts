@@ -41,15 +41,11 @@ const myTallyDriver = new TallyDriver(myConfiguration, myEmitter)
 const nextApp = next({ dev: myConfiguration.isDev() })
 const nextHandler = nextApp.getRequestHandler()
 
-const sendLogToTally = (tally: Tally, log: Log) => {
-  io.emit(`tally.logged.${tally.name}`, log)
-}
 const sendTalliesToBrowser = function() {
   io.emit('tallies', myTallyDriver.toValueObjects())
 }
 myEmitter.on('tally.connected', sendTalliesToBrowser)
 myEmitter.on('tally.changed', sendTalliesToBrowser)
-myEmitter.on('tally.logged', ({tally, log}) => sendLogToTally(tally, log))
 myEmitter.on('tally.changed', (tally) => {
   io.emit(`tally.changed.${tally.name}`, myTallyDriver.toValueObjects())
 })
@@ -209,6 +205,28 @@ io.on('connection', (socket: ServerSideSocket) => {
     myTallyDriver.removeTally(tallyName)
   })
 
+  const tallyLogEvents = [
+    new SocketAwareEvent(myEmitter, 'tally.logged', socket, (socket, {tally, log}) => {
+      socket.emit('tally.log', {tallyName: tally.name, log: log.toJson()})
+    }),
+  ]
+  socket.on('events.tallyLog.subscribe', () => {
+    tallyLogEvents.forEach(pipe => pipe.register())
+
+    const logs = myTallyDriver.getTallies().map(tally => {
+      return {
+        tallyName: tally.name,
+        logs: tally.getLogs().map(log => log.toJson())
+      }
+    })
+
+    socket.emit('tally.log.state', logs)
+  })
+  socket.on('events.tallyLog.unsubscribe', () => {
+    // @TODO: not used yet
+    tallyLogEvents.forEach(pipe => pipe.unregister())
+  })
+
   const channelEvents = [
     new SocketAwareEvent(myEmitter, 'config.changed.channels', socket, (socket, channels) => {
       socket.emit('channel.state', {channels: channels.map(channel => channel.toJson())})
@@ -285,7 +303,7 @@ nextApp.prepare().then(() => {
       } else {
         res.json({
           tally: tally.toJson(),
-          logs: tally.getLogs().map(log => log.toValueObject()),
+          logs: tally.getLogs().map(log => log.toJson()),
         })
       }
     }

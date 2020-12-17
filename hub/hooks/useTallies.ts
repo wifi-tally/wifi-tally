@@ -8,7 +8,7 @@ function useTallies() {
   const [tallies, setTallies] = useState(tallyTracker.tallies)
 
   const onChange = (tallies) => {
-    setTallies(tallies)
+    setTallies(Array.from(tallies))
   }
 
   useEffect(() => {
