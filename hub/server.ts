@@ -41,19 +41,6 @@ const myTallyDriver = new TallyDriver(myConfiguration, myEmitter)
 const nextApp = next({ dev: myConfiguration.isDev() })
 const nextHandler = nextApp.getRequestHandler()
 
-const sendTalliesToBrowser = function() {
-  io.emit('tallies', myTallyDriver.toValueObjects())
-}
-myEmitter.on('tally.connected', sendTalliesToBrowser)
-myEmitter.on('tally.changed', sendTalliesToBrowser)
-myEmitter.on('tally.changed', (tally) => {
-  io.emit(`tally.changed.${tally.name}`, myTallyDriver.toValueObjects())
-})
-myEmitter.on('tally.missing', sendTalliesToBrowser)
-myEmitter.on('tally.timedout', sendTalliesToBrowser)
-myEmitter.on('tally.removed', sendTalliesToBrowser)
-
-
 // send events to tallies
 myEmitter.on('program.changed', ({programs, previews}) => {
   myTallyDriver.setState(programs, previews)
@@ -169,26 +156,26 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
 
   const tallyEvents = [
-    new SocketAwareEvent(myEmitter, 'tally.connected', socket, (socket, tally) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    new SocketAwareEvent(myEmitter, 'tally.connected', socket, (socket) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
     }),
-    new SocketAwareEvent(myEmitter, 'tally.changed', socket, (socket, tally) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    new SocketAwareEvent(myEmitter, 'tally.changed', socket, (socket) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
     }),
-    new SocketAwareEvent(myEmitter, 'tally.missing', socket, (socket, tally) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    new SocketAwareEvent(myEmitter, 'tally.missing', socket, (socket) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
     }),
-    new SocketAwareEvent(myEmitter, 'tally.timedout', socket, (socket, tally) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    new SocketAwareEvent(myEmitter, 'tally.timedout', socket, (socket) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
     }),
-    new SocketAwareEvent(myEmitter, 'tally.removed', socket, (socket, tally) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    new SocketAwareEvent(myEmitter, 'tally.removed', socket, (socket) => {
+      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
     }),
   ]
   socket.on('events.tally.subscribe', () => {
     tallyEvents.forEach(pipe => pipe.register())
 
-    socket.emit('tally.state', {tallies: myTallyDriver.toValueObjects()})
+    socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
   })
   socket.on('events.tally.unsubscribe', () => {
     // @TODO: not used yet
@@ -287,34 +274,6 @@ io.on('connection', (socket: ServerSideSocket) => {
 })
 
 nextApp.prepare().then(() => {
-  app.get('/tallies', (req, res) => {
-    res.json({
-      tallies: myTallyDriver.toValueObjects(),
-    })
-  })
-  app.get('/tally', (req, res) => {
-    const tallyName = req.query.tallyName?.toString()
-    if (!tallyName) {
-      res.status(404)
-    } else {
-      const tally = myTallyDriver.getTally(tallyName)
-      if (!tally) {
-        res.status(404)
-      } else {
-        res.json({
-          tally: tally.toJson(),
-          logs: tally.getLogs().map(log => log.toJson()),
-        })
-      }
-    }
-  })
-  app.get('/atem', (req, res) => {
-    // @TODO: "any" is not nice here, but this should be removed soon anyways
-    const data: any = myConfiguration.mixerConfigToObject()
-    data.allowedMixers = MixerDriver.getAllowedMixers(myConfiguration.isDev())
-    res.json(data)
-  })
-
   app.use('/lato', express.static(__dirname + '/node_modules/lato-font/css/'));
   app.use('/fonts', express.static(__dirname + '/node_modules/lato-font/fonts/'));
 

@@ -192,18 +192,4 @@ export class AppConfiguration extends Configuration {
     getHttpPort() {
         return (typeof process.env.PORT === "string" && parseInt(process.env.PORT, 10)) || 3000
     }
-
-    /**
-     * @deprecated this should be removed
-     */
-    mixerConfigToObject() {
-        return {
-            currentMixerId: this.getMixerSelection(),
-            atem: this.atemConfiguration.toJson(),
-            channels: this.getChannelsAsJson(),
-            obs: this.obsConfiguration.toJson(),
-            vmix: this.vmixConfiguration.toJson(),
-            mock: this.mockConfiguration.toJson(),
-        }
-    }
 }

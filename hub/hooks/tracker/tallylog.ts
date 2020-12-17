@@ -10,7 +10,6 @@ class TallyLogTracker extends EventEmitter{
         this.logs = null
 
         socket.on('tally.log.state', (data) => {
-            console.log(data)
             this.logs = new Map(data.map(({tallyName, logs}) => {
                 return [
                     tallyName,
@@ -22,7 +21,6 @@ class TallyLogTracker extends EventEmitter{
             })
         })
         socket.on('tally.log', ({tallyName, log}) => {
-            console.log(tallyName, log)
             if (!this.logs) {
                 console.warn("Disregarding logs, because did not receive the initial logs yet.")
                 return

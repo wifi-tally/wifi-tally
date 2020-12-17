@@ -202,9 +202,8 @@ export class TallyDriver {
     getTallies() {
         return Array.from(this.tallies.values())
     }
-    /** @deprecated */
-    toValueObjects() {
-        return Array.from(this.tallies.values()).map(tally => tally.toJson())
+    getTalliesAsJson() {
+        return this.getTallies().map(tally => tally.toJson())
     }
 
     getTally(tallyName: string) {
