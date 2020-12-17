@@ -112,11 +112,15 @@ export class TallyDriver {
                         if(tally.state !== ConnectionState.DISCONNECTED) {
                             tally.state = ConnectionState.DISCONNECTED
                             this.emitter.emit('tally.timedout', {tally, diff})
+                            const log = tally.addLog(new Date(), null, `Tally got disconnected after not reporting for ${diff}ms`)
+                            this.emitter.emit('tally.logged', {tally, log})
                         }
                     } else if(diff > 3000) {
                         if(tally.state !== ConnectionState.MISSING) {
                             tally.state = ConnectionState.MISSING
                             this.emitter.emit('tally.missing', {tally, diff})
+                            const log = tally.addLog(new Date(), null, `Tally got missing. It has not reported for ${diff}ms`)
+                            this.emitter.emit('tally.logged', {tally, log})
                         }
                     }
                 }

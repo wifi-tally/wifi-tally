@@ -54,16 +54,7 @@ myEmitter.on('tally.changed', (tally) => {
   io.emit(`tally.changed.${tally.name}`, myTallyDriver.toValueObjects())
 })
 myEmitter.on('tally.missing', sendTalliesToBrowser)
-myEmitter.on('tally.missing', ({tally, diff}) => {
-  // @TODO: Logging should be the job of Tally Driver
-  const log = tally.addLog(new Date(), null, `Tally got missing. It has not reported for ${diff}ms`)
-  sendLogToTally(tally, log)
-})
 myEmitter.on('tally.timedout', sendTalliesToBrowser)
-myEmitter.on('tally.timedout', ({tally, diff}) => {
-  const log = tally.addLog(new Date(), null, `Tally got disconnected after not reporting for ${diff}ms`)
-  sendLogToTally(tally, log)
-})
 myEmitter.on('tally.removed', sendTalliesToBrowser)
 
 
