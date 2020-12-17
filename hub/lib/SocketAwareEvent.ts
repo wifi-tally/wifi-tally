@@ -3,7 +3,7 @@ import ServerEventEmitter, { EventHandlersDataMap } from './ServerEventEmitter'
 import { ServerSideSocket } from './SocketEvents'
 
 export interface SocketAwareEvent<EventName extends keyof EventHandlersDataMap> {
-    constructor(eventEmitter: ServerEventEmitter, eventName: EventName, socket: Socket, fnc: (socket: Socket, ...args: Parameters<EventHandlersDataMap[EventName]>) => void)
+    constructor(eventEmitter: ServerEventEmitter, eventName: EventName, socket: ServerSideSocket, fnc: (socket: ServerSideSocket, ...args: Parameters<EventHandlersDataMap[EventName]>) => void)
 }
 
 /* Takes care that an event on the server is passed through

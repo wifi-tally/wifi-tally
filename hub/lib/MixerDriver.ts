@@ -121,14 +121,16 @@ export class MixerDriver {
 
     static getAllowedMixers = function(isDev: boolean) {
         const mixers = [
+            MockConnector.ID,
             NullConnector.ID,
+            // --- order of the first items is important as they act as defaults ---
             AtemConnector.ID,
             ObsConnector.ID,
             VmixConnector.ID,
         ]
     
-        if (isDev) {
-            mixers.unshift(MockConnector.ID)
+        if (!isDev) {
+            mixers.filter(id => id !== MockConnector.ID)
         }
     
         return mixers

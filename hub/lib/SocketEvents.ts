@@ -38,6 +38,8 @@ export interface ClientSentEvents {
 }
 
 export interface ServerSideSocket {
+    id: string
+    
     emit<EventName extends keyof ServerSentEvents>(
         event: EventName,
         ...args: Parameters<ServerSentEvents[EventName]>

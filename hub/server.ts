@@ -15,7 +15,7 @@ import express from 'express'
 const app = express()
 import { Server } from 'http'
 const server = new Server(app)
-import socketIo from 'socket.io'
+import socketIo, { Socket } from 'socket.io'
 const io = socketIo(server)
 import next from 'next'
 import Log, { Severity } from './domain/Log'
