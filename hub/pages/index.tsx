@@ -44,9 +44,6 @@ const IndexPage = props => {
   useSocket('tallies', tallies => {
     setTallies(tallies)
   })
-  useSocket('config', config => {
-    setChannels(config.channels.map(c => Channel.fromJson(c)))
-  })
 
   const patchTally = function(tally, channel) {
     socket.emit('tally.patch', tally.name, channel)

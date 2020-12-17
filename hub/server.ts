@@ -66,9 +66,6 @@ myEmitter.on('tally.timedout', ({tally, diff}) => {
 })
 myEmitter.on('tally.removed', sendTalliesToBrowser)
 
-myEmitter.on('config.changed', function() {
-  io.emit('config', myConfiguration.mixerConfigToObject())
-})
 
 // send events to tallies
 myEmitter.on('program.changed', ({programs, previews}) => {
