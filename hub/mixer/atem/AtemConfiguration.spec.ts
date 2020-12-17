@@ -55,13 +55,13 @@ describe('getIp/setIp', () => {
     })
 })
 
-describe('fromSave/toSave', () => {
+describe('fromJson/toJson', () => {
     it("does work", () => {
         const conf = createDefaultAtemConfiguration()
         conf.setIp("1.2.3.4")
         conf.setPort(1234)
         const loadedConf = createDefaultAtemConfiguration()
-        loadedConf.fromSave(conf.toSave())
+        loadedConf.fromJson(conf.toJson())
         
         expect(loadedConf.getIp().toString()).toEqual("1.2.3.4")
         expect(loadedConf.getPort().toNumber()).toEqual(1234)

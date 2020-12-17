@@ -158,16 +158,16 @@ io.on('connection', (socket: ServerSideSocket) => {
 
   const configEvents = [
     new SocketAwareEvent(myEmitter, 'config.changed.atem', socket, (socket, atemConfiguration) => {
-      socket.emit('config.state.atem', atemConfiguration.toSave())
+      socket.emit('config.state.atem', atemConfiguration.toJson())
     }),
     new SocketAwareEvent(myEmitter, 'config.changed.mock', socket, (socket, mockConfiguration) => {
-      socket.emit('config.state.mock', mockConfiguration.toSave())
+      socket.emit('config.state.mock', mockConfiguration.toJson())
     }),
     new SocketAwareEvent(myEmitter, 'config.changed.obs', socket, (socket, obsConfiguration) => {
-      socket.emit('config.state.obs', obsConfiguration.toSave())
+      socket.emit('config.state.obs', obsConfiguration.toJson())
     }),
     new SocketAwareEvent(myEmitter, 'config.changed.vmix', socket, (socket, vmixConfiguration) => {
-      socket.emit('config.state.vmix', vmixConfiguration.toSave())
+      socket.emit('config.state.vmix', vmixConfiguration.toJson())
     }),
     new SocketAwareEvent(myEmitter, 'config.changed.mixer', socket, (socket, mixerName) => {
       socket.emit('config.state.mixer', mixerName)
@@ -176,11 +176,11 @@ io.on('connection', (socket: ServerSideSocket) => {
   socket.on('events.config.subscribe', () => {
     configEvents.forEach(pipe => pipe.register())
 
-    socket.emit('config.state.atem', myConfiguration.getAtemConfiguration().toSave())
+    socket.emit('config.state.atem', myConfiguration.getAtemConfiguration().toJson())
     socket.emit('config.state.mixer', myConfiguration.getMixerSelection() || "")
-    socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toSave())
-    socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toSave())
-    socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toSave())
+    socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
+    socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
+    socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
   })
   socket.on('events.program.unsubscribe', () => {
     // @TODO: not used yet
@@ -198,7 +198,7 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
   socket.on('config.change.atem', (newAtemConfiguration, newMixerName) => {
     const atem = new AtemConfiguration()
-    atem.fromSave(newAtemConfiguration)
+    atem.fromJson(newAtemConfiguration)
     myConfiguration.setAtemConfiguration(atem)
 
     if (newMixerName) {
@@ -207,7 +207,7 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
   socket.on('config.change.mock', (newMockConfiguration, newMixerName) => {
     const mock = new MockConfiguration()
-    mock.fromSave(newMockConfiguration)
+    mock.fromJson(newMockConfiguration)
     myConfiguration.setMockConfiguration(mock)
 
     if (newMixerName) {
@@ -221,7 +221,7 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
   socket.on('config.change.obs', (newObsConfiguration, newMixerName) => {
     const obs = new ObsConfiguration()
-    obs.fromSave(newObsConfiguration)
+    obs.fromJson(newObsConfiguration)
     myConfiguration.setObsConfiguration(obs)
 
     if (newMixerName) {
@@ -230,7 +230,7 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
   socket.on('config.change.vmix', (newVmixConfiguration, newMixerName) => {
     const vmix = new VmixConfiguration()
-    vmix.fromSave(newVmixConfiguration)
+    vmix.fromJson(newVmixConfiguration)
     myConfiguration.setVmixConfiguration(vmix)
 
     if (newMixerName) {

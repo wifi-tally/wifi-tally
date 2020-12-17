@@ -31,7 +31,7 @@ function AtemSettings(props: AtemSettingsProps) {
             config.setIp(ip)
             config.setPort(port)
 
-            socket.emit('config.change.atem', config.toSave(), props.id)
+            socket.emit('config.change.atem', config.toJson(), props.id)
         }
     }
 

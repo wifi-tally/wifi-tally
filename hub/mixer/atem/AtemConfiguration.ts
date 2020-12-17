@@ -18,11 +18,11 @@ class AtemConfiguration extends Configuration {
         this.port = AtemConfiguration.defaultPort
     }
 
-    fromSave(data: AtemConfigurationSaveType): void {
+    fromJson(data: AtemConfigurationSaveType): void {
         this.loadIpAddress("ip", this.setIp.bind(this), data)
         this.loadIpPort("port", this.setPort.bind(this), data)
     }
-    toSave(): AtemConfigurationSaveType {
+    toJson(): AtemConfigurationSaveType {
         return {
             ip: this.ip.toString(),
             port: this.port.toNumber(),
@@ -30,7 +30,7 @@ class AtemConfiguration extends Configuration {
     }
     clone(): AtemConfiguration {
         const clone = new AtemConfiguration()
-        clone.fromSave(this.toSave())
+        clone.fromJson(this.toJson())
         return clone
     }
 

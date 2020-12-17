@@ -31,7 +31,7 @@ function ObsSettings(props: ObsSettingsProps) {
             config.setIp(ip)
             config.setPort(port)
 
-            socket.emit('config.change.obs', config.toSave(), props.id)
+            socket.emit('config.change.obs', config.toJson(), props.id)
         }
     }
 

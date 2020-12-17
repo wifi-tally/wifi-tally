@@ -14,8 +14,8 @@ export interface Connector {
 }
 
 export abstract class Configuration {
-    abstract fromSave(data: object): void
-    abstract toSave(): object
+    abstract fromJson(data: object): void
+    abstract toJson(): object
     abstract clone(): Configuration
 
     protected loadIpAddress(fieldName: string, setter: (value:IpAddress) => void, data: object) {

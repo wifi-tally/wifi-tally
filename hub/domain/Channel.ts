@@ -14,7 +14,7 @@ class Channel {
         this.name = name
     }
 
-    toSave(): ChannelSaveObject {
+    toJson(): ChannelSaveObject {
         return {
             id: this.id,
             name: this.name,
@@ -24,7 +24,7 @@ class Channel {
         return this.name || this.id
     }
 
-    static fromSave = function(valueObject: ChannelSaveObject) {
+    static fromJson = function(valueObject: ChannelSaveObject) {
         const channel = new Channel(
             valueObject.id,
             valueObject.name,

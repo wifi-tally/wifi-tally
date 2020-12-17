@@ -4,11 +4,11 @@ function createDefaultNullConfiguration(): NullConfiguration {
     return new NullConfiguration()
 }
 
-describe('fromSave/toSave', () => {
+describe('fromJson/toJson', () => {
     it("does work", () => {
         const conf = createDefaultNullConfiguration()
         const loadedConf = createDefaultNullConfiguration()
-        loadedConf.fromSave(conf.toSave())
+        loadedConf.fromJson(conf.toJson())
 
         // it does not throw an error. Apart from that it does not have any settings to check
     })

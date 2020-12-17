@@ -91,7 +91,7 @@ export class MixerCommunicator {
 
     notifyChannels(channels : Channel[] | null) {
         channels = channels || []
-        if (JSON.stringify(channels.map(c => c.toSave())) !== JSON.stringify(this.configuration.getChannels().map(c => c.toSave()))) {
+        if (JSON.stringify(channels.map(c => c.toJson())) !== JSON.stringify(this.configuration.getChannels().map(c => c.toJson()))) {
             this.configuration.setChannels(channels)
         }
     }

@@ -90,14 +90,14 @@ describe("setChannel*/getChannels/getChannelCount", () => {
     })
 })
 
-describe('fromSave/toSave', () => {
+describe('fromJson/toJson', () => {
     it("does work", () => {
         const conf = createDefaultMockConfiguration()
         conf.setTickTime(1234)
         conf.setChannelCount(7)
         conf.setChannelNames(["one", "two", "three"])
         const loadedConf = createDefaultMockConfiguration()
-        loadedConf.fromSave(conf.toSave())
+        loadedConf.fromJson(conf.toJson())
         
         expect(loadedConf.getTickTime()).toEqual(1234)
         expect(loadedConf.getChannels()).toEqual(conf.getChannels())

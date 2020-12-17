@@ -42,7 +42,7 @@ function MockSettings(props: MockSettingsProps) {
     )
     
     // @TODO: better compare objects
-    if (JSON.stringify(config?.toSave()) !== JSON.stringify(oldConfig?.toSave())) {
+    if (JSON.stringify(config?.toJson()) !== JSON.stringify(oldConfig?.toJson())) {
         setOldConfig(config)
         setTickTime(config?.getTickTime().toString())
         setChannelCount(config?.getChannelCount().toString())

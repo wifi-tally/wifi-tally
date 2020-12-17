@@ -17,11 +17,11 @@ class ObsConfiguration extends Configuration {
         this.port = ObsConfiguration.defaultPort
     }
 
-    fromSave(data: ObsConfigurationSaveType): void {
+    fromJson(data: ObsConfigurationSaveType): void {
         this.loadIpAddress("ip", this.setIp.bind(this), data)
         this.loadIpPort("port", this.setPort.bind(this), data)
     }
-    toSave(): ObsConfigurationSaveType {
+    toJson(): ObsConfigurationSaveType {
         return {
             ip: this.ip.toString(),
             port: this.port.toNumber(),
@@ -29,7 +29,7 @@ class ObsConfiguration extends Configuration {
     }
     clone(): ObsConfiguration {
         const clone = new ObsConfiguration()
-        clone.fromSave(this.toSave())
+        clone.fromJson(this.toJson())
         return clone
     }
 

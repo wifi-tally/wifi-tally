@@ -42,12 +42,12 @@ class MockConfiguration extends Configuration {
         }
     }
 
-    fromSave(data: MockConfigurationSaveType): void {
+    fromJson(data: MockConfigurationSaveType): void {
         this.loadNumber("channelCount", this.setChannelCount.bind(this), data)
         this.loadStringArray("channelNames", this.setChannelNames.bind(this), data)
         this.loadNumber("tickTime", this.setTickTime.bind(this), data)
     }
-    toSave(): MockConfigurationSaveType {
+    toJson(): MockConfigurationSaveType {
         return {
             channelCount: this.channelCount,
             channelNames: this.channelNames,
@@ -56,7 +56,7 @@ class MockConfiguration extends Configuration {
     }
     clone(): MockConfiguration {
         const clone = new MockConfiguration()
-        clone.fromSave(this.toSave())
+        clone.fromJson(this.toJson())
         return clone
     }
 

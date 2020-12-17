@@ -17,11 +17,11 @@ class VmixConfiguration extends Configuration {
         this.port = VmixConfiguration.defaultPort
     }
 
-    fromSave(data: VmixConfigurationSaveType): void {
+    fromJson(data: VmixConfigurationSaveType): void {
         this.loadIpAddress("ip", this.setIp.bind(this), data)
         this.loadIpPort("port", this.setPort.bind(this), data)
     }
-    toSave(): VmixConfigurationSaveType {
+    toJson(): VmixConfigurationSaveType {
         return {
             ip: this.ip.toString(),
             port: this.port.toNumber(),
@@ -29,7 +29,7 @@ class VmixConfiguration extends Configuration {
     }
     clone(): VmixConfiguration {
         const clone = new VmixConfiguration()
-        clone.fromSave(this.toSave())
+        clone.fromJson(this.toJson())
         return clone
     }
 

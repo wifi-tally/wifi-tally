@@ -1,15 +1,15 @@
 import { Configuration } from "../interfaces";
 
 class NullConfiguration extends Configuration {
-    fromSave(data: object): void {
+    fromJson(data: object): void {
         // empty. Has no settings, so nothing to load
     }
-    toSave(): object {
+    toJson(): object {
         return {}
     }
     clone(): NullConfiguration {
         const clone = new NullConfiguration()
-        clone.fromSave(this.toSave())
+        clone.fromJson(this.toJson())
         return clone
     }
 

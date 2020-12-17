@@ -43,7 +43,7 @@ class AppConfigurationPersistence {
             if (typeof config !== "object" || config === null) {
                 throw new Error(`Expected ${this.fileName} to contain a JSON object, but got ${typeof config}`)
             }
-            this.configuration.fromSave(config)
+            this.configuration.fromJson(config)
         } else {
             console.warn(`Configuration File ${this.fileName} does not exist. Using defaults.`)
             
@@ -64,7 +64,7 @@ class AppConfigurationPersistence {
         }
 
         return new Promise((resolve, reject) => {
-            const data: object = this.configuration.toSave()
+            const data: object = this.configuration.toJson()
             const dataToWrite = Object.assign({
                 _warning: "This file was automatically generated.",
                 _warning2: "Do not edit it while the hub is running. Your changes will be lost."

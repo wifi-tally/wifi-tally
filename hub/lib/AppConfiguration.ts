@@ -39,7 +39,7 @@ export class AppConfiguration extends Configuration {
             return
         } else if (Array.isArray(value)) {
             try {
-                setter(value.map(c => Channel.fromSave(c)))
+                setter(value.map(c => Channel.fromJson(c)))
             } catch (err) {
                 console.error(`error loading property "${fieldName}" of configuration: ${err}`)
                 return
@@ -56,7 +56,7 @@ export class AppConfiguration extends Configuration {
             return
         } else if (Array.isArray(value)) {
             try {
-                setter(value.map(t => Tally.fromSave(t)))
+                setter(value.map(t => Tally.fromJson(t)))
             } catch (err) {
                 console.error(`error loading property "${fieldName}" of configuration: ${err}`)
                 return
@@ -66,41 +66,41 @@ export class AppConfiguration extends Configuration {
         }
     }
 
-    fromSave(data: any): void {
+    fromJson(data: any): void {
         if (data.atem) {
-            this.atemConfiguration.fromSave(data.atem)
+            this.atemConfiguration.fromJson(data.atem)
         }
         if (data.mock) {
-            this.mockConfiguration.fromSave(data.mock)
+            this.mockConfiguration.fromJson(data.mock)
         }
         if (data.null) {
-            this.nullConfiguration.fromSave(data.null)
+            this.nullConfiguration.fromJson(data.null)
         }
         if (data.obs) {
-            this.obsConfiguration.fromSave(data.obs)
+            this.obsConfiguration.fromJson(data.obs)
         }
         if (data.vmix) {
-            this.vmixConfiguration.fromSave(data.vmix)
+            this.vmixConfiguration.fromJson(data.vmix)
         }
         this.loadString("mixer", this.setMixerSelection.bind(this), data)
         this.loadChannelArray("channels", this.setChannels.bind(this), data)
         this.loadTallyArray("tallies", this.setTallies.bind(this), data)
     }
-    toSave(): object {
+    toJson(): object {
         return {
             mixer: this.mixerSelection,
-            atem: this.atemConfiguration.toSave(),
-            mock: this.mockConfiguration.toSave(),
-            "null": this.nullConfiguration.toSave(),
-            obs: this.obsConfiguration.toSave(),
-            vmix: this.vmixConfiguration.toSave(),
-            tallies: this.tallies.map(tally => tally.toSave()),
-            channels: this.channels.map(channel => channel.toSave()),
+            atem: this.atemConfiguration.toJson(),
+            mock: this.mockConfiguration.toJson(),
+            "null": this.nullConfiguration.toJson(),
+            obs: this.obsConfiguration.toJson(),
+            vmix: this.vmixConfiguration.toJson(),
+            tallies: this.tallies.map(tally => tally.toJson()),
+            channels: this.channels.map(channel => channel.toJson()),
         }
     }
     clone(): AppConfiguration {
         const clone = new AppConfiguration(this.emitter)
-        clone.fromSave(this.toSave())
+        clone.fromJson(this.toJson())
         return clone
     }
 
@@ -196,11 +196,11 @@ export class AppConfiguration extends Configuration {
     mixerConfigToObject() {
         return {
             currentMixerId: this.getMixerSelection(),
-            atem: this.atemConfiguration.toSave(),
-            channels: this.channels.map(channel => channel.toSave()),
-            obs: this.obsConfiguration.toSave(),
-            vmix: this.vmixConfiguration.toSave(),
-            mock: this.mockConfiguration.toSave(),
+            atem: this.atemConfiguration.toJson(),
+            channels: this.channels.map(channel => channel.toJson()),
+            obs: this.obsConfiguration.toJson(),
+            vmix: this.vmixConfiguration.toJson(),
+            mock: this.mockConfiguration.toJson(),
         }
     }
 }

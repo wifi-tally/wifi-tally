@@ -54,13 +54,13 @@ describe('getIp/setIp', () => {
     })
 })
 
-describe('fromSave/toSave', () => {
+describe('fromJson/toJson', () => {
     it("does work", () => {
         const conf = createDefaultObsConfiguration()
         conf.setIp("1.2.3.4")
         conf.setPort(1234)
         const loadedConf = createDefaultObsConfiguration()
-        loadedConf.fromSave(conf.toSave())
+        loadedConf.fromJson(conf.toJson())
         
         expect(loadedConf.getIp().toString()).toEqual("1.2.3.4")
         expect(loadedConf.getPort().toNumber()).toEqual(1234)

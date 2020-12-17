@@ -7,7 +7,7 @@ import ObsConfiguration from '../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
 import Tally from '../domain/Tally'
 
-describe("toSave/fromSave", () => {
+describe("toJson/fromJson", () => {
     test('it can persist atem configuration', () => {
         const emitter = new EventEmitter()
         const config = new AppConfiguration(emitter)
@@ -16,7 +16,7 @@ describe("toSave/fromSave", () => {
         config.setAtemConfiguration(atemConfig)
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getAtemConfiguration().getIp().toString()).toEqual("10.1.1.42")
     })
@@ -28,7 +28,7 @@ describe("toSave/fromSave", () => {
         config.setMockConfiguration(mockConfig)
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getMockConfiguration().getChannelCount()).toEqual(42)
     })
@@ -43,7 +43,7 @@ describe("toSave/fromSave", () => {
         config.setObsConfiguration(obsConfig)
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getObsConfiguration().getIp().toString()).toEqual("10.1.1.43")
     })
@@ -55,7 +55,7 @@ describe("toSave/fromSave", () => {
         config.setVmixConfiguration(vmixConfig)
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getVmixConfiguration().getIp().toString()).toEqual("10.1.1.44")
 
@@ -66,7 +66,7 @@ describe("toSave/fromSave", () => {
         config.setMixerSelection('atem')
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getMixerSelection()).toEqual('atem')
     })
@@ -79,7 +79,7 @@ describe("toSave/fromSave", () => {
         ])
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         const tallies = otherConfig.getTallies()
         expect(tallies[0]?.name).toEqual("Tally 01")
@@ -96,7 +96,7 @@ describe("toSave/fromSave", () => {
         ])
 
         const otherConfig = new AppConfiguration(emitter)
-        otherConfig.fromSave(config.toSave())
+        otherConfig.fromJson(config.toJson())
 
         const channels = otherConfig.getChannels()
         expect(channels[0]?.id).toEqual("one")

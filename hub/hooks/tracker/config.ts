@@ -24,22 +24,22 @@ class ConfigTracker extends EventEmitter{
         })
         socket.on('config.state.atem', (atem) => {
             this.atemConfiguration = new AtemConfiguration()
-            this.atemConfiguration.fromSave(atem)
+            this.atemConfiguration.fromJson(atem)
             this.emit('atem', this.atemConfiguration)
         })
         socket.on('config.state.mock', (mock) => {
             this.mockConfiguration = new MockConfiguration()
-            this.mockConfiguration.fromSave(mock)
+            this.mockConfiguration.fromJson(mock)
             this.emit('mock', this.mockConfiguration)
         })
         socket.on('config.state.obs', (obs) => {
             this.obsConfiguration = new ObsConfiguration()
-            this.obsConfiguration.fromSave(obs)
+            this.obsConfiguration.fromJson(obs)
             this.emit('obs', this.obsConfiguration)
         })
         socket.on('config.state.vmix', (vmix) => {
             this.vmixConfiguration = new VmixConfiguration()
-            this.vmixConfiguration.fromSave(vmix)
+            this.vmixConfiguration.fromJson(vmix)
             this.emit('vmix', this.vmixConfiguration)
         })
         socket.emit('events.config.subscribe')

@@ -22,7 +22,7 @@ test('it shows the data', () => {
     config.setChannelCount(4)
     config.setChannelNames(["John", "Paul", "George", "Ringo"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toJson())
     })
 
     const tickTime = getByTestId("tick-time")
@@ -41,7 +41,7 @@ test('it updates the data on changes on the server', () => {
     config.setChannelCount(4)
     config.setChannelNames(["John", "Paul", "George", "Ringo"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toJson())
     })
     
     const tickTime = getByTestId("tick-time")
@@ -57,7 +57,7 @@ test('it updates the data on changes on the server', () => {
     config2.setChannelCount(2)
     config2.setChannelNames(["Asterix", "Obelix"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config2.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config2.toJson())
     })
 
     expect(tickTime.value).toEqual("2000")
@@ -72,7 +72,7 @@ test('it discards all user changes when values on the server are changed', () =>
     config.setChannelCount(4)
     config.setChannelNames(["John", "Paul", "George", "Ringo"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toJson())
     })
     
     const tickTime = getByTestId("tick-time")
@@ -96,7 +96,7 @@ test('it discards all user changes when values on the server are changed', () =>
     config2.setChannelCount(2)
     config2.setChannelNames(["Asterix", "Obelix"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config2.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config2.toJson())
     })
 
     expect(tickTime.value).toEqual("2000")
@@ -111,7 +111,7 @@ test('it disables the save button on invalid data', () => {
     config.setChannelCount(4)
     config.setChannelNames(["John", "Paul", "George", "Ringo"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toJson())
     })
     
     const tickTime = getByTestId("tick-time")
@@ -135,7 +135,7 @@ test('it saves changes', () => {
     config.setChannelCount(4)
     config.setChannelNames(["John", "Paul", "George", "Ringo"])
     act(() => {
-        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toSave())
+        (socket as DisconnectedClientSideSocket).emitServerEvent('config.state.mock', config.toJson())
     })
     
     const tickTime = getByTestId("tick-time")
@@ -158,7 +158,7 @@ test('it saves changes', () => {
     fireEvent.click(button)
     expect(gotConfigPojo).toBeTruthy()
     const gotConfig = new MockConfiguration()
-    gotConfig.fromSave(gotConfigPojo)
+    gotConfig.fromJson(gotConfigPojo)
     expect(gotConfig.getTickTime()).toEqual(2345)
     expect(gotConfig.getChannelCount()).toEqual(2)
     expect(gotConfig.getChannels().map(c => c.name)).toEqual(["Asterix", "Obelix"])

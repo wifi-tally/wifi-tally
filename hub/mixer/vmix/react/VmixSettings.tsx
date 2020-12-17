@@ -30,7 +30,7 @@ function VmixSettings(props: VmixSettingsProps) {
             config.setIp(ip)
             config.setPort(port)
 
-            socket.emit('config.change.vmix', config.toSave(), props.id)
+            socket.emit('config.change.vmix', config.toJson(), props.id)
         }
     }
 

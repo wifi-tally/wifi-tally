@@ -74,14 +74,14 @@ export class Tally {
         return channelNames.indexOf(this.channelId) !== -1
     }
 
-    toSave(): TallySaveObject {
+    toJson(): TallySaveObject {
         return {
             name: this.name,
             channelId: this.channelId,
         }
     }
 
-    static fromSave(valueObject: TallySaveObject) {
+    static fromJson(valueObject: TallySaveObject) {
         return new Tally(valueObject.name, valueObject.channelId)
     }
 
