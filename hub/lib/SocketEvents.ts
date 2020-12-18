@@ -71,27 +71,29 @@ export interface ServerSideSocket {
 }
 
 export interface ClientSideSocket {
+    connected: boolean
+
     emit<EventName extends keyof ClientSentEvents>(
         event: EventName,
         ...args: Parameters<ClientSentEvents[EventName]>
-    ): this
+    ): any
 
     on<EventName extends keyof ServerSentEvents>(
         event: EventName,
         listener: ServerSentEvents[EventName]
-    ): this
-    on(event: "disconnect", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "connect", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "connect_error", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "connect_timeout", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "disconnected", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "reconnect", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "reconnecting", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "reconnect_error", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
-    on(event: "reconnect_failed", listener: () => void) : this // @TODO: shouldn't this be defined in the parent?
+    ): any
+    on(event: "disconnect", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "connect", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "connect_error", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "connect_timeout", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "disconnected", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "reconnect", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "reconnecting", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "reconnect_error", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
+    on(event: "reconnect_failed", listener: () => void) : any // @TODO: shouldn't this be defined in the parent?
 
     off<EventName extends keyof ServerSentEvents>(
         event: EventName,
         listener: ServerSentEvents[EventName]
-    ): this
+    ): any
 }

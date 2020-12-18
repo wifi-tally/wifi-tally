@@ -23,10 +23,12 @@ function InputIp(props: InputIpProps) {
 
     const handleChange = (value: string) => {
         const ip = validateIp(value)
-        setHasError(ip === undefined)
+        const isValid = ip !== undefined
+        setHasError(!isValid)
         if (props.onChange) {
             props.onChange(ip)
         }
+        return isValid
     }
 
     return (

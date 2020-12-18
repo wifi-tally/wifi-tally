@@ -10,7 +10,7 @@ type ChannelSelectorProps = {
 
 const ChannelSelector = ({className, channels, defaultSelect, onChange} : ChannelSelectorProps) => {
     channels = channels || []
-    const [value, setValue] = useState(defaultSelect || null)
+    const [value, setValue] = useState(defaultSelect)
 
     const handleValueChange = (e) => {
         let val = e.target.value.toString()

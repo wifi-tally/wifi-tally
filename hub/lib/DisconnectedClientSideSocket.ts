@@ -1,11 +1,14 @@
 import { EventEmitter } from "events";
 import { ClientSideSocket, ServerSentEvents, ServerSideSocket } from "./SocketEvents";
 
+// used for tests only
 class DisconnectedClientSideSocket implements ClientSideSocket {
+    connected: boolean
     clientEventEmitter: EventEmitter
     serverEventEmitter: EventEmitter
 
     constructor() {
+        this.connected = false
         this.clientEventEmitter = new EventEmitter()
         this.serverEventEmitter = new EventEmitter()
     }

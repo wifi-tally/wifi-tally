@@ -15,7 +15,7 @@ const Log = (log, idx) => {
 
   return (
     <div key={idx} className={className}>
-      <time className="log-date" date={log.dateTime.toISOString()}>{log.dateTime.toISOString()}</time><div className="log-msg">{log.message}</div>
+      <time className="log-date">{log.dateTime.toISOString()}</time><div className="log-msg">{log.message}</div>
     </div>
   )
 }

@@ -23,10 +23,12 @@ function InputPort(props: InputPortProps) {
 
     const handleChange = (value: string) => {
         const port = validatePort(value)
-        setHasError(port === undefined)
+        const isValid = port !== undefined
+        setHasError(!isValid)
         if (props.onChange) {
             props.onChange(port)
         }
+        return isValid
     }
 
     return (
