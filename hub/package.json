@@ -11,7 +11,6 @@
   "dependencies": {
     "atem-connection": "^2.0.0",
     "express": "^4.15.2",
-    "isomorphic-unfetch": "^3.0.0",
     "lato-font": "^3.0.0",
     "next": "^9.5.5",
     "obs-websocket-js": "^4.0.2",
