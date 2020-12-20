@@ -36,7 +36,6 @@ jobs:
   # 
   # ###
   hub-build: 
-    if: false # @TODO: temporary. Tuning a different job
     needs: setup
     env:
       BUILD_NAME: ${{ needs.setup.outputs.build_name }}
@@ -66,7 +65,7 @@ jobs:
       # upload-artifact is obviously not build to upload 20.000 files - it takes AGES
       # so we zip it
       - name: Tar the build
-        run: tar -czf "./hub-dist.tar.gz" dist/
+        run: tar -czf "./hub-dist.tar.gz" -C dist/ .
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
@@ -81,7 +80,6 @@ jobs:
   # 
   # ###
   luaccross:
-    if: false # @TODO: temporary. Tuning a different job
     name: luac.cross
     runs-on: ubuntu-latest
     steps:
@@ -118,7 +116,6 @@ jobs:
   # 
   # ###
   tally-firmware:
-    if: false # @TODO: temporary. Tuning a different job
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -201,7 +198,6 @@ jobs:
   # 
   # ###
   tally-build:
-    if: false # @TODO: temporary. Tuning a different job
     runs-on: ubuntu-latest
     needs:
       - setup
@@ -359,5 +355,90 @@ jobs:
           repository: ${{ env.PAGES_REPO }}
           github_token: ${{ secrets.PAGES_TOKEN }}
           branch: master
+
+  # ###
+  # 
+  # Bundle it all together
+  # 
+  # ###
+  bundle:
+    needs: 
+      - hub-build
+      - documentation
+      - tally-build
+      - tally-firmware
+      - setup
+    runs-on: ubuntu-latest  
+    env:
+      BUILD_NAME: ${{ needs.setup.outputs.build_name }}
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt-get install tree
+      - run: |
+          mkdir ${GITHUB_WORKSPACE}/dist
+          mkdir ${GITHUB_WORKSPACE}/dist/documentation
+          mkdir ${GITHUB_WORKSPACE}/dist/firmware
+          mkdir ${GITHUB_WORKSPACE}/dist/tally
+          mkdir ${GITHUB_WORKSPACE}/dist/hub
+      - name: Get HTML documentation
+        uses: actions/download-artifact@v2
+        with:
+          name: documentation-html
+          path: ${{ github.workspace }}/dist/documentation/html
+      - name: Get Markdown documentation
+        uses: actions/download-artifact@v2
+        with:
+          name: documentation-markdown
+          path: ${{ github.workspace }}/dist/documentation/markdown
+      - name: Get Firmware
+        uses: actions/download-artifact@v2
+        with:
+          name: nodemcu-firmware
+          path: ${{ github.workspace }}/dist/firmware/
+      - name: Get Tally
+        uses: actions/download-artifact@v2
+        with:
+          name: tally-dist
+          path: ${{ github.workspace }}/dist/tally
+      - name: Get Hub
+        uses: actions/download-artifact@v2
+        with:
+          name: hub-dist
+          path: ${{ github.workspace }}/dist/hub
+      - name: extract hub
+        run: |
+          tar -xzf hub-dist.tar.gz .
+          rm hub-dist.tar.gz
+        working-directory: ${{ github.workspace }}/dist/hub
+      - name: Copy static files
+        run: |
+          echo "${BUILD_NAME}" > "${GITHUB_WORKSPACE}/dist/version.txt"
+          cp "${GITHUB_WORKSPACE}/Readme.md" "${GITHUB_WORKSPACE}/dist"
+          cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/dist"
+          cp "${GITHUB_WORKSPACE}/Changelog.md" "${GITHUB_WORKSPACE}/dist"
+      - name: Log content and size
+        run: |
+          tree -I "node_modules"
+          du -h -d1
+        working-directory: ${{ github.workspace }}/dist
+      - name: Zip it
+        run: |
+          zip -Jrq "${GITHUB_WORKSPACE}/wifi-tally-${BUILD_NAME}.zip" *
+          # tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${BUILD_NAME}.tar.gz" *
+          # tar -cjf "${GITHUB_WORKSPACE}/wifi-tally-${BUILD_NAME}.tar.xz" *
+        working-directory: ${{ github.workspace }}/dist
+      - name: Archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: ${{ github.workspace }}/wifi-tally-*.zip
+          if-no-files-found: error
+          retention-days: 14
       
+      
+
+
 
