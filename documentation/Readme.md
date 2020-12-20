@@ -8,7 +8,7 @@ The files in [docs](docs/) create the [documentation on the project](https://wif
 locally: 
 
 ````bash
-pip install mkdocs mkdocs-material pygments mkdocs-macros-plugin --user
+pip install -r requirements.txt --user
 
 mkdocs serve
 ````

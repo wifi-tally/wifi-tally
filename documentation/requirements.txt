@@ -1,0 +1,4 @@
+mkdocs
+mkdocs-material
+pygments >= 2.4
+mkdocs-macros-plugin
