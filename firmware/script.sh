@@ -19,10 +19,6 @@ cd bin/
 #  base_file_name="nodemcu-$X_BRANCH-$X_NUMBER_OF_MODULES-modules-"$timestamp
 #  file_name_float=$base_file_name"-float.bin"
 
-# rename the file
-module_hash=$(echo "${NODEMCU_MODULES}${X_LUA_FLASH_STORE}${X_SSL_ENABLED}${X_DEBUG_ENABLED}${X_FATFS_ENABLED}" | sha512sum | cut -c1-8)
-file_name_float="nodemcu-$X_BRANCH-${module_hash}-float.bin"
-
 srec_cat  -output "${file_name_float}" -binary 0x00000.bin -binary -fill 0xff 0x00000 0x10000 0x10000.bin -binary -offset 0x10000
 
 # we don't need the integer build

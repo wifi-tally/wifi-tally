@@ -81,6 +81,7 @@ jobs:
   # 
   # ###
   luaccross:
+    if: false # @TODO: temporary. Tuning a different job
     name: luac.cross
     runs-on: ubuntu-latest
     steps:
@@ -108,5 +109,88 @@ jobs:
           if-no-files-found: error
           retention-days: 2
 
+  # ###
+  # 
+  # build the NodeMCU firmware
+  #
+  # basically we try to recreate https://github.com/marcelstoer/nodemcu-custom-build/blob/master/.travis.yml
+  # without the upload and notification logic
+  # 
+  # ###
+  tally-firmware:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/nodemcu-firmware
+    env:
+      # @see https://github.com/marcelstoer/nodemcu-custom-build/blob/master/.travis.yml for used environment variables
+      USER_PROLOG: ""
+      X_EMAIL: invalid@example.com
+      X_U8G_FONTS: font_6x10,font_chikita
+      X_U8G_DISPLAY_I2C: ""
+      X_U8G_DISPLAY_SPI: ""
+      X_UCG_DISPLAY_SPI: ""
+      X_LUA_FLASH_STORE: "0x15000"
+      X_SPIFFS_FIXED_LOCATION: "0"
+      X_SPIFFS_MAX_FILESYSTEM_SIZE: "0"
+      X_SSL_ENABLED: "false"
+      X_DEBUG_ENABLED: "false"
+      X_FATFS_ENABLED: "false"
+    steps:
+      - name: set dynamic environment variables
+        run: |
+          MODULE_HASH=$(echo "${NODEMCU_MODULES}${X_LUA_FLASH_STORE}${X_SSL_ENABLED}${X_DEBUG_ENABLED}${X_FATFS_ENABLED}" | sha512sum | cut -c1-8)
+          echo "file_name_float=nodemcu-${{ env.NODEMCU_FIRMWARE }}-${MODULE_HASH}-float.bin" >> $GITHUB_ENV
+
+          echo "TRAVIS_BUILD_DIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          echo "X_MODULES=${NODEMCU_MODULES}" >> $GITHUB_ENV
+          echo "X_BRANCH=${NODEMCU_FIRMWARE}" >> $GITHUB_ENV
+        working-directory: ./
+      - name: Cache luac.cross
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/nodemcu-firmware/bin/nodemcu-*-float.bin
+          key: ${{ env.file_name_float }}
+      - name: Checkout NodeMCU custom build
+        if: "! steps.cache.outputs.cache-hit"
+        uses: actions/checkout@v2
+        with:
+          repository: marcelstoer/nodemcu-custom-build
+          ref: master
+          path: ${{ github.workspace }}
+      - name: Checkout NodeMCU firmware
+        if: "! steps.cache.outputs.cache-hit"
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.NODEMCU_REPO }}
+          ref: ${{ env.NODEMCU_FIRMWARE }}
+          submodules: recursive
+          path: ${{ github.workspace }}/nodemcu-firmware
+      - name: Checkout our repo
+        if: "! steps.cache.outputs.cache-hit"
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/wifi-tally
+      - name: Install dependencies
+        if: "! steps.cache.outputs.cache-hit"
+        run: |
+          # needed to build esptool.py
+          pip install pyserial
+          sudo apt-get install srecord
+      - name: Build
+        if: "! steps.cache.outputs.cache-hit"
+        run: |
+          # "bash" keyword is necessary, because the shebang points to /bin/env, which does not exist at that place
+          bash "${GITHUB_WORKSPACE}/ESP8266/install.sh"
+          bash "${GITHUB_WORKSPACE}/ESP8266/before-script.sh"
+          bash "${GITHUB_WORKSPACE}/wifi-tally/firmware/script.sh"
+      - name: Archive firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: nodemcu-firmware
+          path: ${{ github.workspace }}/nodemcu-firmware/bin/nodemcu-*-float.bin
+          if-no-files-found: error
+          retention-days: 2
 
   
