@@ -315,5 +315,49 @@ jobs:
           path: ./documentation/docs
           if-no-files-found: error
           retention-days: 2
+
+  # ###
+  #
+  # Publish the documentation
+  #
+  # ###
+  documentation-publish:
+    # only publish when on master branch
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: 
+      - documentation
+      - setup
+    runs-on: ubuntu-latest
+    env:
+      PAGES_REPO: wifi-tally/wifi-tally.github.io
+    steps:
+      - name: Checkout Pages
+        uses: actions/checkout@v2
+        with: 
+          repository: ${{ env.PAGES_REPO }}
+          ref: master
+          token: ${{ secrets.PAGES_TOKEN }}
+          path: .
+          fetch-depth: 1
+      - uses: actions/download-artifact@v2
+        with:
+          name: documentation-html
+          path: .
+      - name: Commit changes
+        run: |
+          if [ $(git status --porcelain | wc -l) == "0" ]; then
+            echo "No changes in the documentation"
+          else
+            git config user.email "bot@xopn.de"
+            git config user.name "Xopn Bot"
+            git add .
+            git commit -m "update for ${{ needs.setup.outputs.build_name }}" --date "$(date)"
+          fi
+      - name: Push Pages
+        uses: ad-m/github-push-action@master
+        with:
+          repository: ${{ env.PAGES_REPO }}
+          github_token: ${{ secrets.PAGES_TOKEN }}
+          branch: master
       
 
