@@ -17,6 +17,8 @@ out:
 	mkdir -p out/
 out/tally-settings.ini: tally-settings.ini out
 	cp $< $@
+out/tally-settings.ini.example: tally-settings.ini.example out
+	cp $< $@
 
 out/init.lua: src/init.lua out
 	cp $< $@
@@ -24,7 +26,7 @@ out/init.lua: src/init.lua out
 out/%.lc: src/%.lua out
 	$(LUAC) -o $@ $<
 
-build: $(TARGETS)
+build: $(TARGETS) out/tally-settings.ini.example
 
 flash: flash-dev
 
