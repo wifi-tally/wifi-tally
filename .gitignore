@@ -2,4 +2,3 @@
 *~
 firmware/*.bin
 !.git*
-!.travis.yml
