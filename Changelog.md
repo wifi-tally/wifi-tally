@@ -1,7 +1,12 @@
 # Upcoming
 
-* [ADDED] Support vor OBS added #27
+There have been numerous technical changes on the hub and the way the release
+is built under the hood. We made sure that nothing broke, but if you spot anything
+please report it.
+
+* [ADDED] Support for OBS added #27
 * [CHANGED] npm dependencies of the hub updated
+* [CHANGED] With moving from travis-ci to Github Actions there are smaller changes in the release package.
 
 # v0.1.0
 
