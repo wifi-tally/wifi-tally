@@ -34,7 +34,7 @@ const ChannelSelector = ({className, channels, defaultSelect, onChange} : Channe
                 return <option key={c.id} value={c.id}>{c.name || `Channel ${c.id}`}</option>
             })
         }
-        { !optionFound ? (<option key={value} value={value}>Channel {value}</option>) : "" }
+        { !optionFound && value !== undefined ? (<option key={value} value={value}>Channel {value}</option>) : "" }
     </select>)
 }
 
