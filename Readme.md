@@ -32,8 +32,6 @@ uses icons from the Noun Project by
 
 ## Status
 
-[![Build Status](https://travis-ci.org/wifi-tally/wifi-tally.svg?branch=master)](https://travis-ci.org/wifi-tally/wifi-tally)
-
 ![GitHub last commit](https://img.shields.io/github/last-commit/wifi-tally/wifi-tally)
 
 ![GitHub (Pre-)Release Date](https://img.shields.io/github/release-date-pre/wifi-tally/wifi-tally?label=latest%20release)
