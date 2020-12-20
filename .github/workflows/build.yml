@@ -2,6 +2,10 @@ name: build
 on: [ "push" ]
 env:
   NODEJS_VERSION: 12
+  LUA: "5.1.4"
+  NODEMCU_REPO: nodemcu/nodemcu-firmware
+  NODEMCU_FIRMWARE: 3.0-master_20200610
+  NODEMCU_MODULES: encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi,ws2812
 defaults:
   run:
     shell: bash
@@ -32,6 +36,7 @@ jobs:
   # 
   # ###
   hub-build: 
+    if: false # @TODO: temporary. Tuning a different job
     needs: setup
     env:
       BUILD_NAME: ${{ needs.setup.outputs.build_name }}
@@ -70,6 +75,38 @@ jobs:
           if-no-files-found: error
           retention-days: 2
 
+  # ###
+  #
+  # luac.cross is needed to build *.lc files that match our firmware
+  # 
+  # ###
+  luaccross:
+    name: luac.cross
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache luac.cross
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./luac.cross
+          key: ${{ runner.os }}-luaccross-${{ env.NODEMCU_REPO }}-${{ env.NODEMCU_FIRMWARE }}
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.NODEMCU_REPO }}
+          ref: ${{ env.NODEMCU_FIRMWARE }}
+          submodules: recursive
+        if: "! steps.cache.outputs.cache-hit"
+      - name: make luac.cross
+        run: make -C ./app/lua/luac_cross/
+        if: "! steps.cache.outputs.cache-hit"
+      - name: Archive luac.cross
+        uses: actions/upload-artifact@v2
+        with:
+          name: luaccross
+          path: "./luac.cross"
+          if-no-files-found: error
+          retention-days: 2
 
 
   
