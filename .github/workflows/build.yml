@@ -1,11 +1,19 @@
 name: build
-on: [ "push" ]
+on: 
+  push: 
+    branches: 
+      - '**'
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+*
 env:
   NODEJS_VERSION: 12
   LUA: "5.1.4"
   NODEMCU_REPO: nodemcu/nodemcu-firmware
   NODEMCU_FIRMWARE: 3.0-master_20200610
   NODEMCU_MODULES: encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi,ws2812
+  AWS_S3_NIGHTLY_BASEURI: https://wifi-tally-nightly.s3.eu-central-1.amazonaws.com
+  AWS_S3_NIGHTLY_BUCKET: wifi-tally-nightly
+  AWS_S3_NIGHTLY_REGION: eu-central-1
 defaults:
   run:
     shell: bash
@@ -18,17 +26,51 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      build_name: ${{ steps.build_name.outputs.build_name }}
+      build_name: ${{ steps.calc.outputs.build_name }}
+      author_name: ${{ steps.calc.outputs.author_name }}
+      author_email: ${{ steps.calc.outputs.author_email }}
+      committer_name: ${{ steps.calc.outputs.committer_name }}
+      committer_email: ${{ steps.calc.outputs.committer_email }}
+      is_head: ${{ steps.calc.outputs.is_head }}
+      branch: ${{ steps.calc.outputs.branch }}
+      tag: ${{ steps.calc.outputs.tag }}
+
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0 # don't shallow clone! We could not generate a nice build_name otherwise
-      - name: Generate build_name
-        id: build_name
-        run: echo "::set-output name=build_name::$(git describe --tags --always)"
+      - name: Generate parameters
+        id: calc
+        run: |
+          TAG=""
+          BUILD_NAME="$(git describe --tags --always)"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF:10}"
+            BUILD_NAME="${GITHUB_REF:10}"
+          fi
+          echo "::set-output name=tag::$TAG"
+          echo "::set-output name=build_name::$BUILD_NAME"
+          echo "::set-output name=author_name::${{ github.event.commits[0].author.name }}"
+          echo "::set-output name=author_email::${{ github.event.commits[0].author.email }}"
+          echo "::set-output name=committer_name::${{ github.event.commits[0].committer.name }}"
+          echo "::set-output name=committer_email::${{ github.event.commits[0].committer.email }}"
+          echo "::set-output name=is_head::${{ github.event.commits[0].id == github.event.head_commit.id }}"
+          echo "::set-output name=branch::"
+          if [[ "${GITHUB_REF}" == refs/heads/* ]]; then
+            echo "::set-output name=branch::${GITHUB_REF:11}"
+          fi
+        shell: bash # we use bash syntax, so this is VERY important
       - name: Output
-        run: echo "build_name=${{ steps.build_name.outputs.build_name }}"
+        run: |
+          echo "build_name=${{ steps.calc.outputs.build_name }}"
+          echo "author_name=${{ steps.calc.outputs.author_name }}"
+          echo "author_email=${{ steps.calc.outputs.author_email }}"
+          echo "committer_name=${{ steps.calc.outputs.committer_name }}"
+          echo "committer_email=${{ steps.calc.outputs.committer_email }}"
+          echo "is_head=${{ steps.calc.outputs.is_head }}"
+          echo "branch=${{ steps.calc.outputs.branch }}"
+          echo "tag=${{ steps.calc.outputs.tag }}"
 
   # ###
   # 
@@ -72,7 +114,7 @@ jobs:
           name: hub-dist
           path: "./hub/hub-dist.tar.gz"
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
 
   # ###
   #
@@ -105,7 +147,7 @@ jobs:
           name: luaccross
           path: "./luac.cross"
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
 
   # ###
   # 
@@ -189,7 +231,7 @@ jobs:
           name: nodemcu-firmware
           path: ${{ github.workspace }}/nodemcu-firmware/bin/nodemcu-*-float.bin
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
 
 
   # ###
@@ -253,7 +295,7 @@ jobs:
           name: tally-dist
           path: ./tally/out
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
 
 
   # ###
@@ -303,14 +345,14 @@ jobs:
           name: documentation-html
           path: ./documentation/site
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
       - name: Archive markdown
         uses: actions/upload-artifact@v2
         with:
           name: documentation-markdown
           path: ./documentation/docs
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
 
   # ###
   #
@@ -369,8 +411,6 @@ jobs:
       - tally-firmware
       - setup
     runs-on: ubuntu-latest  
-    env:
-      BUILD_NAME: ${{ needs.setup.outputs.build_name }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
@@ -415,7 +455,7 @@ jobs:
         working-directory: ${{ github.workspace }}/dist/hub
       - name: Copy static files
         run: |
-          echo "${BUILD_NAME}" > "${GITHUB_WORKSPACE}/dist/version.txt"
+          echo "${{ needs.setup.outputs.build_name }}" > "${GITHUB_WORKSPACE}/dist/version.txt"
           cp "${GITHUB_WORKSPACE}/Readme.md" "${GITHUB_WORKSPACE}/dist"
           cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/dist"
           cp "${GITHUB_WORKSPACE}/Changelog.md" "${GITHUB_WORKSPACE}/dist"
@@ -426,19 +466,82 @@ jobs:
         working-directory: ${{ github.workspace }}/dist
       - name: Zip it
         run: |
-          zip -Jrq "${GITHUB_WORKSPACE}/wifi-tally-${BUILD_NAME}.zip" *
-          # tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${BUILD_NAME}.tar.gz" *
-          # tar -cjf "${GITHUB_WORKSPACE}/wifi-tally-${BUILD_NAME}.tar.xz" *
+          # zip -Jrq "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}.zip" *
+          tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz" *
+          # tar -cjf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz" *
         working-directory: ${{ github.workspace }}/dist
       - name: Archive
         uses: actions/upload-artifact@v2
         with:
-          name: release
-          path: ${{ github.workspace }}/wifi-tally-*.zip
+          name: bundle
+          path: ${{ github.workspace }}/wifi-tally-*.tar.gz
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
       
-      
+
+  # ###
+  # 
+  # Publish the build on AWS S3 for a few days
+  # 
+  # ###
+  nightly:
+    runs-on: ubuntu-latest
+    needs: 
+      - setup
+      - bundle
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: bundle
+          path: .
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
+          aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
+      - name: Push artifact to AWS S3
+        run: |
+          ARTIFACT_FILENAME="wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz"
+          aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
+          echo "::warning ::Your artifacts are available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
+
+  # ###
+  #
+  # Create a Github Release and upload artifacts
+  #
+  # ###
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ needs.setup.outputs.tag != '' }}
+    needs: 
+      - setup
+      - bundle
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: bundle
+          path: .
+      - run: |
+          gunzip -dc wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz | xz -z - > wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz
+          mkdir temp
+          cd temp
+          tar -xzf ../wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz
+          zip -Jrq "../wifi-tally-${{ needs.setup.outputs.build_name }}.zip" *
+      - uses: meeDamian/github-release@2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ needs.setup.outputs.tag }}
+          name: ${{ needs.setup.outputs.tag }}
+          # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
+          prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
+          draft: true
+          files: |
+            wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz
+            wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz
+            wifi-tally-${{ needs.setup.outputs.build_name }}.tar.zip
+          gzip: false
+          allow_override: true
 
 
 
