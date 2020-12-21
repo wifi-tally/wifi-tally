@@ -1,15 +1,11 @@
 import { useState } from 'react'
-import {socket} from '../hooks/useSocket'
 import useSocketInfo from '../hooks/useSocketInfo'
 import useMixerInfo from '../hooks/useMixerInfo'
 import Layout from '../components/Layout'
-import Link from 'next/link'
 import {BroadcastIcon, ServerIcon, DeviceDesktopIcon} from '@primer/octicons-react'
-import ChannelSelector from '../components/ChannelSelector'
-import useProgramPreview from '../hooks/useProgramPreview'
 import Tally from '../domain/Tally'
 import useTallies from '../hooks/useTallies'
-import useChannels from '../hooks/useChannels'
+import TallyComponent from '../components/Tally'
 
 const countConnectedTallies = tallies => {
   if(!tallies) { return null }
@@ -35,16 +31,10 @@ const IndexPage = () => {
   const rawTallies = useTallies()
   const [showDisconnected, setShowDisconnected] = useState(true)
   const [showUnpatched, setShowUnpatched] = useState(true)
-  const channels = useChannels()
   const isMixerConnected = useMixerInfo()
   const isHubConnected = useSocketInfo()
-  const [programs, previews] = useProgramPreview()
 
   const tallies = createTallyList(rawTallies, showDisconnected, showUnpatched)
-
-  const patchTally = function(tally, channel) {
-    socket.emit('tally.patch', tally.name, channel)
-  }
 
   const toggleDisconnected = e => {
     setShowDisconnected(!showDisconnected)
@@ -52,75 +42,6 @@ const IndexPage = () => {
 
   const toggleUnpatched = e => {
     setShowUnpatched(!showUnpatched)
-  }
-
-  const handleHighlightTally = (e, tally) => {
-    socket.emit('tally.highlight', tally.name)
-    e.preventDefault()
-  }
-
-  const handleRemoveTally = (e, tally) => {
-    socket.emit('tally.remove', tally.name)
-    e.preventDefault()
-  }
-
-  const format = tally => {
-    let classPatched = "card "
-
-    if(tally.isActive()) {
-      if(!tally.isPatched()) {
-        classPatched += "bg-light "
-      } else if(tally.isIn(programs)) {
-        classPatched += "bg-danger "
-      } else if(tally.isIn(previews)) {
-        classPatched += "bg-success "
-      } else {
-        classPatched += "bg-secondary "
-      }
-    } else {
-      classPatched += "bg-dark "
-      if(!tally.isPatched()) {
-        classPatched += "border-light "
-      } else if(tally.isIn(programs)) {
-        classPatched += "border-danger "
-      } else if(tally.isIn(previews)) {
-        classPatched += "border-success "
-      } else {
-        classPatched += "border-secondary "
-      }
-    }
-    return (
-      <div key={tally.name} className={"tally " + classPatched}>
-        <div className="card-header"><h6 className="card-title">{tally.name}</h6>
-        {tally.isPatched() ? (
-          <div className="card-bubble">{tally.channelId}</div>
-        ) : "" }</div>
-        <div className="card-body">
-          <form>
-            <div className="form-group">
-              <ChannelSelector className="form-control" defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
-            </div>
-          </form>
-          {tally.isActive() ? (
-            <a href="#" className="card-link" onClick={e => handleHighlightTally(e, tally)}>Highlight</a>
-          ) : ""}
-          {!tally.isConnected() ? (
-            <a href="#" className="card-link" onClick={e => handleRemoveTally(e, tally)}>Remove</a>
-          ) : ""}
-          <Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
-            <a className="card-link">Logs</a>
-          </Link>
-        </div>
-        {tally.isActive() ? (
-          <div className={tally.isMissing() ? "card-footer bg-warning" : "card-footer"}>
-            <div className="card-footer-left">{tally.isMissing() ? "missing" : "connected"}</div>
-            <div className="card-footer-right text-muted">{tally.address}:{tally.port}</div>
-          </div>
-        ):(
-          <div className="card-footer">disconnected</div>
-        )}
-      </div>
-    )
   }
 
   const nrConnectedTallies = countConnectedTallies(tallies)
@@ -148,7 +69,7 @@ const IndexPage = () => {
           </div>
         )}
         <div id="tallies">
-          {tallies ? tallies.map(format) : "" /* @TODO: loading */}
+          {tallies ? tallies.map(tally => <TallyComponent tally={tally} />) : "" /* @TODO: loading */}
         </div>
       </div>
     </Layout>
