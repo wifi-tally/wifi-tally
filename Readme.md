@@ -32,6 +32,8 @@ uses icons from the Noun Project by
 
 ## Status
 
+![Build Status](https://github.com/wifi-tally/wifi-tally/workflows/build/badge.svg)
+
 ![GitHub last commit](https://img.shields.io/github/last-commit/wifi-tally/wifi-tally)
 
 ![GitHub (Pre-)Release Date](https://img.shields.io/github/release-date-pre/wifi-tally/wifi-tally?label=latest%20release)
