@@ -130,10 +130,10 @@ export class MixerDriver {
         ]
     
         if (!isDev) {
-            mixers.filter(id => id !== MockConnector.ID)
+            return mixers.filter(id => id !== MockConnector.ID)
+        } else {
+            return mixers
         }
-    
-        return mixers
     }
 
     static getDefaultMixerId = function(isDev: boolean) {
