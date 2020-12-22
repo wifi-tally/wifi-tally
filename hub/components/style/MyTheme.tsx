@@ -45,6 +45,11 @@ const myTheme = createMuiTheme({
   typography: {
     fontSize: 15,
     htmlFontSize: 15,
+    fontFamily: '"Lato", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeightLight: 300,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 600,
     h1: {
       fontSize: "3rem",
       letterSpacing: "0",

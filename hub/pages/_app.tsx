@@ -3,6 +3,8 @@ import React from 'react'
 import MyTheme from '../components/style/MyTheme'
 // import App from 'next/app'
 
+import 'lato-font/css/lato-font.css'
+
 
 function MyApp({ Component, pageProps }) {
   return <MyTheme>
