@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => {
 })
 
 type LayoutProps = {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 const Layout = ({children}: LayoutProps) => {
@@ -32,9 +32,7 @@ const Layout = ({children}: LayoutProps) => {
         </Link>
       </Toolbar>
     </AppBar>
-    <Container maxWidth={false} className={classes.contentContainer}>
-      {children}
-    </Container>
+    { children && (<Container maxWidth={false} className={classes.contentContainer} children={children} />) }
   </>)
 }
 

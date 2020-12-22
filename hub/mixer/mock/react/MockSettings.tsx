@@ -46,11 +46,11 @@ function MockSettings(props: MockSettingsProps) {
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
-        >
+        >{configuration && (<>
             <ValidatingInput label="Tick Time" object={configuration} propertyName="tickTime" onValid={(tickTime) => { setTickTime(tickTime); setTickTimeValid(true) }} onInvalid={() => setTickTimeValid(false)} />
             <ValidatingInput label="Channel Count" object={configuration} propertyName="channelCount" onValid={(channelCount) => { setChannelCount(channelCount); setChannelCountValid(true) }} onInvalid={() => setChannelCountValid(false)} />
             <ValidatingInput label="Channel Names" object={configuration} propertyName="channelNames" onValid={(channelNames) => { setChannelNames(channelNames); setChannelNamesValid(true) }} onInvalid={() => setChannelNamesValid(false)} />
-        </MixerSettingsWrapper>
+        </>)}</MixerSettingsWrapper>
     )
 }
 

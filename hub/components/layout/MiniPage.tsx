@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => {
       padding: theme.spacing(1, 2),
       borderBottom: "1px solid " + theme.palette.background.default,
     },
-    content: props => ({
+    content: (props: any) => ({
       padding: theme.spacing(2, props.contentPadding || 2),
     })
   }
