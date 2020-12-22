@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import ChannelSelector from '../components/ChannelSelector'
-import Link from 'next/link'
 import { Tally as TallyType } from '../domain/Tally'
 import useChannels from '../hooks/useChannels'
 import useProgramPreview from '../hooks/useProgramPreview'
 import { socket } from '../hooks/useSocket'
 import { Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core'
-import MuiLink from '@material-ui/core/Link'
+import TallyMenu from './TallyMenu'
 
 
 const useStyles = makeStyles(theme => {
@@ -38,8 +37,17 @@ const useStyles = makeStyles(theme => {
             backgroundColor: theme.palette.grey[500],
         },
         tallyHead: {
-            padding: theme.spacing(2),
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: theme.spacing(1, 1, 1, 2),
             borderBottom: "1px solid " + theme.palette.grey[800],
+        },
+        tallyHeadTitle:  {
+
+        },
+        tallyHeadIcon: {
+
         },
         tallyBody: {
             padding: theme.spacing(2)
@@ -86,15 +94,6 @@ function Tally({ tally, className }: TallyProps) {
         socket.emit('tally.patch', tally.name, channel)
     }
 
-    const handleHighlightTally = (e, tally) => {
-        socket.emit('tally.highlight', tally.name)
-        e.preventDefault()
-    }
-
-    const handleRemoveTally = (e, tally) => {
-        socket.emit('tally.remove', tally.name)
-        e.preventDefault()
-    }
     const classRoot: string[] = []
     className && classRoot.push(className)
     classRoot.push(classes.tally)
@@ -118,20 +117,12 @@ function Tally({ tally, className }: TallyProps) {
 
     return (<>
         <Paper className={classRoot.join(" ")}>
-            <div className={classHead.join(" ")}>
-                {tally.name}
-            </div>
+            <div className={classHead.join(" ")}><>
+                <div className={classes.tallyHeadTitle}>{tally.name}</div>
+                <TallyMenu className={classes.tallyHeadIcon} tally={tally} />
+            </></div>
             <div className={classes.tallyBody}>
                 <ChannelSelector defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
-                {tally.isActive() ? (
-                    <MuiLink onClick={e => handleHighlightTally(e, tally)}>Highlight</MuiLink>
-                ) : ""}
-                {!tally.isConnected() ? (
-                    <MuiLink onClick={e => handleRemoveTally(e, tally)}>Remove</MuiLink>
-                ) : ""}
-                <Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
-                    <MuiLink href="">Logs</MuiLink>
-                </Link>
             </div>
             <div className={classes.tallyFoot + (tally.isActive() && tally.isMissing() ? " " + classes.tallyFootMissing : "")}>
                 {tally.isActive() ? (<>
