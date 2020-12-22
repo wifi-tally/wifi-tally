@@ -25,6 +25,23 @@ export function useMixerNameConfiguration() {
 
   return mixerName
 }
+export function useAllowedMixersConfiguration() {
+  const [allowedMixers, setAllowedMixers] = useState(configTracker.allowedMixers)
+
+  const onChange = newAllowedMixers => {
+    setAllowedMixers(newAllowedMixers)
+  }
+
+  useEffect(() => {
+    configTracker.on("allowedMixers", onChange)
+    return () => {
+      // cleanup
+      configTracker.off("allowedMixers", onChange)
+    }
+  })
+
+  return allowedMixers
+}
 
 export function useAtemConfiguration() {
   const [atemConfiguration, setAtemConfiguration] = useState<AtemConfiguration|undefined>(undefined)

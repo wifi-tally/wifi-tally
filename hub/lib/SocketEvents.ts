@@ -21,7 +21,7 @@ export interface ServerSentEvents {
     'config.state.mock': (mockConfiguration: MockConfigurationSaveType) => void
     'config.state.obs': (obsConfiguration: ObsConfigurationSaveType) => void
     'config.state.vmix': (vmixConfiguration: VmixConfigurationSaveType) => void
-    'config.state.mixer': (mixerName: string) => void
+    'config.state.mixer': (data: {mixerName: string, allowedMixers: string[]}) => void
 }
 
 // events the client sends to the server

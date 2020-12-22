@@ -7,6 +7,7 @@ import ObsConfiguration from '../../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../../mixer/vmix/VmixConfiguration'
 
 class ConfigTracker extends EventEmitter{
+    allowedMixers?: string[]
     mixerName?: string
     // @TODO: this should be more easily extensible
     atemConfiguration?: AtemConfiguration
@@ -18,9 +19,11 @@ class ConfigTracker extends EventEmitter{
     constructor(socket: ClientSideSocket) {
         super()
         
-        socket.on('config.state.mixer', (mixer) => {
-            this.mixerName = mixer
+        socket.on('config.state.mixer', ({mixerName, allowedMixers}) => {
+            this.mixerName = mixerName
+            this.allowedMixers = allowedMixers
             this.emit('mixer', this.mixerName)
+            this.emit('allowedMixers', this.allowedMixers)
         })
         socket.on('config.state.atem', (atem) => {
             this.atemConfiguration = new AtemConfiguration()

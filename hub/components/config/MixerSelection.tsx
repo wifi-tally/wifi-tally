@@ -1,6 +1,6 @@
 import { makeStyles, NativeSelect, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
-import { useMixerNameConfiguration } from '../../hooks/useConfiguration'
+import { useAllowedMixersConfiguration, useMixerNameConfiguration } from '../../hooks/useConfiguration'
 import Spinner from '../Spinner'
 import MiniPage from '../layout/MiniPage'
 
@@ -29,29 +29,34 @@ function isValidChild(child: React.ReactElement) {
 }
 
 type MixerSelectionProps = {
-    children?: React.ReactElement[],
+    children?: React.ReactElement[]
 }
 
 function MixerSelection({children}: MixerSelectionProps) {
     const mixerName = useMixerNameConfiguration()
+    const allowedMixers = useAllowedMixersConfiguration()
+    
     const [oldMixerName, setOldMixerName] = useState(mixerName)
     const [mixerId, setMixerId] = useState(mixerName)
     const classes = useStyles()
 
-    const isLoading = mixerName === undefined
+    const isLoading = mixerName === undefined || allowedMixers === undefined
     if (mixerName !== oldMixerName) {
         setMixerId(mixerName)
         setOldMixerName(mixerName)
     }
 
-    const currentMixer = children?.reduce((cur, child) => {
+    const availableChildren = children?.filter((child) => {
         if (!isValidChild(child)) {
             throw `Expected all nodes of MixerSelection to be ReactNodes implementing SettingProps, but got ${child?.constructor?.name || typeof child}`
         }
 
-
-        return child.props.id === mixerId ? child : cur
+        return allowedMixers?.includes(child.props.id)
     })
+
+    const currentMixer = availableChildren?.reduce((cur, child) => {
+        return child.props.id === mixerId ? child : cur
+    }, null)
 
     return (
         <MiniPage title="Video Mixer">
@@ -59,7 +64,7 @@ function MixerSelection({children}: MixerSelectionProps) {
             {isLoading ? <Spinner /> : (<>
                 <div className={classes.select}>
                     <NativeSelect value={mixerId} onChange={e => setMixerId(e.target.value)}>
-                        {children?.map(child => {
+                        {availableChildren?.map(child => {
                             return (<MixerOption key={child.props.id} id={child.props.id} label={child.props.label} />)
                         })}
                     </NativeSelect>

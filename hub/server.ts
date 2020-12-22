@@ -138,14 +138,14 @@ io.on('connection', (socket: ServerSideSocket) => {
       socket.emit('config.state.vmix', vmixConfiguration.toJson())
     }),
     new SocketAwareEvent(myEmitter, 'config.changed.mixer', socket, (socket, mixerName) => {
-      socket.emit('config.state.mixer', mixerName)
+      socket.emit('config.state.mixer', {mixerName, allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev())})
     }),
   ]
   socket.on('events.config.subscribe', () => {
     configEvents.forEach(pipe => pipe.register())
 
     socket.emit('config.state.atem', myConfiguration.getAtemConfiguration().toJson())
-    socket.emit('config.state.mixer', myConfiguration.getMixerSelection() || "")
+    socket.emit('config.state.mixer', {mixerName: myConfiguration.getMixerSelection() || "", allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev())})
     socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
