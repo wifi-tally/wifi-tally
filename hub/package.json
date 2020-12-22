@@ -9,6 +9,9 @@
   },
   "bin": "server.js",
   "dependencies": {
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "atem-connection": "^2.0.0",
     "express": "^4.15.2",
     "lato-font": "^3.0.0",
@@ -23,7 +26,7 @@
     "yargs": "^15.4.1"
   },
   "scripts": {
-    "dev": "ts-node --project tsconfig.server.json server.ts --env=development",
+    "dev": "ts-node --project tsconfig.server.json server.ts --env=development --trace-warnings",
     "build:client": "next build",
     "build:server": "tsc --project tsconfig.server.json",
     "start": "node server.js --env=production",
@@ -44,9 +47,6 @@
     }
   },
   "devDependencies": {
-    "@material-ui/core": "^4.11.2",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.57",
     "@testing-library/dom": "^7.27.1",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^9.5.0",
