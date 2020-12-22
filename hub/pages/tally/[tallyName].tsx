@@ -1,36 +1,69 @@
 import React from 'react'
 import Layout from '../../components/Layout'
-
+import MiniPage from '../../components/style/MiniPage'
 import useTallyLog from '../../hooks/useTallyLog'
+import LogType from '../../domain/Log'
+import { makeStyles } from '@material-ui/core'
 
-const Log = (log, idx) => {
-  let className = "log "
+type TallyDetailsProps = {
+  tallyName: string
+}
+
+type LogProps = {
+  log: LogType
+  idx: number
+  classes: any
+}
+
+const useStyles = makeStyles(theme => {
+  return {
+    logLine: {
+      fontFamily: "monospace", // @TODO: should be part of the theme
+      padding: theme.spacing(1, 2),
+    },
+    bgStatus: {
+      backgroundColor: theme.palette.primary.main,
+    },
+    bgError: {
+      backgroundColor: theme.palette.error.main,
+    },
+    bgWarning: {
+      backgroundColor: theme.palette.warning.main,
+    },
+    logDate: {
+      opacity: "0.5",
+      fontSize: "0.8em",
+    },
+  }
+})
+
+const Log = ({log, idx, classes}: LogProps) => {
+
+  const classNames = [classes.logLine]
   if(log.isWarning()) {
-    className = className + "bg-warning "
+    classNames.push(classes.bgWarning)
   } else if (log.isError()) {
-    className = className + "bg-danger "
+    classNames.push(classes.bgError)
   } else if (log.isStatus()) {
-    className = className + "bg-primary "
+    classNames.push(classes.bgStatus)
   }
 
   return (
-    <div key={idx} className={className}>
-      <time className="log-date">{log.dateTime.toISOString()}</time><div className="log-msg">{log.message}</div>
+    <div key={idx} className={classNames.join(" ")}>
+      <time className={classes.logDate}>{log.dateTime.toISOString()}</time><div>{log.message}</div>
     </div>
   )
 }
 
-const TallyDetails = ({tallyName}) => {
+const TallyDetails = ({tallyName}: TallyDetailsProps) => {
   const logs = useTallyLog(tallyName)
+  const classes = useStyles()
 
   return (
     <Layout>
-      <div className="page card">
-        <h4 className="card-header">{tallyName}'s Logs</h4>
-        <div className="card-body">
-          {logs ? logs.map(Log) : "" /* @TODO: loading */ }
-        </div>
-      </div>
+      <MiniPage title={`${tallyName}'s Logs`} contentPadding="0">
+        {logs ? logs.map((log, idx) => <Log log={log} idx={idx} classes={classes} />) : "" /* @TODO: loading */ }
+      </MiniPage>
     </Layout>
   )
 }

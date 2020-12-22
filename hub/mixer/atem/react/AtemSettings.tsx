@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
-import Input from '../../../components/config/Input'
-import InputIp from '../../../components/config/InputIp'
-import InputPort from '../../../components/config/InputPort'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
-import { IpAddress } from '../../../domain/IpAddress'
-import { IpPort } from '../../../domain/IpPort'
+import ValidatingInput from '../../../components/config/ValidatingInput'
 import { useAtemConfiguration } from '../../../hooks/useConfiguration'
 import { socket } from '../../../hooks/useSocket'
 
@@ -15,14 +11,15 @@ type AtemSettingsProps = {
 
 function AtemSettings(props: AtemSettingsProps) {
     const configuration = useAtemConfiguration()
-    const [ip, setIp] = useState<IpAddress|null|undefined>(null)
-    const [port, setPort] = useState<IpPort|null|undefined>(null)
-
-    const isValid = ip !== undefined && port !== undefined
-    const isLoading = configuration === undefined
+    const [ip, setIp] = useState<string|null>(null)
+    const [ipValid, setIpValid] = useState(true)
+    const [port, setPort] = useState<string|null>(null)
+    const [portValid, setPortValid] = useState(true)
+    const isLoading = !configuration
+    const isValid = ipValid && portValid
 
     const handleSave = () => {
-        if (configuration === undefined || ip === undefined || port === undefined) {
+        if (configuration === undefined) {
             console.error("Not saving, because there is an invalid value in the form.")
         } else if (props.id !== "atem") {
             console.warn(`Changing id prop of AtemSettings is not supported. But got ${props.id}.`)
@@ -43,8 +40,11 @@ function AtemSettings(props: AtemSettingsProps) {
             isLoading={isLoading}
             onSave={handleSave}
         >
-            <InputIp label="ATEM IP" default={configuration?.getIp()} onChange={(newIp) => { setIp(newIp) }} />
-            <InputPort label="ATEM Port" default={configuration?.getPort()} onChange={(newPort) => { setPort(newPort) }} />
+            {configuration && (<>
+                <ValidatingInput label="ATEM IP" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
+                <ValidatingInput label="ATEM Port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
+            </>)}
+            
         </MixerSettingsWrapper>
     )
 }

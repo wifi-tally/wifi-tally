@@ -1,26 +1,37 @@
+import React from 'react'
+import { AppBar, Button, Container, makeStyles, Toolbar } from '@material-ui/core';
 import Link from 'next/link'
 
-const Layout = props => (
-  <div>
-    <nav className="navbar navbar-dark bg-primary">
-      <a className="navbar-brand" href="#">Tally Hub</a>
-        <ul className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <Link href="/">
-              <a className="nav-link">Tallies</a>
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link href="/config">
-              <a className="nav-link">Configuration</a>
-            </Link>
-          </li>
-        </ul>
-    </nav>
-    <div id="content">
-      {props.children}
-    </div>
-  </div>
-);
+
+const useStyles = makeStyles(theme => {
+  return {
+    contentContainer: {
+      marginTop: theme.spacing(2),
+    },
+  }
+})
+
+type LayoutProps = {
+  children: React.ReactNode
+}
+
+const Layout = ({children}: LayoutProps) => {
+  const classes = useStyles()
+  return (<>
+    <AppBar position="static">
+      <Toolbar>
+        <Link href="/" passHref>
+          <Button>Tallies</Button>
+        </Link>
+        <Link href="/config" passHref>
+          <Button>Configuration</Button>
+        </Link>
+      </Toolbar>
+    </AppBar>
+    <Container maxWidth={false} className={classes.contentContainer}>
+      {children}
+    </Container>
+  </>)
+}
 
 export default Layout;

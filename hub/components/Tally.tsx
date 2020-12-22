@@ -5,84 +5,142 @@ import { Tally as TallyType } from '../domain/Tally'
 import useChannels from '../hooks/useChannels'
 import useProgramPreview from '../hooks/useProgramPreview'
 import { socket } from '../hooks/useSocket'
+import { Paper } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
+import MuiLink from '@material-ui/core/Link'
+
+
+const useStyles = makeStyles(theme => {
+    return {
+        tally: {
+            border: "solid 1px " + theme.palette.grey[800],
+            width: "250px",
+            margin: theme.spacing(1),
+            backgroundColor: theme.palette.grey[700],
+            overflow: "hidden",
+        },
+        borderInPreview: {
+            borderColor: theme.palette.success.main,
+        },
+        borderInProgram: {
+            borderColor: theme.palette.error.main,
+        },
+        borderUnpatched: {
+            borderColor: theme.palette.grey[500],
+        },
+        bgInPreview: {
+            backgroundColor: theme.palette.success.main,
+        },
+        bgInProgram: {
+            backgroundColor: theme.palette.error.main,
+        },
+        bgUnpatched: {
+            backgroundColor: theme.palette.grey[500],
+        },
+        tallyHead: {
+            padding: theme.spacing(2),
+            borderBottom: "1px solid " + theme.palette.grey[800],
+        },
+        tallyBody: {
+            padding: theme.spacing(2)
+        },
+        tallyFoot: {
+            padding: theme.spacing(1, 2),
+            borderTop: "1px solid " + theme.palette.grey[800],
+            fontSize: "0.75rem",
+            display: "table",
+            width: "100%",
+            textTransform: "uppercase",
+            textAlign: "center",
+            fontWeight: "bold",
+        },
+        tallyFootLeft: {
+            display: "table-cell",
+            width: "50%",
+            textAlign: "center",
+        },
+        tallyFootMissing: {
+            backgroundColor: theme.palette.warning.main,
+            color: theme.palette.getContrastText(theme.palette.warning.main)
+        },
+        tallyFootRight: {
+            display: "table-cell",
+            width: "50%",
+            textAlign: "center",
+            opacity: 0.5,
+        },
+    }
+})
 
 type TallyProps = {
-	tally: TallyType,
+    tally: TallyType
+    className?: string
 }
 
-function Tally({ tally }: TallyProps) {
-	const channels = useChannels()
-	const [programs, previews] = useProgramPreview()
+function Tally({ tally, className }: TallyProps) {
+    const channels = useChannels()
+    const [programs, previews] = useProgramPreview()
+    const classes = useStyles()
 
-	const patchTally = function (tally, channel) {
-		socket.emit('tally.patch', tally.name, channel)
-	}
+    const patchTally = function (tally, channel) {
+        socket.emit('tally.patch', tally.name, channel)
+    }
 
-	const handleHighlightTally = (e, tally) => {
-		socket.emit('tally.highlight', tally.name)
-		e.preventDefault()
-	}
+    const handleHighlightTally = (e, tally) => {
+        socket.emit('tally.highlight', tally.name)
+        e.preventDefault()
+    }
 
-	const handleRemoveTally = (e, tally) => {
-		socket.emit('tally.remove', tally.name)
-		e.preventDefault()
-	}
-	let classPatched = "card "
+    const handleRemoveTally = (e, tally) => {
+        socket.emit('tally.remove', tally.name)
+        e.preventDefault()
+    }
+    const classRoot: string[] = []
+    className && classRoot.push(className)
+    classRoot.push(classes.tally)
+    const classHead = [classes.tallyHead]
+    if (!tally.isPatched()) {
+        classRoot.push(classes.borderUnpatched)
+    } else if (programs && tally.isIn(programs)) {
+        classRoot.push(classes.borderInProgram)
+    } else if (previews && tally.isIn(previews)) {
+        classRoot.push(classes.borderInPreview)
+    }
+    if (tally.isActive()) {
+        if (!tally.isPatched()) {
+            classHead.push(classes.bgUnpatched)
+        } else if (programs && tally.isIn(programs)) {
+            classHead.push(classes.bgInProgram)
+        } else if (previews && tally.isIn(previews)) {
+            classHead.push(classes.bgInPreview)
+        }
+    }
 
-	if (tally.isActive()) {
-		if (!tally.isPatched()) {
-			classPatched += "bg-light "
-		} else if (programs && tally.isIn(programs)) {
-			classPatched += "bg-danger "
-		} else if (previews && tally.isIn(previews)) {
-			classPatched += "bg-success "
-		} else {
-			classPatched += "bg-secondary "
-		}
-	} else {
-		classPatched += "bg-dark "
-		if (!tally.isPatched()) {
-			classPatched += "border-light "
-		} else if (programs && tally.isIn(programs)) {
-			classPatched += "border-danger "
-		} else if (previews && tally.isIn(previews)) {
-			classPatched += "border-success "
-		} else {
-			classPatched += "border-secondary "
-		}
-	}
-	return (
-		<div key={tally.name} className={"tally " + classPatched}>
-			<div className="card-header"><h6 className="card-title">{tally.name}</h6>
-				{tally.isPatched() ? (
-					<div className="card-bubble">{tally.channelId}</div>
-				) : ""}</div>
-			<div className="card-body">
-				<form>
-					<div className="form-group">
-						<ChannelSelector className="form-control" defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
-					</div>
-				</form>
-				{tally.isActive() ? (
-					<a href="#" className="card-link" onClick={e => handleHighlightTally(e, tally)}>Highlight</a>
-				) : ""}
-				{!tally.isConnected() ? (
-					<a href="#" className="card-link" onClick={e => handleRemoveTally(e, tally)}>Remove</a>
-				) : ""}
-				<Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
-					<a className="card-link">Logs</a>
-				</Link>
-			</div>
-			{tally.isActive() ? (
-				<div className={tally.isMissing() ? "card-footer bg-warning" : "card-footer"}>
-					<div className="card-footer-left">{tally.isMissing() ? "missing" : "connected"}</div>
-					<div className="card-footer-right text-muted">{tally.address}:{tally.port}</div>
-				</div>
-			) : (
-					<div className="card-footer">disconnected</div>
-				)}
-		</div>
-	)
+    return (<>
+        <Paper className={classRoot.join(" ")}>
+            <div className={classHead.join(" ")}>
+                {tally.name}
+            </div>
+            <div className={classes.tallyBody}>
+                <ChannelSelector defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
+                {tally.isActive() ? (
+                    <MuiLink onClick={e => handleHighlightTally(e, tally)}>Highlight</MuiLink>
+                ) : ""}
+                {!tally.isConnected() ? (
+                    <MuiLink onClick={e => handleRemoveTally(e, tally)}>Remove</MuiLink>
+                ) : ""}
+                <Link href="/tally/[tallyName]" as={`/tally/${tally.name}`}>
+                    <MuiLink href="">Logs</MuiLink>
+                </Link>
+            </div>
+            <div className={classes.tallyFoot + (tally.isActive() && tally.isMissing() ? " " + classes.tallyFootMissing : "")}>
+                {tally.isActive() ? (<>
+                    <div className={classes.tallyFootLeft}>{ tally.isMissing() ? "missing": "connected" }</div>
+                    <div className={classes.tallyFootRight}>{tally.address}:{tally.port}</div>
+                </>) : "disconnected"}
+            </div>
+        </Paper>
+    </>)
 }
 
 

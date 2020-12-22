@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
-import InputIp from '../../../components/config/InputIp'
-import InputPort from '../../../components/config/InputPort'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
-import { IpAddress } from '../../../domain/IpAddress'
-import { IpPort } from '../../../domain/IpPort'
+import ValidatingInput from '../../../components/config/ValidatingInput'
+import ExternalLink from '../../../components/ExternalLink'
 import { useObsConfiguration } from '../../../hooks/useConfiguration'
 import { socket } from '../../../hooks/useSocket'
 import ObsConnector from '../ObsConnector'
@@ -15,14 +13,15 @@ type ObsSettingsProps = {
 
 function ObsSettings(props: ObsSettingsProps) {
     const configuration = useObsConfiguration()
-    const [ip, setIp] = useState<IpAddress|null|undefined>(null)
-    const [port, setPort] = useState<IpPort|null|undefined>(null)
-
-    const isValid = ip !== undefined && port !== undefined
-    const isLoading = configuration === undefined
+    const [ip, setIp] = useState<string|null>(null)
+    const [ipValid, setIpValid] = useState(true)
+    const [port, setPort] = useState<string|null>(null)
+    const [portValid, setPortValid] = useState(true)
+    const isLoading = !configuration
+    const isValid = ipValid && portValid
 
     const handleSave = () => {
-        if (configuration === undefined || ip === undefined || port === undefined) {
+        if (configuration === undefined) {
             console.error("Not saving, because there is an invalid value in the form.")
         } else if (props.id !== ObsConnector.ID) {
             console.warn(`Changing id prop of ObsSettings is not supported. But got ${props.id}.`)
@@ -38,13 +37,15 @@ function ObsSettings(props: ObsSettingsProps) {
     return (
         <MixerSettingsWrapper 
             title="OBS Studio Configuration"
-            description={<>Connects to OBS Studio over network. The <a href="https://github.com/Palakis/obs-websocket" target="_blank">obs-websocket plugin</a> has to be installed.</>}
+            description={<>Connects to OBS Studio over network. The <ExternalLink href="https://github.com/Palakis/obs-websocket">obs-websocket plugin</ExternalLink> has to be installed.</>}
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
         >
-            <InputIp label="OBS IP" default={configuration?.getIp()} onChange={(newIp) => { setIp(newIp) }} />
-            <InputPort label="OBS Port" default={configuration?.getPort()} onChange={(newPort) => { setPort(newPort) }} />
+            { configuration && (<>
+                <ValidatingInput label="Obs IP" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
+                <ValidatingInput label="Obs Port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
+            </>)}
         </MixerSettingsWrapper>
     )
 }

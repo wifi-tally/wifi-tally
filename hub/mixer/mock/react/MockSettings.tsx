@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
-import NewInput from '../../../components/config/NewInput'
+import ValidatingInput from '../../../components/config/ValidatingInput'
 import { useMockConfiguration } from '../../../hooks/useConfiguration'
 import { socket } from '../../../hooks/useSocket'
 import MockConnector from '../MockConnector'
@@ -10,56 +10,30 @@ type MockSettingsProps = {
     label: string,
 }
 
-function useStatefulValidation(defaultValue, validator) {
-    const [tickTime, setTickTime] = useState(defaultValue)
-
-    const isTickTimeValid = (() => {
-        if (tickTime === undefined) { return false }
-        try {
-            return validator(tickTime) !== undefined
-        } catch {
-            return false
-        }
-    })()
-
-    return [tickTime, isTickTimeValid, setTickTime]
-}
-
 function MockSettings(props: MockSettingsProps) {
-    const config = useMockConfiguration()
-    const [oldConfig, setOldConfig] = useState(config)
-    const [tickTime, isTickTimeValid, setTickTime] = useStatefulValidation(
-        config?.getTickTime().toString(),
-        val => config?.clone().setTickTime(val)
-    )
-    const [channelCount, isChannelCountValid, setChannelCount] = useStatefulValidation(
-        config?.getChannelCount().toString(),
-        val => config?.clone().setChannelCount(val)
-    )
-    const [channelNames, areChannelNamesValid, setChannelNames] = useStatefulValidation(
-        config?.getChannels().filter(c => c.name).map(c => c.name).join(", "),
-        val => config?.clone().setChannelNames(val)
-    )
+    const configuration = useMockConfiguration()
+    const [tickTime, setTickTime] = useState<string|null>(null)
+    const [tickTimeValid, setTickTimeValid] = useState(true)
+    const [channelCount, setChannelCount] = useState<string|null>(null)
+    const [channelCountValid, setChannelCountValid] = useState(true)
+    const [channelNames, setChannelNames] = useState<string|null>(null)
+    const [channelNamesValid, setChannelNamesValid] = useState(true)
+    const isLoading = !configuration
+    const isValid = tickTimeValid && channelCountValid && channelNamesValid
     
-    // @TODO: better compare objects
-    if (JSON.stringify(config?.toJson()) !== JSON.stringify(oldConfig?.toJson())) {
-        setOldConfig(config)
-        setTickTime(config?.getTickTime().toString())
-        setChannelCount(config?.getChannelCount().toString())
-        setChannelNames(config?.getChannels().filter(c => c.name).map(c => c.name).join(", "))
-    }
-
-    const isValid = isTickTimeValid && isChannelCountValid && areChannelNamesValid
-    const isLoading = config === undefined
-
     const handleSave = () => {
-        if (!config) { return }
-        const newConfig = config.clone()
-        tickTime && newConfig.setTickTime(tickTime)
-        channelCount && newConfig.setChannelCount(channelCount)
-        channelNames && newConfig.setChannelNames(channelNames)
+        if (configuration === undefined) {
+            console.error("Not saving, because there is an invalid value in the form.")
+        } else if (props.id !== MockConnector.ID) {
+            console.warn(`Changing id prop of MockSettings is not supported. But got ${props.id}.`)
+        } else {
+            const config = configuration.clone()
+            config.setTickTime(tickTime)
+            config.setChannelCount(channelCount)
+            config.setChannelNames(channelNames)
 
-        socket.emit('config.change.mock', newConfig, MockConnector.ID)
+            socket.emit('config.change.mock', config.toJson(), MockConnector.ID)
+        }
     }
 
     return (
@@ -73,9 +47,9 @@ function MockSettings(props: MockSettingsProps) {
             isLoading={isLoading}
             onSave={handleSave}
         >
-            <NewInput label="Tick Time" testId="tick-time" value={tickTime} onChange={val => setTickTime(val)} isValid={isTickTimeValid} />
-            <NewInput label="Channel Count" testId="channel-count" value={channelCount} onChange={val => setChannelCount(val)} isValid={isChannelCountValid} />
-            <NewInput label="Channel Names" testId="channel-names" value={channelNames} onChange={val => setChannelNames(val)} isValid={areChannelNamesValid} />
+            <ValidatingInput label="Tick Time" object={configuration} propertyName="tickTime" onValid={(tickTime) => { setTickTime(tickTime); setTickTimeValid(true) }} onInvalid={() => setTickTimeValid(false)} />
+            <ValidatingInput label="Channel Count" object={configuration} propertyName="channelCount" onValid={(channelCount) => { setChannelCount(channelCount); setChannelCountValid(true) }} onInvalid={() => setChannelCountValid(false)} />
+            <ValidatingInput label="Channel Names" object={configuration} propertyName="channelNames" onValid={(channelNames) => { setChannelNames(channelNames); setChannelNamesValid(true) }} onInvalid={() => setChannelNamesValid(false)} />
         </MixerSettingsWrapper>
     )
 }

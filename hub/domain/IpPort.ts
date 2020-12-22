@@ -18,6 +18,9 @@ export class IpPort {
     toNumber() {
         return this.port
     }
+    toString() {
+        return this.toNumber().toString()
+    }
 }
 
 const ipPort = (port: number|string) => new IpPort(port)

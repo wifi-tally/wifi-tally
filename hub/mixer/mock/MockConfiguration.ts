@@ -116,6 +116,11 @@ class MockConfiguration extends Configuration {
         
         return this
     }
+    getChannelNames() {
+        const result = this.getChannels().filter(c => c.name).map(c => c.name)
+        result.toString = () => result.join(", ")
+        return result
+    }
     getChannelCount() {
         return this.channelCount
     }

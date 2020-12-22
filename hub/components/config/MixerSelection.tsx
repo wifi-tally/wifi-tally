@@ -1,8 +1,17 @@
+import { makeStyles, NativeSelect, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
 import { useMixerNameConfiguration } from '../../hooks/useConfiguration'
-import { socket } from '../../hooks/useSocket'
 import Spinner from '../Spinner'
-import MixerSettingsWrapper from './MixerSettingsWrapper'
+import MiniPage from '../style/MiniPage'
+
+const useStyles = makeStyles(theme => ({
+    text: {
+        color: theme.palette.grey[600]
+    },
+    select: {
+        marginBottom: theme.spacing(2),
+    },
+}))
 
 type MixerOptionProps = {
     id: string
@@ -27,6 +36,7 @@ function MixerSelection({children}: MixerSelectionProps) {
     const mixerName = useMixerNameConfiguration()
     const [oldMixerName, setOldMixerName] = useState(mixerName)
     const [mixerId, setMixerId] = useState(mixerName)
+    const classes = useStyles()
 
     const isLoading = mixerName === undefined
     if (mixerName !== oldMixerName) {
@@ -44,22 +54,19 @@ function MixerSelection({children}: MixerSelectionProps) {
     })
 
     return (
-        <div className="page card">
-            <h4 className="card-header">Video Mixer</h4>
-            <div className="card-body">
-                <p className="text-muted">Select a Video Mixer to use.</p>
-                {isLoading ? <Spinner /> : (<>
-                    <div className="form-group">
-                        <select className="form-control" value={mixerId} onChange={e => setMixerId(e.target.value)}>
-                            {children?.map(child => {
-                                return (<MixerOption key={child.props.id} id={child.props.id} label={child.props.label} />)
-                            })}
-                        </select>
-                    </div>
-                    {currentMixer}
-                </>)}
-            </div>
-        </div>
+        <MiniPage title="Video Mixer">
+            <Typography paragraph className={classes.text}>Select a Video Mixer to use.</Typography>
+            {isLoading ? <Spinner /> : (<>
+                <div className={classes.select}>
+                    <NativeSelect value={mixerId} onChange={e => setMixerId(e.target.value)}>
+                        {children?.map(child => {
+                            return (<MixerOption key={child.props.id} id={child.props.id} label={child.props.label} />)
+                        })}
+                    </NativeSelect>
+                </div>
+                {currentMixer}
+            </>)}
+        </MiniPage>
     )
 }
 

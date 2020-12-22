@@ -12,7 +12,6 @@ class ProgramTracker extends EventEmitter{
         this.previews = null
 
         socket.on('program.state', ({programs, previews}) => {
-            console.log("program.state", programs, previews)
             this.programs = programs
             this.previews = previews
             this.emit('program', this.programs, this.previews)

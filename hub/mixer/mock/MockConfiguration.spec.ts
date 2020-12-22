@@ -89,6 +89,26 @@ describe("setChannel*/getChannels/getChannelCount", () => {
         expect(channels[2].name).toBeFalsy()
     })
 })
+describe("getChannelNames", () => {
+    it("it returns an empty string if no channel names are set", () => {
+        const conf = createDefaultMockConfiguration()
+        conf.setChannelCount(4)
+        conf.setChannelNames([])
+        expect(conf.getChannelNames().toString()).toBeFalsy()
+    })
+    it("it returns a list if all channel names are set", () => {
+        const conf = createDefaultMockConfiguration()
+        conf.setChannelCount(2)
+        conf.setChannelNames(["foo", "bar"])
+        expect(conf.getChannelNames().toString()).toEqual("foo, bar")
+    })
+    it("it trims empty channel names", () => {
+        const conf = createDefaultMockConfiguration()
+        conf.setChannelCount(4)
+        conf.setChannelNames(["foo", "bar"])
+        expect(conf.getChannelNames().toString()).toEqual("foo, bar")
+    })
+})
 
 describe('fromJson/toJson', () => {
     it("does work", () => {
