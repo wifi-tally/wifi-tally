@@ -38,19 +38,19 @@ export class Tally {
         this.logs = []
     }
     isPatched() : boolean {
-        return this.channelId !== null
+        return this.channelId !== undefined
     }
     isConnected() : boolean {
-        return this.address !== null && this.port !== null && this.state === ConnectionState.CONNECTED
+        return this.address !== undefined && this.port !== undefined && this.state === ConnectionState.CONNECTED
     }
     isDisconnected() : boolean {
         return !this.isActive()
     }
     isActive() : boolean {
-        return this.address !== null && this.port !== null && this.state !== ConnectionState.DISCONNECTED
+        return this.address !== undefined && this.port !== undefined && this.state !== ConnectionState.DISCONNECTED
     }
     isMissing() : boolean {
-        return this.address !== null && this.port !== null && this.state === ConnectionState.MISSING
+        return this.address !== undefined && this.port !== undefined && this.state === ConnectionState.MISSING
     }
     setHighlight(highlight: boolean) : void {
         this.highlight = highlight
