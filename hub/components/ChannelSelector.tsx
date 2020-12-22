@@ -36,15 +36,15 @@ const ChannelSelector = ({channels, defaultSelect, onChange} : ChannelSelectorPr
 
     let optionFound = value === null
 
-    return (<Select autoWidth={true} className={classes.root} classes={{ select: classes.select }} value={value || ""} onChange={handleValueChange}>
+    return (<Select native autoWidth={true} className={classes.root} classes={{ select: classes.select }} value={value || ""} onChange={handleValueChange}>
         <option value="" key={null}>(unpatched)</option>
         {channels.map(c => {
             if (c.id === value) {
                 optionFound = true
             }
             return <option key={c.id} value={c.id}>{c.name || `Channel ${c.id}`}</option>
-        })
-    }
+        })}
+        { !optionFound && value !== undefined ? (<option key={value} value={value}>Channel {value}</option>) : "" }
     </Select>)
 }
 
