@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import useSocketInfo from '../hooks/useSocketInfo'
 import useMixerInfo from '../hooks/useMixerInfo'
-import Layout from '../components/Layout'
+import Layout from '../components/layout/Layout'
 import Tally from '../domain/Tally'
 import useTallies from '../hooks/useTallies'
 import TallyComponent from '../components/Tally'
@@ -16,7 +16,10 @@ const useStyles = makeStyles(theme => {
   return {
     buttons: {
       display: "block",
-      marginBottom: theme.spacing(2)
+      marginBottom: theme.spacing(2),
+    },
+    button: {
+      textTransform: "none",
     },
     buttonIcon: {
       marginRight: theme.spacing(1)
@@ -76,16 +79,16 @@ const IndexPage = () => {
     <Layout>
       <div className={classes.buttons}>
         <ButtonGroup size="small" variant="contained">
-          <Button color={showDisconnected ? "primary" : "default"} onClick={toggleDisconnected}>Show Disconnected</Button>
-          <Button color={showUnpatched ? "primary" : "default"} onClick={toggleUnpatched}>Show Unpatched</Button>
+          <Button className={classes.button} color={showDisconnected ? "primary" : "default"} onClick={toggleDisconnected}>Show Disconnected</Button>
+          <Button className={classes.button} color={showUnpatched ? "primary" : "default"} onClick={toggleUnpatched}>Show Unpatched</Button>
           <Tooltip title={"Hub " + (isHubConnected ? "connected" : "disconnected")}>
-            <Button color="default" variant="outlined"><DesktopWindowsIcon className={classes.buttonIcon} /> {isHubConnected ? 1 : 0}</Button>
+            <Button className={classes.button} color="default" variant="outlined"><DesktopWindowsIcon className={classes.buttonIcon} /> {isHubConnected ? 1 : 0}</Button>
           </Tooltip>
           <Tooltip title={"Video Mixer " + (isMixerConnected ? "connected" : "disconnected")}>
-            <Button color="default" variant="outlined"><ServerIcon className={classes.buttonIcon} /> {isMixerConnected ? 1 : 0}</Button>
+            <Button className={classes.button} color="default" variant="outlined"><ServerIcon className={classes.buttonIcon} /> {isMixerConnected ? 1 : 0}</Button>
           </Tooltip>
           <Tooltip title={nrConnectedTallies + " connected tallies"}>
-            <Button color="default" variant="outlined"><WifiIcon className={classes.buttonIcon} /> {nrConnectedTallies === null ? "?" : nrConnectedTallies}</Button>
+            <Button className={classes.button} color="default" variant="outlined"><WifiIcon className={classes.buttonIcon} /> {nrConnectedTallies === null ? "?" : nrConnectedTallies}</Button>
           </Tooltip>
         </ButtonGroup>
       </div>

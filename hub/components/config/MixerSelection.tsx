@@ -2,7 +2,7 @@ import { makeStyles, NativeSelect, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
 import { useMixerNameConfiguration } from '../../hooks/useConfiguration'
 import Spinner from '../Spinner'
-import MiniPage from '../style/MiniPage'
+import MiniPage from '../layout/MiniPage'
 
 const useStyles = makeStyles(theme => ({
     text: {

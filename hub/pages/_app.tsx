@@ -1,6 +1,6 @@
 import { CssBaseline } from '@material-ui/core'
 import React from 'react'
-import MyTheme from '../components/style/MyTheme'
+import MyTheme from '../components/layout/MyTheme'
 // import App from 'next/app'
 
 import 'lato-font/css/lato-font.css'

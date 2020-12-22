@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '../components/layout/Layout'
 import AtemSettings from '../mixer/atem/react/AtemSettings'
 import MixerSelection from '../components/config/MixerSelection'
 import NullSettings from '../mixer/null/react/NullSettings'

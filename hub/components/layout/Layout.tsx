@@ -1,10 +1,13 @@
 import React from 'react'
-import { AppBar, Button, Container, makeStyles, Toolbar } from '@material-ui/core';
+import { AppBar, Button, Container, makeStyles, Toolbar, Typography } from '@material-ui/core';
 import Link from 'next/link'
 
 
 const useStyles = makeStyles(theme => {
   return {
+    logo: {
+      marginRight: theme.spacing(2),
+    },
     contentContainer: {
       marginTop: theme.spacing(2),
     },
@@ -20,6 +23,7 @@ const Layout = ({children}: LayoutProps) => {
   return (<>
     <AppBar position="static">
       <Toolbar>
+        <Typography className={classes.logo} variant="h2">Tally Hub</Typography>
         <Link href="/" passHref>
           <Button>Tallies</Button>
         </Link>

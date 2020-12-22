@@ -1,6 +1,6 @@
 import React from 'react'
-import Layout from '../../components/Layout'
-import MiniPage from '../../components/style/MiniPage'
+import Layout from '../../components/layout/Layout'
+import MiniPage from '../../components/layout/MiniPage'
 import useTallyLog from '../../hooks/useTallyLog'
 import LogType from '../../domain/Log'
 import { makeStyles } from '@material-ui/core'
