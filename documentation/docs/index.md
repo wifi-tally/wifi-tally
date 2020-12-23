@@ -13,7 +13,7 @@ allows easy configuration and monitoring.
 [Eucalyp](https://thenounproject.com/browse/?i=3151803),
 [Atif Arshad](https://thenounproject.com/browse/?i=1294543),
 [Hrbon](https://thenounproject.com/browse?i=3014911) and
-[ProSymbals](https://thenounproject.com/browse/?i=1086042), all licensed [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode)</span>
+[ProSymbols](https://thenounproject.com/browse/?i=1086042), all licensed [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode)</span>
 
 ![Tally Hub](images/tally-hub.png)
 
