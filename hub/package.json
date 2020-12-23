@@ -19,7 +19,8 @@
     "build:backend": "tsc --project tsconfig.server.json",
     "test": "react-scripts test",
     "test:ci": "CI=true react-scripts test",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "cypress:backend": "ts-node --project tsconfig.server.json src/server.ts --env=test"
   },
   "devDependencies": {
     "@material-ui/core": "^4.11.2",

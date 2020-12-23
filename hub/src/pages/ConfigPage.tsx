@@ -5,6 +5,7 @@ import MixerSelection from '../components/config/MixerSelection'
 import NullSettings from '../mixer/null/react/NullSettings'
 import MockSettings from '../mixer/mock/react/MockSettings'
 import ObsSettings from '../mixer/obs/react/ObsSettings'
+import TestSettings from '../mixer/test/react/TestSettings'
 import VmixSettings from '../mixer/vmix/react/VmixSettings'
 
 const ConfigPage = () => {
@@ -15,6 +16,7 @@ const ConfigPage = () => {
         <AtemSettings />
         <MockSettings />
         <ObsSettings />
+        <TestSettings />
         <VmixSettings />
       </MixerSelection>
     </Layout>

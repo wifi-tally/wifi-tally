@@ -7,18 +7,17 @@ import { MixerDriver } from './lib/MixerDriver'
 import express from 'express'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import { Server } from 'http'
-import socketIo, { Socket } from 'socket.io'
-import Log, { Severity } from './domain/Log'
+import socketIo from 'socket.io'
 
 import { SocketAwareEvent } from './lib/SocketAwareEvent'
 import ServerEventEmitter from './lib/ServerEventEmitter'
-import Tally from './domain/Tally'
 import { ServerSideSocket } from './lib/SocketEvents'
 import AppConfigurationPersistence from './lib/AppConfigurationPersistence'
 import AtemConfiguration from './mixer/atem/AtemConfiguration'
 import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
+import TestConnector from './mixer/test/TestConnector'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -33,7 +32,12 @@ const io = socketIo(server)
 const myEmitter = new ServerEventEmitter()
 myEmitter.setMaxListeners(99)
 const myConfiguration = new AppConfiguration(myEmitter)
-const myConfigurationPersistence = new AppConfigurationPersistence(myConfiguration, myEmitter)
+if (myConfiguration.isTest()) {
+  console.log("Starting test environment")
+  myConfiguration.setMixerSelection(TestConnector.ID)
+} else {
+  new AppConfigurationPersistence(myConfiguration, myEmitter)
+}
 
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
 const myTallyDriver = new TallyDriver(myConfiguration, myEmitter)
@@ -135,14 +139,14 @@ io.on('connection', (socket: ServerSideSocket) => {
       socket.emit('config.state.vmix', vmixConfiguration.toJson())
     }),
     new SocketAwareEvent(myEmitter, 'config.changed.mixer', socket, (socket, mixerName) => {
-      socket.emit('config.state.mixer', {mixerName, allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev())})
+      socket.emit('config.state.mixer', {mixerName, allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev(), myConfiguration.isTest())})
     }),
   ]
   socket.on('events.config.subscribe', () => {
     configEvents.forEach(pipe => pipe.register())
 
     socket.emit('config.state.atem', myConfiguration.getAtemConfiguration().toJson())
-    socket.emit('config.state.mixer', {mixerName: myConfiguration.getMixerSelection() || "", allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev())})
+    socket.emit('config.state.mixer', {mixerName: myConfiguration.getMixerSelection() || "", allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev(), myConfiguration.isTest())})
     socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
@@ -270,9 +274,20 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
 })
 
+if (myConfiguration.isTest()) {
+  const port = myConfiguration.getTestConfiguration().getPort()
+
+  app.use('/test/mixer', createProxyMiddleware({
+    pathRewrite: (path) => path.substr(11),
+    target: `http://localhost:${port}`,
+    logLevel: "debug",
+  }))
+}
+
 if (myConfiguration.isDev()) {
   const proxyPort = process.env.DEV_PROXY_PORT || 3001
   console.info(`Serving frontend via proxy. The React dev server is expected to run on port ${proxyPort}.`)
+
   app.use('/', createProxyMiddleware({ 
     target: `http://localhost:${proxyPort}`, 
     changeOrigin: true, 

@@ -8,6 +8,7 @@ import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
 import NullConfiguration from '../mixer/null/NullConfiguration'
 import { Configuration } from '../mixer/interfaces'
 import Tally from '../domain/Tally'
+import TestConfiguration from '../mixer/test/TestConfiguration'
 
 export class AppConfiguration extends Configuration {
     emitter: ServerEventEmitter
@@ -15,6 +16,7 @@ export class AppConfiguration extends Configuration {
     mockConfiguration: MockConfiguration
     nullConfiguration: NullConfiguration
     obsConfiguration: ObsConfiguration
+    testConfiguration: TestConfiguration
     vmixConfiguration: VmixConfiguration
     tallies: Tally[]
     channels: Channel[]
@@ -27,6 +29,7 @@ export class AppConfiguration extends Configuration {
         this.mockConfiguration = new MockConfiguration()
         this.nullConfiguration = new NullConfiguration()
         this.obsConfiguration = new ObsConfiguration()
+        this.testConfiguration = new TestConfiguration()
         this.vmixConfiguration = new VmixConfiguration()
         this.tallies = []
         this.channels = MixerDriver.defaultChannels
@@ -79,6 +82,9 @@ export class AppConfiguration extends Configuration {
         if (data.obs) {
             this.obsConfiguration.fromJson(data.obs)
         }
+        if (data.test) {
+            this.testConfiguration.fromJson(data.test)
+        }
         if (data.vmix) {
             this.vmixConfiguration.fromJson(data.vmix)
         }
@@ -93,6 +99,7 @@ export class AppConfiguration extends Configuration {
             mock: this.mockConfiguration.toJson(),
             "null": this.nullConfiguration.toJson(),
             obs: this.obsConfiguration.toJson(),
+            test: this.testConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
             tallies: this.tallies.map(tally => tally.toJsonForSave()),
             channels: this.channels.map(channel => channel.toJson()),
@@ -144,6 +151,16 @@ export class AppConfiguration extends Configuration {
         this.emitter.emit("config.changed.obs", this.obsConfiguration)
     }
 
+    getTestConfiguration() {
+        return this.testConfiguration.clone()
+    }
+
+    setTestConfiguration(testConfiguration: TestConfiguration) {
+        this.testConfiguration = testConfiguration.clone()
+        this.emitter.emit("config.changed", this)
+        this.emitter.emit("config.changed.test", this.testConfiguration)
+    }
+
     getVmixConfiguration() {
         return this.vmixConfiguration.clone()
     }
@@ -187,6 +204,10 @@ export class AppConfiguration extends Configuration {
 
     isDev() {
         return process.env.NODE_ENV !== 'production'
+    }
+
+    isTest() {
+        return process.env.NODE_ENV === 'test'
     }
 
     getHttpPort() {

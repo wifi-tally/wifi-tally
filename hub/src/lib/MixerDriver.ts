@@ -8,6 +8,7 @@ import Channel from '../domain/Channel'
 import type { AppConfiguration } from './AppConfiguration'
 import ServerEventEmitter from './ServerEventEmitter'
 import { Configuration, Connector } from '../mixer/interfaces'
+import TestConnector from '../mixer/test/TestConnector'
 
 const haveValuesChanged = (one: any, two: any) => {
     //@TODO: this could probably be more performant
@@ -59,7 +60,7 @@ export class MixerDriver {
     }
 
     async changeMixer(newMixerId) {
-        if(!MixerDriver.getAllowedMixers(this.configuration.isDev()).includes(newMixerId)) {
+        if(!MixerDriver.getAllowedMixers(this.configuration.isDev(), this.configuration.isDev()).includes(newMixerId)) {
             console.error(`Can not switch to unknown mixer with id ${newMixerId}`)
             return
         }
@@ -92,6 +93,9 @@ export class MixerDriver {
             } else if(newMixerId === NullConnector.ID) {
                 MixerClass = NullConnector
                 this.getCurrentMixerSettings = this.configuration.getNullConfiguration.bind(this.configuration)
+            } else if(newMixerId === TestConnector.ID) {
+                MixerClass = TestConnector
+                this.getCurrentMixerSettings = this.configuration.getTestConfiguration.bind(this.configuration)
             } else {
                 console.error(`Someone(TM) forgot to implement the ${newMixerId} mixer in MixerDriver.js.`)
                 return
@@ -118,30 +122,25 @@ export class MixerDriver {
         return this.currentMixerInstance !== undefined && this.currentMixerInstance.isConnected()
     }
 
-
-    static getAllowedMixers = function(isDev: boolean) {
-        const mixers = [
+    static getAllowedMixers = function(isDev: boolean, isTest: boolean) {
+        let mixers = [
             MockConnector.ID,
+            TestConnector.ID,
             NullConnector.ID,
             // --- order of the first items is important as they act as defaults ---
             AtemConnector.ID,
             ObsConnector.ID,
             VmixConnector.ID,
         ]
-    
+
         if (!isDev) {
-            return mixers.filter(id => id !== MockConnector.ID)
-        } else {
-            return mixers
+            mixers = mixers.filter(id => id !== MockConnector.ID)
         }
-    }
+        if (!isTest) {
+            mixers = mixers.filter(id => id !== TestConnector.ID)
+        }
 
-    static getDefaultMixerId = function(isDev: boolean) {
-        return this.getAllowedMixers(isDev)[0];
-    }
-
-    static isValidMixerId = function(name: string, isDev: boolean) {
-        return this.getAllowedMixers(isDev).includes(name)
+        return mixers
     }
 
     static defaultChannels = Array(8).fill(null).map((_,i) => {
