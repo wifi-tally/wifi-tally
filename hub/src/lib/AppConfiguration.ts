@@ -21,6 +21,11 @@ export class AppConfiguration extends Configuration {
     tallies: Tally[]
     channels: Channel[]
     mixerSelection?: string
+    tallyPort: number
+    tallyHighlightTime: number
+    tallyKeepAlivesPerSecond: number
+    tallyTimeoutDisconnected: number
+    tallyTimeoutMissing: number
     
     constructor(emitter: ServerEventEmitter) {
         super()
@@ -33,6 +38,12 @@ export class AppConfiguration extends Configuration {
         this.vmixConfiguration = new VmixConfiguration()
         this.tallies = []
         this.channels = MixerDriver.defaultChannels
+
+        this.tallyPort = 7411
+        this.tallyHighlightTime = 1000 // ms
+        this.tallyKeepAlivesPerSecond = 10
+        this.tallyTimeoutDisconnected = 30000 // ms
+        this.tallyTimeoutMissing = 3000 //ms
     }
 
     protected loadChannelArray(fieldName: string, setter: (value:Channel[]) => void, data: object) {
@@ -212,5 +223,38 @@ export class AppConfiguration extends Configuration {
 
     getHttpPort() {
         return (typeof process.env.PORT === "string" && parseInt(process.env.PORT, 10)) || 3000
+    }
+
+    getTallyPort() {
+        return this.tallyPort
+    }
+
+    getTallyHighlightTime() {
+        return this.tallyHighlightTime
+    }
+
+    // the more keep alives you send the less likely it is that
+    // the tally shows a wrong state, but you send more packages
+    // over the network.
+    getTallyKeepAlivesPerSecond() {
+        return this.tallyKeepAlivesPerSecond
+    }
+
+    setTallyTimeoutDisconnected(timeout: number) {
+        if (timeout < 1000) { throw `timeout too small: ${timeout}ms` }
+        this.tallyTimeoutDisconnected = timeout
+    }
+
+    getTallyTimeoutDisconnected() {
+        return this.tallyTimeoutDisconnected
+    }
+
+    setTallyTimeoutMissing(timeout: number) {
+        if (timeout < 1000) { throw `timeout too small: ${timeout}ms` }
+        this.tallyTimeoutMissing = timeout
+    }
+
+    getTallyTimeoutMissing() {
+        return this.tallyTimeoutMissing
     }
 }

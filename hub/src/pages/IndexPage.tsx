@@ -79,16 +79,16 @@ const IndexPage = () => {
     <Layout testId="index">
       <div className={classes.buttons}>
         <ButtonGroup size="small" variant="contained">
-          <Button className={classes.button} color={showDisconnected ? "primary" : "default"} onClick={toggleDisconnected}>Show Disconnected</Button>
-          <Button className={classes.button} color={showUnpatched ? "primary" : "default"} onClick={toggleUnpatched}>Show Unpatched</Button>
+          <Button data-testid="toggle-disconnected" className={classes.button} color={showDisconnected ? "primary" : "default"} onClick={toggleDisconnected}>Show Disconnected</Button>
+          <Button data-testid="toggle-unpatched" className={classes.button} color={showUnpatched ? "primary" : "default"} onClick={toggleUnpatched}>Show Unpatched</Button>
           <Tooltip title={"Hub " + (isHubConnected ? "connected" : "disconnected")}>
-            <Button className={classes.button} color="default" variant="outlined"><DesktopWindowsIcon className={classes.buttonIcon} /> {isHubConnected ? 1 : 0}</Button>
+            <Button data-testid="hub-connected" className={classes.button} color="default" variant="outlined"><DesktopWindowsIcon className={classes.buttonIcon} /> {isHubConnected ? 1 : 0}</Button>
           </Tooltip>
           <Tooltip title={"Video Mixer " + (isMixerConnected ? "connected" : "disconnected")}>
-            <Button className={classes.button} color="default" variant="outlined"><ServerIcon className={classes.buttonIcon} /> {isMixerConnected ? 1 : 0}</Button>
+            <Button data-testid="mixer-connected" className={classes.button} color="default" variant="outlined"><ServerIcon className={classes.buttonIcon} /> {isMixerConnected ? 1 : 0}</Button>
           </Tooltip>
           <Tooltip title={nrConnectedTallies + " connected tallies"}>
-            <Button className={classes.button} color="default" variant="outlined"><WifiIcon className={classes.buttonIcon} /> {nrConnectedTallies === null ? "?" : nrConnectedTallies}</Button>
+            <Button data-testid="tallies-connected" className={classes.button} color="default" variant="outlined"><WifiIcon className={classes.buttonIcon} /> {nrConnectedTallies === null ? "?" : nrConnectedTallies}</Button>
           </Tooltip>
         </ButtonGroup>
       </div>

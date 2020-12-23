@@ -35,6 +35,8 @@ const myConfiguration = new AppConfiguration(myEmitter)
 if (myConfiguration.isTest()) {
   console.log("Starting test environment")
   myConfiguration.setMixerSelection(TestConnector.ID)
+  myConfiguration.setTallyTimeoutMissing(1000)
+  myConfiguration.setTallyTimeoutDisconnected(3000)
 } else {
   new AppConfigurationPersistence(myConfiguration, myEmitter)
 }

@@ -36,7 +36,7 @@ const ChannelSelector = ({channels, defaultSelect, onChange} : ChannelSelectorPr
 
     let optionFound = value === null
 
-    return (<Select native autoWidth={true} className={classes.root} classes={{ select: classes.select }} value={value || ""} onChange={handleValueChange}>
+    return (<Select data-testid="channel-selector" native autoWidth={true} className={classes.root} classes={{ select: classes.select }} value={value || ""} onChange={handleValueChange}>
         <option value="" key={null}>(unpatched)</option>
         {channels.map(c => {
             if (c.id === value) {

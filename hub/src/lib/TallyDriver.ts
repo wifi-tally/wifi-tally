@@ -4,12 +4,6 @@ import ServerEventEmitter from './ServerEventEmitter'
 import { ChannelList } from './MixerCommunicator'
 import { AppConfiguration } from './AppConfiguration'
 
-const tallyHighlightTime = 1000 // ms
-// the more keep alives you send the less likely it is that
-// the tally shows a wrong state, but you send more packages
-// over the network.
-const keepAlivesPerSecond = 10
-
 const updateTally = function(tally: Tally, io: dgram.Socket, programs: ChannelList, previews: ChannelList) {
     if(tally.isActive()) {
         let command = "release"
@@ -91,7 +85,7 @@ export class TallyDriver {
             console.log(`Listening for Tallies on ${address.address}:${address.port}`)
         });
         
-        this.io.bind(7411)
+        this.io.bind(this.configuration.getTallyPort())
 
         // watchdog to check if a tally disconnected
         const lastTallyReport: Map<string, Date> = new Map();
@@ -108,14 +102,14 @@ export class TallyDriver {
                     tally.state = ConnectionState.DISCONNECTED
                 } else {
                     const diff = now.getTime() - lastTallyReportDate.getTime() // milliseconds
-                    if(diff > 30000) {
+                    if(diff > this.configuration.getTallyTimeoutDisconnected()) {
                         if(tally.state !== ConnectionState.DISCONNECTED) {
                             tally.state = ConnectionState.DISCONNECTED
                             this.emitter.emit('tally.timedout', {tally, diff})
                             const log = tally.addLog(new Date(), null, `Tally got disconnected after not reporting for ${diff}ms`)
                             this.emitter.emit('tally.logged', {tally, log})
                         }
-                    } else if(diff > 3000) {
+                    } else if(diff > this.configuration.getTallyTimeoutMissing()) {
                         if(tally.state !== ConnectionState.MISSING) {
                             tally.state = ConnectionState.MISSING
                             this.emitter.emit('tally.missing', {tally, diff})
@@ -132,7 +126,7 @@ export class TallyDriver {
         // - compensate for lost packages
         setInterval(() => {
             this.updateTallies()
-        }, 1000 / keepAlivesPerSecond)
+        }, 1000 / this.configuration.getTallyKeepAlivesPerSecond())
     }
     private tallyReported(tallyName, rinfo) {
         let tally = this.tallies.get(tallyName)
@@ -162,7 +156,7 @@ export class TallyDriver {
             setTimeout(() => {
                 tally.setHighlight(false)
                 this.updateTally(tallyName)
-            }, tallyHighlightTime)
+            }, this.configuration.getTallyHighlightTime())
             tally.setHighlight(true)
             this.updateTally(tallyName)
         }

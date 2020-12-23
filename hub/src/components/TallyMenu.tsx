@@ -67,7 +67,7 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
     setAnchorEl(null)
   }
 
-  return (<div className={className}>
+  return (<div data-testId="menu" className={className}>
     <IconButton size="small" title={`${tally.name} Menu`} aria-controls="menu" aria-haspopup="true" onClick={handleMenuClick}>
       <MoreIcon />
     </IconButton>

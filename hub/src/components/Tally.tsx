@@ -116,7 +116,7 @@ function Tally({ tally, className }: TallyProps) {
     }
 
     return (<>
-        <Paper className={classRoot.join(" ")}>
+        <Paper className={classRoot.join(" ")} data-testid={`tally-${tally.name}`}>
             <div className={classHead.join(" ")}><>
                 <div className={classes.tallyHeadTitle}>{tally.name}</div>
                 <TallyMenu className={classes.tallyHeadIcon} tally={tally} />
