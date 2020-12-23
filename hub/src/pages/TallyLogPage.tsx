@@ -1,13 +1,10 @@
 import React from 'react'
-import Layout from '../../components/layout/Layout'
-import MiniPage from '../../components/layout/MiniPage'
-import useTallyLog from '../../hooks/useTallyLog'
-import LogType from '../../domain/Log'
+import Layout from '../components/layout/Layout'
+import MiniPage from '../components/layout/MiniPage'
+import useTallyLog from '../hooks/useTallyLog'
+import LogType from '../domain/Log'
 import { makeStyles } from '@material-ui/core'
-
-type TallyDetailsProps = {
-  tallyName: string
-}
+import { useParams } from "react-router-dom"
 
 type LogProps = {
   log: LogType
@@ -55,7 +52,8 @@ const Log = ({log, idx, classes}: LogProps) => {
   )
 }
 
-const TallyDetails = ({tallyName}: TallyDetailsProps) => {
+const TallyLogPage = () => {
+  const { tallyName } = useParams()
   const logs = useTallyLog(tallyName)
   const classes = useStyles()
 
@@ -68,10 +66,10 @@ const TallyDetails = ({tallyName}: TallyDetailsProps) => {
   )
 }
 
-TallyDetails.getInitialProps = async (context) => {
+TallyLogPage.getInitialProps = async (context) => {
   return {
     tallyName: context.query.tallyName
   }
 }
 
-export default TallyDetails;
+export default TallyLogPage;

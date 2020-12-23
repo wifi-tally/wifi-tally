@@ -7,7 +7,7 @@ import MockSettings from '../mixer/mock/react/MockSettings'
 import ObsSettings from '../mixer/obs/react/ObsSettings'
 import VmixSettings from '../mixer/vmix/react/VmixSettings'
 
-const Config = props => {
+const ConfigPage = () => {
   return (
     <Layout>
       <MixerSelection>
@@ -20,4 +20,4 @@ const Config = props => {
     </Layout>
   )
 }
-export default Config;
+export default ConfigPage;

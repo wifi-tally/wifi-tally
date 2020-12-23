@@ -1,12 +1,15 @@
 # Upcoming
 
 There have been numerous technical changes on the hub and the way the release
-is built under the hood. We made sure that nothing broke, but if you spot anything
+is built under the hood. One of the results is, that the release packages are now
+significantly smaller. We made sure that nothing broke, but if you spot anything
 please report it.
 
 * [ADDED] Support for OBS added #27
+* [CHANGED] the release size has been reduced significantly. This should speed up download and extraction by a magnitude
+* [CHANGED] replaced the UI framework (from bootstrap to MaterialUI). There are some minor changes in the UI, but the general flow stayed the same
 * [CHANGED] npm dependencies of the hub updated
-* [CHANGED] With moving from travis-ci to Github Actions there are smaller changes in the release package.
+* [OTHER] TravisCI, the service we used to build the release packages, has basically discontinued its Open Source support. So the release is now built with Github Actions. This is nothing that you would see when using the software, but still worth mentioning.
 
 # v0.1.0
 

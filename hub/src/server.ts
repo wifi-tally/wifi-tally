@@ -1,23 +1,13 @@
 // set NODE_ENV from argument to enable portability to windows
 import yargs from 'yargs'
 
-const argv = yargs.argv
-if (argv.env !== undefined) {
-  // @ts-ignore @TODO: setting the env is not nice, but the easiest way to be cross-platform compatible
-  // @see https://github.com/wifi-tally/wifi-tally/issues/18
-  process.env.NODE_ENV = argv.env
-}
-
 import { TallyDriver } from './lib/TallyDriver'
 import { AppConfiguration } from './lib/AppConfiguration'
 import { MixerDriver } from './lib/MixerDriver'
 import express from 'express'
-const app = express()
+import { createProxyMiddleware } from 'http-proxy-middleware'
 import { Server } from 'http'
-const server = new Server(app)
 import socketIo, { Socket } from 'socket.io'
-const io = socketIo(server)
-import next from 'next'
 import Log, { Severity } from './domain/Log'
 
 import { SocketAwareEvent } from './lib/SocketAwareEvent'
@@ -30,6 +20,16 @@ import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 
+const argv = yargs.argv
+if (argv.env !== undefined) {
+  // @ts-ignore @TODO: setting the env is not nice, but the easiest way to be cross-platform compatible
+  // @see https://github.com/wifi-tally/wifi-tally/issues/18
+  process.env.NODE_ENV = argv.env
+}
+const app = express()
+const server = new Server(app)
+const io = socketIo(server)
+
 const myEmitter = new ServerEventEmitter()
 myEmitter.setMaxListeners(99)
 const myConfiguration = new AppConfiguration(myEmitter)
@@ -37,9 +37,6 @@ const myConfigurationPersistence = new AppConfigurationPersistence(myConfigurati
 
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
 const myTallyDriver = new TallyDriver(myConfiguration, myEmitter)
-
-const nextApp = next({ dev: myConfiguration.isDev() })
-const nextHandler = nextApp.getRequestHandler()
 
 // send events to tallies
 myEmitter.on('program.changed', ({programs, previews}) => {
@@ -273,15 +270,37 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
 })
 
-nextApp.prepare().then(() => {
-  app.use('/lato', express.static(__dirname + '/node_modules/lato-font/css/'));
-  app.use('/fonts', express.static(__dirname + '/node_modules/lato-font/fonts/'));
+if (myConfiguration.isDev()) {
+  const proxyPort = process.env.DEV_PROXY_PORT || 3001
+  console.info(`Serving frontend via proxy. The React dev server is expected to run on port ${proxyPort}.`)
+  app.use('/', createProxyMiddleware({ 
+    target: `http://localhost:${proxyPort}`, 
+    changeOrigin: true, 
+    ws: true,
+    onError: (err: any, req, res) => {
+      res.writeHead(500, {
+        'Content-Type': 'text/plain',
+      });
+      if (err && err.code === "ECONNREFUSED") {
+        res.end(`Could not connect to server on http://localhost:${proxyPort}. Is the react dev server running?\nTo fix it run:\n    npm run start:frontend`)
+      } else {
+        res.end("The proxy reported an error: \n" + err.toString())
+      }
+    },
+  }))
+} else {
+  const publicDirName = "frontend-static"
+  console.info(`Serving frontend from directory ${publicDirName}`)
+  app.use('/', express.static(`${__dirname}/${publicDirName}/`))
 
-  app.get('*', (req, res) => {
-    return nextHandler(req, res)
+  // fetch all route to allow deep-links into the application
+  app.get('*', function(req, res) {
+    res.sendFile(`${__dirname}/${publicDirName}/index.html`)
   })
+}
 
-  server.listen(myConfiguration.getHttpPort(), () => {
-    console.log(`Web Server available on http://localhost:${myConfiguration.getHttpPort()}`)
-  })
+
+
+server.listen(myConfiguration.getHttpPort(), () => {
+  console.log(`Web Server available on http://localhost:${myConfiguration.getHttpPort()}`)
 })
