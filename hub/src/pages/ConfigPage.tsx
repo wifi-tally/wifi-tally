@@ -9,7 +9,7 @@ import VmixSettings from '../mixer/vmix/react/VmixSettings'
 
 const ConfigPage = () => {
   return (
-    <Layout>
+    <Layout testId="config">
       <MixerSelection>
         <NullSettings />
         <AtemSettings />

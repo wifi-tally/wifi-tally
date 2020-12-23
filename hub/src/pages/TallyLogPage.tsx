@@ -58,7 +58,7 @@ const TallyLogPage = () => {
   const classes = useStyles()
 
   return (
-    <Layout>
+    <Layout testId="tally-log">
       <MiniPage title={`${tallyName}'s Logs`} contentPadding="0">
         {logs ? logs.map((log, idx) => <Log log={log} idx={idx} classes={classes} />) : "" /* @TODO: loading */ }
       </MiniPage>

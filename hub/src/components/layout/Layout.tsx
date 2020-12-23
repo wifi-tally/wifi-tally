@@ -14,13 +14,14 @@ const useStyles = makeStyles(theme => {
 })
 
 type LayoutProps = {
+  testId: string // this makes it easy in cypress to determine on which page we are
   children?: React.ReactNode
 }
 
-const Layout = ({children}: LayoutProps) => {
+const Layout = ({testId: cypressId, children}: LayoutProps) => {
   const classes = useStyles()
 
-  return (<>
+  return (<div data-testid={`page-${cypressId}`}>
     <AppBar position="static">
       <Toolbar>
         <Typography className={classes.logo} variant="h2">Tally Hub</Typography>
@@ -29,7 +30,7 @@ const Layout = ({children}: LayoutProps) => {
       </Toolbar>
     </AppBar>
     { children && (<Container maxWidth={false} className={classes.contentContainer} children={children} />) }
-  </>)
+  </div>)
 }
 
 export default Layout;

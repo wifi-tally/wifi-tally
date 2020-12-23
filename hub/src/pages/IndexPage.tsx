@@ -76,7 +76,7 @@ const IndexPage = () => {
   }
 
   return (
-    <Layout>
+    <Layout testId="index">
       <div className={classes.buttons}>
         <ButtonGroup size="small" variant="contained">
           <Button className={classes.button} color={showDisconnected ? "primary" : "default"} onClick={toggleDisconnected}>Show Disconnected</Button>
