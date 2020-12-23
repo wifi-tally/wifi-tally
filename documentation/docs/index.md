@@ -31,6 +31,7 @@ allows easy configuration and monitoring.
 ## Supported Video Mixers
 
 * [Blackmagic Design ATEM](https://www.blackmagicdesign.com/products)
+* [OBS Studio](https://obsproject.com/))
 * [vMix](https://www.vmix.com/software/)
 
 !!! info
