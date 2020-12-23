@@ -35,14 +35,15 @@ function VmixSettings(props: VmixSettingsProps) {
     return (
         <MixerSettingsWrapper 
             title="vMix"
+            testId="vmix"
             description="Connects to any vMix over network."
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
         >
         { configuration && (<>
-            <ValidatingInput label="vMix IP" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
-            <ValidatingInput label="vMix Port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
+            <ValidatingInput label="vMix IP" testId="vmix-ip" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
+            <ValidatingInput label="vMix Port" testId="vmix-port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
         </>)}
         </MixerSettingsWrapper>
     )

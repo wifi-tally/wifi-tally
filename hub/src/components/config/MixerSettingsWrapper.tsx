@@ -15,6 +15,7 @@ const useStyles = makeStyles(theme => ({
 
 type MixerSettingsWrapperProps = {
     title: string, 
+    testId: string,
     description?: React.ReactNode, 
     canBeSaved?: boolean,
     isLoading?: boolean
@@ -22,7 +23,7 @@ type MixerSettingsWrapperProps = {
     onSave?: () => void
 }
 
-function MixerSettingsWrapper({title, description, canBeSaved, isLoading, children, onSave}: MixerSettingsWrapperProps ) {
+function MixerSettingsWrapper({title, testId, description, canBeSaved, isLoading, children, onSave}: MixerSettingsWrapperProps ) {
     const classes = useStyles()
 
     const buttonLabel = "Save"
@@ -36,7 +37,7 @@ function MixerSettingsWrapper({title, description, canBeSaved, isLoading, childr
     if (isLoading) {
         return (<Spinner />)
     } else {
-        return (<>
+        return (<div data-testid={testId}>
             { description ? (<Typography paragraph className={classes.text}>{description}</Typography>): ""}
             <form onSubmit={handleSubmit}>
                 { children && (<>
@@ -44,12 +45,12 @@ function MixerSettingsWrapper({title, description, canBeSaved, isLoading, childr
                     <div>{children}</div>
                 </>) }
                 { onSave ? (canBeSaved === false ? (
-                    <Tooltip title="The form contains errors"><div className={classes.tooltipWrapFix}><Button variant="contained" disabled>{buttonLabel}</Button></div></Tooltip>
+                    <Tooltip title="The form contains errors"><div className={classes.tooltipWrapFix}><Button data-testid={`${testId}-submit`} variant="contained" disabled>{buttonLabel}</Button></div></Tooltip>
                 ) : (
-                    <Button type="submit" variant="contained" color="primary">{buttonLabel}</Button>
+                    <Button data-testid={`${testId}-submit`} type="submit" variant="contained" color="primary">{buttonLabel}</Button>
                 )) : "" }
             </form>  
-        </>)
+        </div>)
     }
 }
 

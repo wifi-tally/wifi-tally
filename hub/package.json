@@ -36,6 +36,7 @@
     "@types/react-dom": "^16.9.10",
     "cross-env": "^7.0.3",
     "cypress": "^6.2.0",
+    "eslint-plugin-cypress": "^2.11.2",
     "lato-font": "^3.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -49,7 +50,8 @@
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:cypress/recommended"
     ]
   },
   "browserslist": {

@@ -16,6 +16,7 @@ function TestSettings(props: TestSettingsProps) {
 
     return (<MixerSettingsWrapper 
         title="Test Configuration"
+        testId="test"
         description="A mixer used for automatic testing. You should never have to select it manually."
         onSave={handleSave}
     ></MixerSettingsWrapper>)

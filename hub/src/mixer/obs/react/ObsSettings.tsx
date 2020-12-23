@@ -37,14 +37,15 @@ function ObsSettings(props: ObsSettingsProps) {
     return (
         <MixerSettingsWrapper 
             title="OBS Studio Configuration"
+            testId="obs"
             description={<>Connects to OBS Studio over network. The <ExternalLink href="https://github.com/Palakis/obs-websocket">obs-websocket plugin</ExternalLink> has to be installed.</>}
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
         >
             { configuration && (<>
-                <ValidatingInput label="Obs IP" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
-                <ValidatingInput label="Obs Port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
+                <ValidatingInput label="Obs IP" testId="obs-ip" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
+                <ValidatingInput label="Obs Port" testId="obs-port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
             </>)}
         </MixerSettingsWrapper>
     )

@@ -63,7 +63,7 @@ function MixerSelection({children}: MixerSelectionProps) {
             <Typography paragraph className={classes.text}>Select a Video Mixer to use.</Typography>
             {isLoading ? <Spinner /> : (<>
                 <div className={classes.select}>
-                    <NativeSelect value={mixerId} onChange={e => setMixerId(e.target.value)}>
+                    <NativeSelect data-testid="mixer-select" value={mixerId} onChange={e => setMixerId(e.target.value)}>
                         {availableChildren?.map(child => {
                             return (<MixerOption key={child.props.id} id={child.props.id} label={child.props.label} />)
                         })}

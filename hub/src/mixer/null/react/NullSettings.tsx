@@ -17,6 +17,7 @@ function NullSettings(props: NullSettingsProps) {
 
     return (<MixerSettingsWrapper 
         title="Null Configuration"
+        testId="null"
         description="Off"
         onSave={handleSave}
     ></MixerSettingsWrapper>)

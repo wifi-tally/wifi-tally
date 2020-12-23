@@ -39,6 +39,7 @@ function MockSettings(props: MockSettingsProps) {
     return (
         <MixerSettingsWrapper 
             title="Mock Configuration"
+            testId="mock"
             description="
             This simulates a Video Mixer by changing the channels randomly at a fixed time interval.
             It is intended for development, when you do not have a video mixer at hand, but serves
@@ -47,9 +48,9 @@ function MockSettings(props: MockSettingsProps) {
             isLoading={isLoading}
             onSave={handleSave}
         >{configuration && (<>
-            <ValidatingInput label="Tick Time" object={configuration} propertyName="tickTime" onValid={(tickTime) => { setTickTime(tickTime); setTickTimeValid(true) }} onInvalid={() => setTickTimeValid(false)} />
-            <ValidatingInput label="Channel Count" object={configuration} propertyName="channelCount" onValid={(channelCount) => { setChannelCount(channelCount); setChannelCountValid(true) }} onInvalid={() => setChannelCountValid(false)} />
-            <ValidatingInput label="Channel Names" object={configuration} propertyName="channelNames" onValid={(channelNames) => { setChannelNames(channelNames); setChannelNamesValid(true) }} onInvalid={() => setChannelNamesValid(false)} />
+            <ValidatingInput label="Tick Time" testId="mock-tick" object={configuration} propertyName="tickTime" onValid={(tickTime) => { setTickTime(tickTime); setTickTimeValid(true) }} onInvalid={() => setTickTimeValid(false)} />
+            <ValidatingInput label="Channel Count" testId="mock-channelCount" object={configuration} propertyName="channelCount" onValid={(channelCount) => { setChannelCount(channelCount); setChannelCountValid(true) }} onInvalid={() => setChannelCountValid(false)} />
+            <ValidatingInput label="Channel Names" testId="mock-channelNames" object={configuration} propertyName="channelNames" onValid={(channelNames) => { setChannelNames(channelNames); setChannelNamesValid(true) }} onInvalid={() => setChannelNamesValid(false)} />
         </>)}</MixerSettingsWrapper>
     )
 }

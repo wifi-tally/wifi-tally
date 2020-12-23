@@ -35,14 +35,15 @@ function AtemSettings(props: AtemSettingsProps) {
     return (
         <MixerSettingsWrapper 
             title="ATEM Configuration"
+            testId="atem"
             description="Connects to any ATEM device over network."
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
         >
             {configuration && (<>
-                <ValidatingInput label="ATEM IP" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
-                <ValidatingInput label="ATEM Port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
+                <ValidatingInput label="ATEM IP" testId="atem-ip" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
+                <ValidatingInput label="ATEM Port" testId="atem-port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
             </>)}
             
         </MixerSettingsWrapper>

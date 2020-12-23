@@ -4,6 +4,7 @@ import { Configuration } from '../../mixer/interfaces'
 
 type ValidatingInputProps = {
     label: string
+    testId: string
     object: Configuration
     propertyName: string
     errorMessage?: string
@@ -25,7 +26,7 @@ const upperCaseFirst = (value: string) => `${value.substr(0, 1).toUpperCase()}${
  * It validates values by trying to call the setter on the object. If it does not throw an error
  * the value is assumed to be valid.
  */
-function ValidatingInput({label, object, propertyName, errorMessage, onValid, onInvalid}: ValidatingInputProps) {
+function ValidatingInput({label, testId, object, propertyName, errorMessage, onValid, onInvalid}: ValidatingInputProps) {
     const getterName = `get${upperCaseFirst(propertyName)}`
     const setterName = `set${upperCaseFirst(propertyName)}`
     if (typeof object[getterName] !== "function") { throw `${getterName} is not a function` }
@@ -61,6 +62,7 @@ function ValidatingInput({label, object, propertyName, errorMessage, onValid, on
 
     return (
         <TextField
+            data-testId={testId}
             label={label} 
             value={value} 
             onChange={handleChange}
