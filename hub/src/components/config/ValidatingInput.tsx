@@ -62,7 +62,7 @@ function ValidatingInput({label, testId, object, propertyName, errorMessage, onV
 
     return (
         <TextField
-            data-testId={testId}
+            data-testid={testId}
             label={label} 
             value={value} 
             onChange={handleChange}
