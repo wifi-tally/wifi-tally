@@ -15,13 +15,13 @@ type TallyMenuProps = {
 
 interface MenuItemLinkProps {
   children?: React.ReactNode;
+  testid: string;
   to: string;
-  onClick: () => void
 }
 
 // @see https://material-ui.com/de/guides/composition/#list
 function MenuItemLink(props: MenuItemLinkProps) {
-  const { children, to, onClick } = props;
+  const { children, to, testid } = props;
 
   const renderLink = React.useMemo(
     () =>
@@ -33,7 +33,7 @@ function MenuItemLink(props: MenuItemLinkProps) {
 
   return (
     <li>
-      <MenuItem component={renderLink} children={children} />
+      <MenuItem data-testid={testid} component={renderLink} children={children} />
     </li>
   );
 }
@@ -67,7 +67,7 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
     setAnchorEl(null)
   }
 
-  return (<div data-testId="menu" className={className}>
+  return (<div data-testId={`tally-${tally.name}-menu`} className={className}>
     <IconButton size="small" title={`${tally.name} Menu`} aria-controls="menu" aria-haspopup="true" onClick={handleMenuClick}>
       <MoreIcon />
     </IconButton>
@@ -78,17 +78,17 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
-      <MenuItemLink to={`/tally/${tally.name}`} onClick={handleClose}><>
+      <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.name}/log`}><>
         <ListItemIcon><SubjectIcon fontSize="small" /></ListItemIcon>
         <ListItemText>Logs</ListItemText>
       </></MenuItemLink>
-      <Tooltip title={!allowHighlight ? "Tally is not connected" : ""}><div>
+      <Tooltip data-testid={`tally-${tally.name}-highlight`} title={!allowHighlight ? "Tally is not connected" : ""}><div>
         <MenuItem component="div" disabled={!allowHighlight} onClick={handleHighlightTally}>
           <ListItemIcon><HighlightIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Highlight</ListItemText>
         </MenuItem>
       </div></Tooltip>
-      <Tooltip title={!allowRemove ? "Connected Tallies can not be removed" : ""}><div>
+      <Tooltip data-testid={`tally-${tally.name}-remove`} title={!allowRemove ? "Connected Tallies can not be removed" : ""}><div>
         <MenuItem disabled={!allowRemove} onClick={handleRemoveTally}>
           <ListItemIcon><DeleteIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Remove</ListItemText>

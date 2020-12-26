@@ -17,7 +17,7 @@ import tallyTasks from './tally'
 /**
  * @type {Cypress.PluginConfig}
  */
-export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) => {
+const tasks = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 
@@ -25,3 +25,5 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) =
     ...tallyTasks(config)
   })
 }
+
+export default tasks

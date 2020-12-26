@@ -12,7 +12,7 @@ function App() {
       <MyTheme>
         <CssBaseline />
         <Switch>
-          <Route path="/tally/:tallyName">
+          <Route path="/tally/:tallyName/log">
             <TallyLogPage />
           </Route>
           <Route path="/config">

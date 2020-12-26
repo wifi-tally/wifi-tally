@@ -46,7 +46,7 @@ const Log = ({log, idx, classes}: LogProps) => {
   }
 
   return (
-    <div key={idx} className={classNames.join(" ")}>
+    <div data-testid={`log-line-${idx}`} data-severity={log.isWarning() ? "warning" : (log.isError() ? "error" : (log.isStatus() ? "status" : "info"))} key={idx} className={classNames.join(" ")}>
       <time className={classes.logDate}>{log.dateTime.toISOString()}</time><div>{log.message}</div>
     </div>
   )

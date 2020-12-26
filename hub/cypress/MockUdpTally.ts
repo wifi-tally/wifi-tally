@@ -40,6 +40,12 @@ class MockUdpTally {
     this.interval && clearInterval(this.interval)
   }
 
+  log(message:string, severity: string) {
+    const command = `log "${this.name}" ${severity} "${message}"`
+    console.log(command)
+    this.io.send(command, 7411)
+  }
+
 }
 
 export default MockUdpTally
