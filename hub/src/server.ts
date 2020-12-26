@@ -19,6 +19,7 @@ import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
+import { Socket } from 'dgram'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -62,7 +63,8 @@ myEmitter.on('program.changed', ({programs, previews}) => {
 })
 
 // socket.io server
-io.on('connection', (socket: ServerSideSocket) => {
+io.on('connection', (socket: ServerSideSocket & socketIo.Socket) => {
+  socket.setMaxListeners(99)
   const mixerEvents = [
     // @TODO: use event objects instead of repeating the same structure again and again
     new SocketAwareEvent(myEmitter, 'mixer.connected', socket, (socket) => {
