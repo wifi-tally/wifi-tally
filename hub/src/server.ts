@@ -269,13 +269,15 @@ if (myConfiguration.isDev()) {
     changeOrigin: true, 
     ws: true,
     onError: (err: any, req, res) => {
-      res.writeHead(500, {
-        'Content-Type': 'text/plain',
-      });
-      if (err && err.code === "ECONNREFUSED") {
-        res.end(`Could not connect to server on http://localhost:${proxyPort}. Is the react dev server running?\nTo fix it run:\n    npm run start:frontend`)
-      } else {
-        res.end("The proxy reported an error: \n" + err.toString())
+      if (typeof res.writeHead === "function") {
+        res.writeHead(500, {
+          'Content-Type': 'text/plain',
+        });
+        if (err && err.code === "ECONNREFUSED") {
+          res.end(`Could not connect to server on http://localhost:${proxyPort}. Is the react dev server running?\nTo fix it run:\n    npm run start:frontend`)
+        } else {
+          res.end("The proxy reported an error: \n" + err.toString())
+        }
       }
     },
   }))
