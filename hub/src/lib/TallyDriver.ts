@@ -3,29 +3,13 @@ import dgram from 'dgram'
 import ServerEventEmitter from './ServerEventEmitter'
 import { ChannelList } from './MixerCommunicator'
 import { AppConfiguration } from './AppConfiguration'
+import CommandParser, { InvalidCommandError } from '../tally/CommandParser'
+import CommandCreator from '../tally/CommandCreator'
 
 const updateTally = function(tally: Tally, io: dgram.Socket, programs: ChannelList, previews: ChannelList) {
     if(tally.isActive()) {
-        let command = "release"
-        if(tally.isHighlighted()) {
-            command = "highlight"
-        } else if(programs === null && tally.isPatched()) {
-            // mixer is disconnected
-            command = "unknown"
-        } else if (programs !== null && tally.isIn(programs)) {
-            command = "on-air"
-        } else if (previews !== null && tally.isIn(previews)) {
-            command = "preview"
-        }
+        const command = CommandCreator.createStateCommand(tally, programs, previews)
         io.send(command, tally.port, tally.address)
-    }
-}
-
-class InvalidCommandError extends Error {
-    constructor(...args) {
-        super(...args)
-
-        this.message = `Received an invalid command: "${this.message}"`
     }
 }
 
@@ -57,19 +41,20 @@ export class TallyDriver {
         
         this.io.on('message', (msg, rinfo) => {
             try {
-                const theMsg = msg.toString().trim()
-                if (theMsg.startsWith("tally-ho")) {
-                    const tallyName = TallyDriver.parseTallyHo(theMsg)
+                const command = CommandParser.parse(msg.toString().trim())
+                if (command.command === "tally-ho") {
+                    const {tallyName} = command
                     this.tallyReported(tallyName, rinfo)
-                } else if (theMsg.startsWith("log")) {
-                    const [tallyName, severity, message] = TallyDriver.parseLog(theMsg)
+                } else if (command.command === "log") {
+                    const {tallyName, severity, message} = command
                     const tally = this.tallyReported(tallyName, rinfo)
                     if (tally) {
                         const log = tally.addLog(new Date(), severity, message)
                         this.emitter.emit('tally.logged', {tally, log})
                     }
                 } else {
-                    throw new InvalidCommandError(theMsg)
+                    // typescript should complain if we missed a command
+                    ((_: never) => {})(command)
                 }
             } catch (e) {
                 if (e instanceof InvalidCommandError) {
@@ -204,33 +189,6 @@ export class TallyDriver {
         if(this.tallies.has(tallyName)) {
             const tally = this.tallies.get(tallyName)
             return tally
-        }
-    }
-
-    static parseTallyHo = function(cmd: string) {
-        const result = cmd.match(/^([^ ]+) "(.+)"/)
-        if (result === null) {
-            throw new InvalidCommandError(cmd)
-        } else {
-            const [_, command, name] = result
-            if (command !== "tally-ho") {
-                throw new InvalidCommandError(command)
-            }
-            return name
-        }
-    }
-
-    static parseLog = function(cmd: string) : [string, string, string] {
-        const result = cmd.match(/^([^ ]+) "(.+)" ([^ ]+) "(.*)"/)
-    
-        if (result === null) {
-            throw new InvalidCommandError(cmd)
-        } else {
-            const [_, command, name, severity, message] = result
-            if (command !== "log") {
-                throw  new InvalidCommandError(command)
-            }
-            return [name, severity, message]
         }
     }
 }
