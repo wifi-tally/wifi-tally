@@ -54,7 +54,7 @@ export class MixerDriver {
             if (needsRefresh) {
                 this.changeMixer(configuration.getMixerSelection())
             } else {
-                console.debug("settings where changed, but no need to restart mixer")
+                console.debug("settings were changed, but no need to restart mixer")
             }
         })
     }
