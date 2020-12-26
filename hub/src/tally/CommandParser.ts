@@ -1,3 +1,5 @@
+import Log from "../domain/Log"
+
 export type TallyHoCommand = {
   command: "tally-ho"
   tallyName: string
@@ -6,8 +8,7 @@ export type TallyHoCommand = {
 export type LogCommand = {
   command: "log"
   tallyName: string
-  severity: "INFO" | "WARN" | "ERROR"
-  message: string
+  log: Log
 }
 
 export type TallySentCommand = TallyHoCommand | LogCommand
@@ -62,7 +63,8 @@ class TallyCommandParser {
             return "ERROR"
           }
         })()
-        return { command, tallyName, severity, message }
+        const log = new Log(new Date(), severity, message)
+        return { command, tallyName, log }
     }
   }
 }

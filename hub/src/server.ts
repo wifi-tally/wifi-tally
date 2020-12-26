@@ -1,7 +1,8 @@
 // set NODE_ENV from argument to enable portability to windows
 import yargs from 'yargs'
 
-import { TallyDriver } from './lib/TallyDriver'
+import TallyContainer from './tally/TallyContainer'
+import UdpTallyDriver from './tally/UdpTallyDriver'
 import { AppConfiguration } from './lib/AppConfiguration'
 import { MixerDriver } from './lib/MixerDriver'
 import express from 'express'
@@ -42,31 +43,11 @@ if (myConfiguration.isTest()) {
 }
 
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
-const myTallyDriver = new TallyDriver(myConfiguration, myEmitter)
 
-// send events to tallies
-myEmitter.on('program.changed', ({programs, previews}) => {
-  myTallyDriver.setState(programs, previews)
-})
-myEmitter.on('tally.connected', (tally) => myTallyDriver.updateTally(tally.name))
-myEmitter.on('tally.changed', (tally) => myTallyDriver.updateTally(tally.name))
+const myTallyContainer = new TallyContainer(myConfiguration, myEmitter)
+new UdpTallyDriver(myConfiguration, myTallyContainer)
 
 // log stuff
-myEmitter.on('tally.connected', tally => {
-    console.info(`Tally ${tally.name} connected`)
-})
-myEmitter.on('tally.changed', tally => {
-    console.debug(`Tally ${tally.name} changed configuration`)
-})
-myEmitter.on('tally.missing', ({tally}) => {
-    console.warn(`Tally ${tally.name} went missing`)
-})
-myEmitter.on('tally.timedout', ({tally}) => {
-    console.warn(`Tally ${tally.name} timed out`)
-})
-myEmitter.on('tally.removed', tally => {
-    console.debug(`Tally ${tally.name} removed from configuration`)
-})
 myEmitter.on('tally.logged', ({tally, log}) => {
     let fn = console.info
     if(log.isError()) { 
@@ -159,26 +140,17 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
 
   const tallyEvents = [
-    new SocketAwareEvent(myEmitter, 'tally.connected', socket, (socket) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
-    }),
     new SocketAwareEvent(myEmitter, 'tally.changed', socket, (socket) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
-    }),
-    new SocketAwareEvent(myEmitter, 'tally.missing', socket, (socket) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
-    }),
-    new SocketAwareEvent(myEmitter, 'tally.timedout', socket, (socket) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
+      socket.emit('tally.state', {tallies: myTallyContainer.getTalliesAsJson()})
     }),
     new SocketAwareEvent(myEmitter, 'tally.removed', socket, (socket) => {
-      socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
+      socket.emit('tally.state', {tallies: myTallyContainer.getTalliesAsJson()})
     }),
   ]
   socket.on('events.tally.subscribe', () => {
     tallyEvents.forEach(pipe => pipe.register())
 
-    socket.emit('tally.state', {tallies: myTallyDriver.getTalliesAsJson()})
+    socket.emit('tally.state', {tallies: myTallyContainer.getTalliesAsJson()})
   })
   socket.on('events.tally.unsubscribe', () => {
     // @TODO: not used yet
@@ -186,13 +158,13 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
   
   socket.on('tally.patch', (tallyName, channelId) => {
-    myTallyDriver.patchTally(tallyName, channelId)
+    myTallyContainer.patch(tallyName, channelId)
   })
   socket.on('tally.highlight', (tallyName) => {
-    myTallyDriver.highlight(tallyName)
+    myTallyContainer.highlight(tallyName)
   })
   socket.on('tally.remove', tallyName => {
-    myTallyDriver.removeTally(tallyName)
+    myTallyContainer.remove(tallyName)
   })
 
   const tallyLogEvents = [
@@ -203,7 +175,7 @@ io.on('connection', (socket: ServerSideSocket) => {
   socket.on('events.tallyLog.subscribe', () => {
     tallyLogEvents.forEach(pipe => pipe.register())
 
-    const logs = myTallyDriver.getTallies().map(tally => {
+    const logs = myTallyContainer.getTallies().map(tally => {
       return {
         tallyName: tally.name,
         logs: tally.getLogs().map(log => log.toJson())

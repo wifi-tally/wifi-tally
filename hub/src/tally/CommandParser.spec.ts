@@ -1,5 +1,5 @@
 import CommandParser from './CommandParser'
-import { LogCommand, TallyHoCommand } from './Commands'
+import { LogCommand, TallyHoCommand } from './CommandParser'
 
 
 test('fails if command is invalid #1', () => {
@@ -27,18 +27,18 @@ describe('log command', () => {
         const result = CommandParser.parse('log "Tally Name" INFO "Hello World"')
 
         expect(result.command).toEqual("log")
-        const { tallyName, severity, message } = result as LogCommand
+        const { tallyName, log } = result as LogCommand
         expect(tallyName).toBe("Tally Name")
-        expect(severity).toBe("INFO")
-        expect(message).toBe("Hello World")
+        expect(log.isInfo()).toBe(true)
+        expect(log.message).toBe("Hello World")
     })
     test('logs as error if log level is invalid', () => {
         const result = CommandParser.parse('log "Tally Name" UNKNOWN "Hello World"')
         expect(result.command).toEqual("log")
-        const { tallyName, severity, message } = result as LogCommand
+        const { tallyName, log } = result as LogCommand
         expect(tallyName).toBe("Tally Name")
-        expect(severity).toBe("ERROR")
-        expect(message).toBe("Hello World")
+        expect(log.isError()).toBe(true)
+        expect(log.message).toBe("Hello World")
     })
     test('fails if command is invalid', () => {
         expect(() => {

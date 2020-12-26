@@ -58,6 +58,7 @@ class AppConfigurationPersistence {
     }
 
     async save() {
+        // @TODO: don't save if there are no changes
         if (this.saveTimeout) {
             clearTimeout(this.saveTimeout)
             this.saveTimeout = undefined

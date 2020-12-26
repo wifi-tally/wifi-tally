@@ -27,13 +27,10 @@ export interface EventHandlersDataMap {
     'mixer.connected': () => void
     'mixer.disconnected': () => void
     'program.changed': (data: {programs: ChannelList, previews: ChannelList}) => void
-    'tally.changed': (t: Tally) => void
-    'tally.connected': (t: Tally) => void
-    'tally.logged': (data: {tally: Tally, log: Log}) => void
-    'tally.missing': (data: {tally: Tally, diff: number}) => void
+    'tally.created': (t: Tally) => void
+    'tally.changed': (t: Tally|undefined) => void
     'tally.removed': (t: Tally) => void
-    'tally.reported': (t: Tally) => void
-    'tally.timedout': (data: {tally: Tally, diff: number}) => void
+    'tally.logged': (data: {tally: Tally, log: Log}) => void
 }
 
 export type ServerEventName = keyof EventHandlersDataMap
