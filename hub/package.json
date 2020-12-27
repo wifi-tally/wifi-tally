@@ -20,7 +20,8 @@
     "test": "react-scripts test",
     "test:ci": "CI=true react-scripts test",
     "cypress:open": "cypress open",
-    "cypress:backend": "ts-node --project tsconfig.server.json src/server.ts --env=test"
+    "cypress:backend": "ts-node --project tsconfig.server.json src/server.ts --env=test",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@material-ui/core": "^4.11.2",
@@ -47,13 +48,6 @@
     "ts-node": "^9.0.0",
     "typescript": "^4.1.3",
     "web-vitals": "^0.2.4"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest",
-      "plugin:cypress/recommended"
-    ]
   },
   "browserslist": {
     "production": [

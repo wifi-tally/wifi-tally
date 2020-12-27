@@ -100,7 +100,6 @@ function Tally({ tally, className }: TallyProps) {
     const classHead = [classes.tallyHead]
     let dataColor = "idle"
     let isActive = false
-    console.log(tally.isPatched())
     if (!tally.isPatched()) {
         classRoot.push(classes.borderUnpatched)
         dataColor = "unpatched"

@@ -1,3 +1,5 @@
+/// <reference types="Cypress" />
+
 import randomTallyName from '../browserlib/randomTallyName'
 
 describe('Tally Log display', () => {

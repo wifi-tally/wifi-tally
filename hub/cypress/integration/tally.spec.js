@@ -1,3 +1,5 @@
+/// <reference types="Cypress" />
+
 import randomTallyName from '../browserlib/randomTallyName'
 import TestConfiguration from '../../src/mixer/test/TestConfiguration'
 import { socket } from '../../src/hooks/useSocket'

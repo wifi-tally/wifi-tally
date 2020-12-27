@@ -1,3 +1,5 @@
+/// <reference types="Cypress" />
+
 describe('Smoke Test', () => {
   it('Check that the page is running', () => {
     cy.visit('/')

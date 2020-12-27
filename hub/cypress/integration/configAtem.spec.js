@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+/// <reference types="Cypress" />
 
 describe('Check Atem Configuration', () => {
   beforeEach(() => {
@@ -37,6 +37,7 @@ describe('Check Atem Configuration', () => {
     cy.get("*[data-testid=atem-submit]").should('be.disabled')
     cy.get("*[data-testid=atem-port]").type("{selectall}1234")
     cy.get("*[data-testid=atem-submit]").should('be.enabled')
+    
   })
 
   it('can save', () => {
