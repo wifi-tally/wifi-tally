@@ -116,6 +116,31 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  # @see https://github.com/cypress-io/github-action
+  cypress-run:
+    needs: setup
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+        with:
+          path: .
+      - name: Use node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - # this step also runs "npm ci" and takes care of caching
+        name: Cypress run
+        uses: cypress-io/github-action@v2
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        with:
+          start: npm run cypress:backend, npm run start:frontend
+          wait-on: 'http://localhost:3000, http://localhost:3001'
+          working-directory: ./hub
+          record: true
+          tag: "node-${{ env.NODEJS_VERSION }},${{ needs.setup.outputs.build_name }}"
+
   # ###
   #
   # luac.cross is needed to build *.lc files that match our firmware
