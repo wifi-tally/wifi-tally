@@ -569,7 +569,7 @@ jobs:
           files: |
             wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz
             wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz
-            wifi-tally-${{ needs.setup.outputs.build_name }}.tar.zip
+            wifi-tally-${{ needs.setup.outputs.build_name }}.zip
           gzip: false
           allow_override: true
 

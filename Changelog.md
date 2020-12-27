@@ -1,9 +1,12 @@
-# Upcoming
+# v0.2.0
 
 There have been numerous technical changes on the hub and the way the release
 is built under the hood. One of the results is, that the release packages are now
 significantly smaller. We made sure that nothing broke, but if you spot anything
 please report it.
+
+Code on the Tally did not change. If you are doing an upgrade there is no need to
+modify the Tallies.
 
 * [ADDED] Support for OBS added #27
 * [CHANGED] the release size has been reduced significantly. This should speed up download and extraction by a magnitude
