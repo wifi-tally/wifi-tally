@@ -218,7 +218,7 @@ export class AppConfiguration extends Configuration {
     }
 
     isTest() {
-        return process.env.NODE_ENV === 'test'
+        return process.env.HUB_WITH_TEST === 'true'
     }
 
     getHttpPort() {

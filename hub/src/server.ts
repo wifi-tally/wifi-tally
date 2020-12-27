@@ -28,6 +28,9 @@ if (argv.env !== undefined) {
   // @see https://github.com/wifi-tally/wifi-tally/issues/18
   process.env.NODE_ENV = argv.env
 }
+if (argv['with-test'] !== undefined) {
+  process.env.HUB_WITH_TEST = "true"
+}
 const app = express()
 const server = new Server(app)
 const io = socketIo(server)

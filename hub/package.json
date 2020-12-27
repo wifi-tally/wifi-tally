@@ -20,7 +20,7 @@
     "test": "react-scripts test",
     "test:ci": "CI=true react-scripts test",
     "cypress:open": "cypress open",
-    "cypress:backend": "ts-node --project tsconfig.server.json src/server.ts --env=test",
+    "cypress:backend": "ts-node --project tsconfig.server.json src/server.ts --env=development --with-test",
     "lint": "eslint ."
   },
   "devDependencies": {

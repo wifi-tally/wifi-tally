@@ -60,7 +60,7 @@ export class MixerDriver {
     }
 
     async changeMixer(newMixerId) {
-        if(!MixerDriver.getAllowedMixers(this.configuration.isDev(), this.configuration.isDev()).includes(newMixerId)) {
+        if(!MixerDriver.getAllowedMixers(this.configuration.isDev(), this.configuration.isTest()).includes(newMixerId)) {
             console.error(`Can not switch to unknown mixer with id ${newMixerId}`)
             return
         }
