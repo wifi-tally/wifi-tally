@@ -12,25 +12,32 @@ class MockUdpTally {
   }
 
   connect() {
-    this.io = dgram.createSocket('udp4')
+    
+      this.io = dgram.createSocket('udp4')
 
-    this.io.on('error', (err) => {
-        console.log(`Tally ${this.name} error: ${err.stack}`)
-        this.io.close()
-    })
-    
-    this.io.on('message', (msg) => {
-      this.messages.push(msg.toString().trim())
-    })
-    
-    this.io.bind({
-      port: 0,
-      exclusive: false
-    }, () => {
-      this.interval = setInterval(() => {
-        this.io.send(`tally-ho "${this.name}"`, 7411)
-      }, 100)
-    })
+      this.io.on('error', (err) => {
+          console.log(`Tally ${this.name} error: ${err.stack}`)
+          this.io.close()
+      })
+      
+      this.io.on('message', (msg) => {
+        this.messages.push(msg.toString().trim())
+      })
+      
+      this.io.bind({
+        port: 0,
+        exclusive: false
+      }, () => {
+        this.interval = setInterval(() => {
+          this.io.send(`tally-ho "${this.name}"`, 7411)
+        }, 100)
+      })
+      
+      return new Promise((resolve) => {
+        this.io.once('message', () => {
+          resolve(null) // we are connected once the first message pops in
+        })
+      })
   }
 
   disconnect() {

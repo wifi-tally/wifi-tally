@@ -10,9 +10,7 @@ const tallies = function(config: Cypress.PluginConfigOptions) {
   function tally(name: string) {
     const tally = new MockUdpTally(name)
     mockTallies.push(tally)
-    tally.connect()
-
-    return null
+    return tally.connect()
   }
 
   function tallyLog({name, message, severity}) {
