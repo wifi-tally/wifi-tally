@@ -13,6 +13,7 @@
 // the project's config changing)
 
 import tallyTasks from './tally'
+import atemTasks from './atem'
 
 /**
  * @type {Cypress.PluginConfig}
@@ -22,7 +23,8 @@ const tasks = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) =>
   // `config` is the resolved Cypress config
 
   on('task', {
-    ...tallyTasks(config)
+    ...tallyTasks(config),
+    ...atemTasks(config)
   })
 }
 

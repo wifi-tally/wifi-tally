@@ -89,5 +89,6 @@ jobs:
           wait-on: 'http://localhost:3000'
           working-directory: ./hub
           record: true
+          spec: "cypress/**/!(manual_)*.spec.ts"
           browser: ${{ matrix.browser }}
           tag: "node-${{ matrix.node }},bundle-test,${{ matrix.os }},${{ matrix.browser }}"

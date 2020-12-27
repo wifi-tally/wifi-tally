@@ -144,6 +144,7 @@ jobs:
           wait-on: 'http://localhost:3000, http://localhost:3001'
           working-directory: ./hub
           record: true
+          spec: "cypress/**/!(manual_)*.spec.ts"
           tag: "node-${{ env.NODEJS_VERSION }},${{ needs.setup.outputs.build_name }}"
 
   # ###

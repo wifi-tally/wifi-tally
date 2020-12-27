@@ -1,4 +1,8 @@
 {
   "projectId": "1qd2ua",
-  "baseUrl": "http://localhost:3000"
+  "baseUrl": "http://localhost:3000",
+  "env": {
+    "atem_ip": "192.168.178.200",
+    "atem_port": "9910"
+  }
 }
