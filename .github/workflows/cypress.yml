@@ -19,6 +19,7 @@ jobs:
   # @see https://github.com/cypress-io/github-action
   cypress:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
