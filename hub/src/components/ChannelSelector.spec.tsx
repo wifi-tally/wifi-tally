@@ -68,32 +68,26 @@ test('it calls onChange with the right value', () => {
     const el1 = getByText("Channel One")
     fireEvent.change(select, { target: { value: el1.value } })
     expect(lastSeenValue).toBe("1")
-    expect(select).toHaveValue("1")
 
     const el2 = getByText("Channel Two")
     fireEvent.change(select, { target: { value: el2.value } })
     expect(lastSeenValue).toBe("2")
-    expect(select).toHaveValue("2")
 
     const el3 = getByText("Channel 3")
     fireEvent.change(select, { target: { value: el3.value } })
     expect(lastSeenValue).toBe("3")
-    expect(select).toHaveValue("3")
 
     const el4 = getByText("Channel foobar")
     fireEvent.change(select, { target: { value: el4.value } })
     expect(lastSeenValue).toBe("foobar")
-    expect(select).toHaveValue("foobar")
 
     const el5 = getByText("Channel 42")
     fireEvent.change(select, { target: { value: el5.value } })
     expect(lastSeenValue).toBe("baz")
-    expect(select).toHaveValue("baz")
 
     const el6 = getByText("(unpatched)")
     fireEvent.change(select, { target: { value: el6.value } })
     expect(lastSeenValue).toBe(null)
-    expect(select).toHaveValue("")
 })
 
 test('it selects (unpatched) by default', () => {
@@ -117,7 +111,7 @@ test('it shows the key if the defaultId does not exist', () => {
         new Channel("2", "Channel Two"),
         new Channel("3", "Channel Three"),
     ]
-    const { getByText, getByRole } = render(<ChannelSelector channels={channels} defaultSelect="4" />, {
+    const { getByText, getByRole } = render(<ChannelSelector channels={channels} value="4" />, {
         container: document.body.appendChild(root)
     })
 

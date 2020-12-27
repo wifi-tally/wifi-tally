@@ -20,6 +20,7 @@ import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import { Socket } from 'dgram'
+import TestConfiguration from './mixer/test/TestConfiguration'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -239,6 +240,15 @@ io.on('connection', (socket: ServerSideSocket & socketIo.Socket) => {
       myConfiguration.setMixerSelection(newMixerName)
     }
   })
+  socket.on('config.change.test', (newTestConfiguration, newMixerName) => {
+    const test = new TestConfiguration()
+    test.fromJson(newTestConfiguration)
+    myConfiguration.setTestConfiguration(test)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
   socket.on('config.change.vmix', (newVmixConfiguration, newMixerName) => {
     const vmix = new VmixConfiguration()
     vmix.fromJson(newVmixConfiguration)
@@ -249,16 +259,6 @@ io.on('connection', (socket: ServerSideSocket & socketIo.Socket) => {
     }
   })
 })
-
-if (myConfiguration.isTest()) {
-  const port = myConfiguration.getTestConfiguration().getPort()
-
-  app.use('/test/mixer', createProxyMiddleware({
-    pathRewrite: (path) => path.substr(11),
-    target: `http://localhost:${port}`,
-    logLevel: "debug",
-  }))
-}
 
 if (myConfiguration.isDev()) {
   const proxyPort = process.env.DEV_PROXY_PORT || 3001

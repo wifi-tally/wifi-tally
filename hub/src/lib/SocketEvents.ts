@@ -6,6 +6,7 @@ import { ChannelList } from "./MixerCommunicator";
 import { TallyObjectType } from "../domain/Tally";
 import { ChannelSaveObject } from "../domain/Channel";
 import { LogObjectType } from "../domain/Log";
+import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
 
 // events the server sends to the client
 export interface ServerSentEvents {
@@ -39,14 +40,14 @@ export interface ClientSentEvents {
     'events.tallyLog.subscribe': () => void
     'events.tallyLog.unsubscribe': () => void
 
-    'tally.patch': (tallyName: string, channelId: string) => void
+    'tally.patch': (tallyName: string, channelId: string|null) => void
     'tally.highlight': (tallyName: string) => void
     'tally.remove': (tallyName: string) => void
 
     'config.change.atem': (atemConfiguration: AtemConfigurationSaveType, newMixer?: "atem") => void
     'config.change.mock': (mockConfiguration: MockConfigurationSaveType, newMixer?: "mock") => void
     'config.change.null': (newMixer?: "null") => void
-    'config.change.test': (newMixer?: "test") => void
+    'config.change.test': (testConfiguration: TestConfigurationSaveType, newMixer?: "test") => void
     'config.change.obs': (obsConfiguration: ObsConfigurationSaveType, newMixer?: "obs") => void
     'config.change.vmix': (vmixConfiguration: VmixConfigurationSaveType, newMixer?: "vmix") => void
 }

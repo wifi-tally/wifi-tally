@@ -15,20 +15,18 @@ const useStyles = makeStyles(theme => ({
 
 type ChannelSelectorProps = {
     channels?: Channel[]
-    defaultSelect?: string
+    value?: string
     onChange?: (value: string|null) => void
 }
 
-const ChannelSelector = ({channels, defaultSelect, onChange} : ChannelSelectorProps) => {
+const ChannelSelector = ({channels, value = null, onChange} : ChannelSelectorProps) => {
     channels = channels || []
-    const [value, setValue] = useState(defaultSelect)
     const classes = useStyles()
 
     const handleValueChange = (e) => {
         let val = e.target.value.toString()
         if (val === "") { val = null }
 
-        setValue(val)
         if (onChange) {
             onChange(val)
         }

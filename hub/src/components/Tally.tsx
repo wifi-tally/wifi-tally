@@ -98,14 +98,21 @@ function Tally({ tally, className }: TallyProps) {
     className && classRoot.push(className)
     classRoot.push(classes.tally)
     const classHead = [classes.tallyHead]
+    let dataColor = "idle"
+    let isActive = false
+    console.log(tally.isPatched())
     if (!tally.isPatched()) {
         classRoot.push(classes.borderUnpatched)
+        dataColor = "unpatched"
     } else if (programs && tally.isIn(programs)) {
         classRoot.push(classes.borderInProgram)
+        dataColor = "program"
     } else if (previews && tally.isIn(previews)) {
         classRoot.push(classes.borderInPreview)
+        dataColor = "preview"
     }
     if (tally.isActive()) {
+        isActive = true
         if (!tally.isPatched()) {
             classHead.push(classes.bgUnpatched)
         } else if (programs && tally.isIn(programs)) {
@@ -116,13 +123,13 @@ function Tally({ tally, className }: TallyProps) {
     }
 
     return (<>
-        <Paper className={classRoot.join(" ")} data-testid={`tally-${tally.name}`}>
+        <Paper data-color={dataColor} data-isactive={isActive} className={classRoot.join(" ")} data-testid={`tally-${tally.name}`}>
             <div className={classHead.join(" ")}><>
                 <div className={classes.tallyHeadTitle}>{tally.name}</div>
                 <TallyMenu className={classes.tallyHeadIcon} tally={tally} />
             </></div>
             <div className={classes.tallyBody}>
-                <ChannelSelector defaultSelect={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
+                <ChannelSelector value={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
             </div>
             <div className={classes.tallyFoot + (tally.isActive() && tally.isMissing() ? " " + classes.tallyFootMissing : "")}>
                 {tally.isActive() ? (<>

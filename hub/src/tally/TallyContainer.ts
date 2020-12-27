@@ -51,6 +51,7 @@ class TallyContainer {
     if(tally) {
         this.tallies.delete(tallyName)
         this.configuration.setTallies(Array.from(this.tallies.values()))
+        console.debug(`Removed tally "${tallyName}"`)
         this.emitter.emit('tally.removed', tally)
     }
 }
@@ -65,6 +66,7 @@ class TallyContainer {
     if (!tally) {
       tally = new Tally(tallyName)
       this.updateTallyState(tally.name)
+      console.debug(`Tally "${tallyName}" created`)
       this.emitter.emit('tally.created', tally)
       this.configuration.setTallies(Object.values(this.tallies))
     }
@@ -75,11 +77,13 @@ class TallyContainer {
     // make sure the old tally existed - or create it
     this.getOrCreate(tally.name)
     this.setTally(tally)
+    console.debug(`Tally "${tally.name}" updated`)
   }
 
   highlight(tallyName: string) {
       const tally = this.tallies.get(tallyName)
       if (tally) {
+          console.debug(`Tally "${tally.name}" highlighted`)
           setTimeout(() => {
             this.deHighlight(tally.name)
           }, this.configuration.getTallyHighlightTime())
@@ -93,6 +97,7 @@ class TallyContainer {
   private deHighlight(tallyName: string) {
     const tally = this.tallies.get(tallyName)
     if (tally) {
+        console.debug(`Tally "${tally.name}" de-highlighted`)
         tally.setHighlight(false)
         this.setTally(tally)
     } else {
@@ -100,11 +105,12 @@ class TallyContainer {
     }
   }
 
-  patch(tallyName: string, channelId: string) {
+  patch(tallyName: string, channelId: string|null) {
       const tally = this.tallies.get(tallyName)
       if (tally) {
-          tally.channelId = channelId
+          tally.channelId = channelId ? channelId : undefined
           this.setTally(tally)
+          console.debug(`Tally "${tally.name}" patched to "${channelId}"`)
       } else {
         console.warn(`Can not patch unknown tally named "${tallyName}"`)
       }

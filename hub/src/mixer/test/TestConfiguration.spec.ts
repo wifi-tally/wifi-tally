@@ -7,18 +7,25 @@ function createDefaultTestConfiguration(): TestConfiguration {
 describe('fromJson/toJson', () => {
     it("does work", () => {
         const conf = createDefaultTestConfiguration()
+        conf.setPrograms(["foo", "bar"])
+        conf.setPreviews(["baz"])
+
         const loadedConf = createDefaultTestConfiguration()
         loadedConf.fromJson(conf.toJson())
 
-        // it does not throw an error. Apart from that it does not have any settings to check
+        expect(loadedConf.getPrograms()).toEqual(["foo", "bar"])
+        expect(loadedConf.getPreviews()).toEqual(["baz"])
     })
 })
 
 describe('clone', () => {
     it("does work", () => {
         const conf = createDefaultTestConfiguration()
-        conf.clone()
+        conf.setPrograms(["foo", "bar"])
+        conf.setPreviews(["baz"])
 
-        // it does not throw an error. Apart from that it does not have any settings to check
+        const clonedConf = conf.clone()
+        expect(clonedConf.getPrograms()).toEqual(["foo", "bar"])
+        expect(clonedConf.getPreviews()).toEqual(["baz"])
     })
 })
