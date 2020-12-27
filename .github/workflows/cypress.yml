@@ -1,0 +1,92 @@
+# tests the hub on a variety of operating systems, NodeJS versions and browsers
+
+name: cypress
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch (where cypress tests are pulled from)'
+        required: true
+        default: 'master'
+      source:
+        description: 'Source tar.gz (from S3 or releases)'
+        required: true
+env:
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  # @see https://github.com/cypress-io/github-action
+  cypress:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: 12
+            browser: chrome
+          - os: ubuntu-latest
+            node: 14
+            browser: chrome
+          - os: macos-latest
+            node: 14
+            browser: chrome
+          - os: windows-latest
+            node: 12
+            browser: edge
+          - os: windows-latest
+            node: 14
+            browser: edge
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - # the source code is ONLY used to to get the cypress tests
+        name: Checkout the source code
+        uses: actions/checkout@v2
+        with:
+          ref: "${{ github.event.inputs.branch }}"
+      - name: Install dependencies
+        run: |
+          python -m pip install requests
+      - name: Download the artifact (cross-env)
+        id: hub
+        run: |
+          import requests
+          import tarfile
+          import os
+
+          url = r"${{ github.event.inputs.source }}"
+          tmp_dir = r"${{ runner.temp }}"
+          file_name = os.path.basename(url)
+          dir_name = file_name[:-7]
+          file_path = os.path.join(tmp_dir, file_name)
+          dir_path = os.path.join(tmp_dir, dir_name)
+
+          print('downloading {}'.format(url))
+          response = requests.get(url)
+
+          with open(file_path, 'wb') as f:
+              f.write(response.content)
+
+          print('created {}'.format(file_path))
+
+          tar = tarfile.open(file_path, "r:gz")
+          tar.extractall(path=dir_path)
+          tar.close()
+
+          hub_dir = os.path.join(dir_path, "hub")
+          print(hub_dir)
+          print('::set-output name=hubDir::{}'.format(hub_dir))
+        shell: python
+      - name: Use node.js ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - # this step also runs "npm ci" and takes care of caching
+        name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          start: "npm run start --prefix ${{ steps.hub.outputs.hubDir }} -- --with-test"
+          wait-on: 'http://localhost:3000'
+          working-directory: ./hub
+          record: true
+          browser: ${{ matrix.browser }}
+          tag: "node-${{ matrix.node }},bundle-test,${{ matrix.os }},${{ matrix.browser }}"

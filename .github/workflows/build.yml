@@ -14,6 +14,8 @@ env:
   AWS_S3_NIGHTLY_BASEURI: https://wifi-tally-nightly.s3.eu-central-1.amazonaws.com
   AWS_S3_NIGHTLY_BUCKET: wifi-tally-nightly
   AWS_S3_NIGHTLY_REGION: eu-central-1
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 defaults:
   run:
     shell: bash
@@ -116,10 +118,15 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  # ###
+  #
+  # Cypress tests are integration tests that the hub
+  #
+  # ###
   # @see https://github.com/cypress-io/github-action
   cypress-run:
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
@@ -132,8 +139,6 @@ jobs:
       - # this step also runs "npm ci" and takes care of caching
         name: Cypress run
         uses: cypress-io/github-action@v2
-        env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
         with:
           start: npm run cypress:backend, npm run start:frontend
           wait-on: 'http://localhost:3000, http://localhost:3001'
