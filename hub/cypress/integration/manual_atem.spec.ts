@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-import { socket } from '../../../src/hooks/useSocket'
+import { socket } from '../../src/hooks/useSocket'
 
 describe('Live AtemCheck', () => {
   let ip: string
