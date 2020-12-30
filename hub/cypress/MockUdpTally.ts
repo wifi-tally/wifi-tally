@@ -6,6 +6,7 @@ class MockUdpTally {
   io?: dgram.Socket
   messages: string[] = []
   interval?: NodeJS.Timeout
+  type: "udp" = "udp"
 
   constructor(name: string) {
     this.name = name

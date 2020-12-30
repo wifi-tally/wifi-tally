@@ -11,7 +11,7 @@ test('it writes changes to configuration', () => {
     // check that it is initially empty
     expect(configuration.getTallies()).toEqual([])
 
-    const tally = container.getOrCreate("Foobar")
+    const tally = container.getOrCreate("Foobar", "web")
 
     // tally was created
     expect(configuration.getTallies()).toHaveLength(1)
@@ -24,6 +24,6 @@ test('it writes changes to configuration', () => {
     expect(configuration.getTallies()[0].name).toEqual("Foobar")
     expect(configuration.getTallies()[0].channelId).toEqual("42")
 
-    container.remove(tally.name)
+    container.remove(tally.name, "web")
     expect(configuration.getTallies()).toEqual([])
 })

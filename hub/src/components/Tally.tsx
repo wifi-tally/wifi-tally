@@ -91,7 +91,7 @@ function Tally({ tally, className }: TallyProps) {
     const classes = useStyles()
 
     const patchTally = function (tally, channel) {
-        socket.emit('tally.patch', tally.name, channel)
+        socket.emit('tally.patch', tally.name, tally.type, channel)
     }
 
     const classRoot: string[] = []
@@ -133,7 +133,7 @@ function Tally({ tally, className }: TallyProps) {
             <div className={classes.tallyFoot + (tally.isActive() && tally.isMissing() ? " " + classes.tallyFootMissing : "")}>
                 {tally.isActive() ? (<>
                     <div className={classes.tallyFootLeft}>{ tally.isMissing() ? "missing": "connected" }</div>
-                    <div className={classes.tallyFootRight}>{tally.address}:{tally.port}</div>
+                    <div className={classes.tallyFootRight}>{tally.isUdpTally() ? `${tally.address}:${tally.port}` : "TODO"}</div>
                 </>) : "disconnected"}
             </div>
         </Paper>

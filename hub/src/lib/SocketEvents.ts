@@ -3,7 +3,7 @@ import { MockConfigurationSaveType } from "../mixer/mock/MockConfiguration";
 import { ObsConfigurationSaveType } from "../mixer/obs/ObsConfiguration";
 import { VmixConfigurationSaveType } from "../mixer/vmix/VmixConfiguration";
 import { ChannelList } from "./MixerCommunicator";
-import { TallyObjectType } from "../domain/Tally";
+import { TallyObjectType, TallyType } from "../domain/Tally";
 import { ChannelSaveObject } from "../domain/Channel";
 import { LogObjectType } from "../domain/Log";
 import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
@@ -11,8 +11,8 @@ import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
 // events the server sends to the client
 export interface ServerSentEvents {
     'tally.state': (data: {tallies: TallyObjectType[]}) => void
-    'tally.log': (data: {tallyName: string, log: LogObjectType}) => void
-    'tally.log.state': (data: {tallyName: string, logs: LogObjectType[]}[]) => void
+    'tally.log': (data: {tallyId: string, log: LogObjectType}) => void
+    'tally.log.state': (data: {tallyId: string, logs: LogObjectType[]}[]) => void
 
     'mixer.state': (data: {isConnected: boolean}) => void
     'program.state': (data: {programs: ChannelList, previews: ChannelList}) => void
@@ -40,9 +40,10 @@ export interface ClientSentEvents {
     'events.tallyLog.subscribe': () => void
     'events.tallyLog.unsubscribe': () => void
 
-    'tally.patch': (tallyName: string, channelId: string|null) => void
-    'tally.highlight': (tallyName: string) => void
-    'tally.remove': (tallyName: string) => void
+    'tally.patch': (tallyName: string, tallyType: TallyType, channelId: string|null) => void
+    'tally.highlight': (tallyName: string, tallyType: TallyType) => void
+    'tally.remove': (tallyName: string, tallyType: TallyType) => void
+    'tally.create': (tallyName: string, channelId?: string) => void
 
     'config.change.atem': (atemConfiguration: AtemConfigurationSaveType, newMixer?: "atem") => void
     'config.change.mock': (mockConfiguration: MockConfigurationSaveType, newMixer?: "mock") => void

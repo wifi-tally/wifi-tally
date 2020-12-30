@@ -10,6 +10,7 @@ import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows'
 import WifiIcon from '@material-ui/icons/Wifi'
 import ServerIcon from '@material-ui/icons/Dns';
 import { Alert, AlertTitle } from '@material-ui/lab'
+import TallyCreate from '../components/TallyCreate'
 
 
 const useStyles = makeStyles(theme => {
@@ -99,9 +100,10 @@ const IndexPage = () => {
           <Typography>We will try to reconnect automatically, but you might also try to reload the page.</Typography>
         </Alert>
       )}
-      <Box display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start" alignContent="flex-start">
+      <Box display="flex" flexWrap="wrap" justifyContent="flex-start" alignItems="stretch" alignContent="flex-start"><>
         {tallies ? tallies.map(tally => <TallyComponent tally={tally} key={tally.name} />) : "" /* @TODO: loading */}
-      </Box>
+        <TallyCreate />
+      </></Box>
     </Layout>
   )
 }

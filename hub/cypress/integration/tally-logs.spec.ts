@@ -9,7 +9,7 @@ describe('Tally Log display', () => {
   beforeEach(() => {
     tallyName = randomTallyName()
     cy.task('tally', tallyName)
-    cy.visit(`/tally/${tallyName}/log`)
+    cy.visit(`/tally/udp-${tallyName}/log`)
     cy.get(`*[data-testid=page-tally-log]`)
   })
   afterEach(() => {

@@ -25,13 +25,12 @@ const tallies = function(config: Cypress.PluginConfigOptions) {
 
   function tallyKill(name: string) {
     const tally = mockTallies.find(tally => tally.name === name)
-    if (!tally) {
-      console.warn(`Could not find tally with name ${name} to remove.`)
-    } else {
+    if (tally) {
       tally.disconnect()
-      socket.emit('tally.remove', tally.name)
+      socket.emit('tally.remove', tally.name, tally.type)
       mockTallies = mockTallies.filter(tally => tally.name !== name)
     }
+    socket.emit('tally.remove', name, "web")
     return null
   }
 

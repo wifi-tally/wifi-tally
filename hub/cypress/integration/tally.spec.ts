@@ -83,11 +83,11 @@ describe('Tally display', () => {
       cy.get(`*[data-testid=tally-${name}]`).contains(name)
       cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched')
       cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'true').then(() => {
-        socket.emit('tally.patch', name, "1")
+        socket.emit('tally.patch', name, "udp", "1")
         cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'program')
         cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'true')
         cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] :selected`).contains("Channel 1").then(() => {
-          socket.emit('tally.patch', name, null)
+          socket.emit('tally.patch', name, "udp", null)
           cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched')
           cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'true')
           cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] :selected`).contains("(unpatched)")
@@ -135,11 +135,11 @@ describe('Tally display', () => {
       })
       cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched')
       cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false').then(() => {
-        socket.emit('tally.patch', name, "1")
+        socket.emit('tally.patch', name, "udp", "1")
         cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'program')
         cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false')
         cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] :selected`).contains("Channel 1").then(() => {
-          socket.emit('tally.patch', name, null)
+          socket.emit('tally.patch', name, "udp", null)
           cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched')
           cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false')
           cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] :selected`).contains("(unpatched)")
@@ -159,7 +159,7 @@ describe('Tally display', () => {
     const name = randomTallyName()
     cy.task('tally', name)
     cy.get(`*[data-testid=tally-${name}]`).contains(name).then(() => {
-      socket.emit('tally.patch', name, "1")
+      socket.emit('tally.patch', name, "udp", "1")
     })
 
     // program

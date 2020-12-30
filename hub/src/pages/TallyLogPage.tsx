@@ -5,6 +5,7 @@ import useTallyLog from '../hooks/useTallyLog'
 import LogType from '../domain/Log'
 import { makeStyles } from '@material-ui/core'
 import { useParams } from "react-router-dom"
+import useTallies from '../hooks/useTallies'
 
 type LogProps = {
   log: LogType
@@ -53,13 +54,15 @@ const Log = ({log, idx, classes}: LogProps) => {
 }
 
 const TallyLogPage = () => {
-  const { tallyName } = useParams()
-  const logs = useTallyLog(tallyName)
+  const { tallyId } = useParams()
+  const logs = useTallyLog(tallyId)
+  const tallies = useTallies()
+  const tally = tallies?.find(tally => tally.getId() === tallyId)
   const classes = useStyles()
 
   return (
     <Layout testId="tally-log">
-      <MiniPage title={`${tallyName}'s Logs`} contentPadding="0">
+      <MiniPage title={`${tally?.name}'s Logs`} contentPadding="0">
         {logs ? logs.map((log, idx) => <Log log={log} idx={idx} classes={classes} />) : "" /* @TODO: loading */ }
       </MiniPage>
     </Layout>

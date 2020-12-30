@@ -4,18 +4,18 @@ import TallyLogTracker from './tracker/tallylog';
 
 const tallyLogTracker = new TallyLogTracker(socket, socketEventEmitter)
 
-function useTallyLog(tallyName: string) {
-  const [logs, setLogs] = useState(tallyLogTracker.logs?.get(tallyName))
+function useTallyLog(tallyId: string) {
+  const [logs, setLogs] = useState(tallyLogTracker.logs?.get(tallyId))
 
   const onChange = (logs) => {
     setLogs(Array.from(logs)) // needs a copy or refresh of component won't trigger
   }
 
   useEffect(() => {
-    tallyLogTracker.on(`log.${tallyName}`, onChange)
+    tallyLogTracker.on(`log.${tallyId}`, onChange)
     return () => {
       // cleanup
-      tallyLogTracker.off(`log.${tallyName}`, onChange)
+      tallyLogTracker.off(`log.${tallyId}`, onChange)
     }
   })
 

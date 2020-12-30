@@ -21,6 +21,7 @@ import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import { Socket } from 'dgram'
 import TestConfiguration from './mixer/test/TestConfiguration'
+import WebTallyDriver from './tally/WebTallyDriver'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -49,6 +50,7 @@ if (myConfiguration.isTest()) {
 
 const myTallyContainer = new TallyContainer(myConfiguration, myEmitter)
 new UdpTallyDriver(myConfiguration, myTallyContainer)
+const myWebTallyDriver = new WebTallyDriver(myConfiguration, myTallyContainer)
 
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
 
@@ -67,8 +69,8 @@ myEmitter.on('program.changed', ({programs, previews}) => {
 })
 
 // socket.io server
-io.on('connection', (socket: ServerSideSocket & socketIo.Socket) => {
-  socket.setMaxListeners(99)
+io.on('connection', (socket: ServerSideSocket) => {
+  (socket as socketIo.Socket).setMaxListeners(99)
   const mixerEvents = [
     // @TODO: use event objects instead of repeating the same structure again and again
     new SocketAwareEvent(myEmitter, 'mixer.connected', socket, (socket) => {
@@ -163,19 +165,22 @@ io.on('connection', (socket: ServerSideSocket & socketIo.Socket) => {
     tallyEvents.forEach(pipe => pipe.unregister())
   })
   
-  socket.on('tally.patch', (tallyName, channelId) => {
-    myTallyContainer.patch(tallyName, channelId)
+  socket.on('tally.patch', (tallyName, tallyType, channelId) => {
+    myTallyContainer.patch(tallyName, tallyType, channelId)
   })
-  socket.on('tally.highlight', (tallyName) => {
-    myTallyContainer.highlight(tallyName)
+  socket.on('tally.highlight', (tallyName, tallyType) => {
+    myTallyContainer.highlight(tallyName, tallyType)
   })
-  socket.on('tally.remove', tallyName => {
-    myTallyContainer.remove(tallyName)
+  socket.on('tally.remove', (tallyName, tallyType) => {
+    myTallyContainer.remove(tallyName, tallyType)
+  })
+  socket.on('tally.create', (tallyName, channelId) => {
+    myWebTallyDriver.create(tallyName, channelId)
   })
 
   const tallyLogEvents = [
     new SocketAwareEvent(myEmitter, 'tally.logged', socket, (socket, {tally, log}) => {
-      socket.emit('tally.log', {tallyName: tally.name, log: log.toJson()})
+      socket.emit('tally.log', {tallyId: tally.getId(), log: log.toJson()})
     }),
   ]
   socket.on('events.tallyLog.subscribe', () => {
@@ -183,7 +188,7 @@ io.on('connection', (socket: ServerSideSocket & socketIo.Socket) => {
 
     const logs = myTallyContainer.getTallies().map(tally => {
       return {
-        tallyName: tally.name,
+        tallyId: tally.getId(),
         logs: tally.getLogs().map(log => log.toJson())
       }
     })

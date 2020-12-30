@@ -1,4 +1,4 @@
-import { ConnectionState, Tally } from '../domain/Tally'
+import { ConnectionState, UdpTally } from '../domain/Tally'
 import dgram from 'dgram'
 import { ChannelList } from '../lib/MixerCommunicator'
 import { AppConfiguration } from '../lib/AppConfiguration'
@@ -36,7 +36,7 @@ class UdpTallyDriver {
                 } else if (command.command === "log") {
                     const {tallyName, log} = command
                     this.tallyReported(tallyName, rinfo)
-                    this.container.addLog(tallyName, log)
+                    this.container.addLog(tallyName, "udp", log)
                 } else {
                     // typescript should complain if we missed a command
                     ((_: never) => {})(command)
@@ -60,7 +60,7 @@ class UdpTallyDriver {
         // check that all tallies are still reporting regularily
         setInterval(() => {
             const now = new Date()
-            this.container.getTallies().forEach(tally => {
+            this.container.getUdpTallies().forEach(tally => {
                 const lastTallyReportDate = this.lastTallyReport.get(tally.name)
                 if(!lastTallyReportDate) {
                     tally.state = ConnectionState.DISCONNECTED
@@ -70,13 +70,13 @@ class UdpTallyDriver {
                         if(tally.state !== ConnectionState.DISCONNECTED) {
                             tally.state = ConnectionState.DISCONNECTED
                             this.container.update(tally)
-                            this.container.addLog(tally.name, new Log(new Date(), Severity.STATUS, `Tally got disconnected after not reporting for ${diff}ms`))
+                            this.container.addLog(tally.name, "udp", new Log(new Date(), Severity.STATUS, `Tally got disconnected after not reporting for ${diff}ms`))
                         }
                     } else if(diff > this.configuration.getTallyTimeoutMissing()) {
                         if(tally.state !== ConnectionState.MISSING) {
                             tally.state = ConnectionState.MISSING
                             this.container.update(tally)
-                            this.container.addLog(tally.name, new Log(new Date(), Severity.STATUS, `Tally got missing. It has not reported for ${diff}ms`))
+                            this.container.addLog(tally.name, "udp", new Log(new Date(), Severity.STATUS, `Tally got missing. It has not reported for ${diff}ms`))
                         }
                     }
                 }
@@ -87,14 +87,14 @@ class UdpTallyDriver {
         // - show the tally, we are still here
         // - compensate for lost packages
         setInterval(() => {
-            this.container.getTallies().forEach(tally => {
+            this.container.getUdpTallies().forEach(tally => {
                 this.updateTallyState(tally, this.container.lastPrograms, this.container.lastPreviews)
             })
         }, 1000 / this.configuration.getTallyKeepAlivesPerSecond())
     }
     private tallyReported(tallyName: string, rinfo: dgram.RemoteInfo) {
         this.lastTallyReport.set(tallyName, new Date())
-        let tally = this.container.getOrCreate(tallyName)
+        let tally = this.container.getOrCreate(tallyName, "udp") as UdpTally
         const oldState = tally.state
         const oldAddress = tally.address
         const oldPort = tally.port
@@ -109,7 +109,7 @@ class UdpTallyDriver {
         return tally
     }
 
-    updateTallyState(tally: Tally, programs: ChannelList, previews: ChannelList) {
+    updateTallyState(tally: UdpTally, programs: ChannelList, previews: ChannelList) {
         if(tally.isActive()) {
             const command = CommandCreator.createStateCommand(tally, programs, previews)
             this.io.send(command, tally.port, tally.address)

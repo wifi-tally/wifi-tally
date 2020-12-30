@@ -51,7 +51,7 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
     e.preventDefault()
     if (!allowHighlight) { return }
 
-    socket.emit('tally.highlight', tally.name)
+    socket.emit('tally.highlight', tally.name, tally.type)
     handleClose()
   }
 
@@ -59,7 +59,7 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
     e.preventDefault()
     if (!allowRemove) { return }
 
-    socket.emit('tally.remove', tally.name)
+    socket.emit('tally.remove', tally.name, tally.type)
     handleClose()
   }
 
@@ -78,7 +78,7 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
-      <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.name}/log`}><>
+      <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.getId()}/log`}><>
         <ListItemIcon><SubjectIcon fontSize="small" /></ListItemIcon>
         <ListItemText>Logs</ListItemText>
       </></MenuItemLink>

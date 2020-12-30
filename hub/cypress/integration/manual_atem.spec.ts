@@ -15,16 +15,16 @@ describe('Live AtemCheck', () => {
   })
   beforeEach(() => {
     cy.task('tally', "Tally01").then(() => {
-      socket.emit('tally.patch', "Tally01", "1")
+      socket.emit('tally.patch', "Tally01", "udp", "1")
     })
     cy.task('tally', "Tally02").then(() => {
-      socket.emit('tally.patch', "Tally02", "2")
+      socket.emit('tally.patch', "Tally02", "udp", "2")
     })
     cy.task('tally', "Tally03").then(() => {
-      socket.emit('tally.patch', "Tally03", "3")
+      socket.emit('tally.patch', "Tally03", "udp", "3")
     })
     cy.task('tally', "Tally04").then(() => {
-      socket.emit('tally.patch', "Tally04", "4")
+      socket.emit('tally.patch', "Tally04", "udp", "4")
     })
   })
   afterEach(() => {

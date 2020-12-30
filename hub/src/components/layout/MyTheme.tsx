@@ -83,6 +83,9 @@ const myTheme = createMuiTheme({
     MuiInput: {
       color: "secondary",
     },
+    MuiInputLabel: {
+      color: "secondary",
+    },
     MuiLink: {
       color: "secondary",
     },
