@@ -69,10 +69,4 @@ const TallyLogPage = () => {
   )
 }
 
-TallyLogPage.getInitialProps = async (context) => {
-  return {
-    tallyName: context.query.tallyName
-  }
-}
-
 export default TallyLogPage;
