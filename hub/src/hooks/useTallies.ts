@@ -17,7 +17,7 @@ function useTallies() {
       // cleanup
       tallyTracker.off("tallies", onChange)
     }
-  })
+  }, [])
 
   return tallies
 }

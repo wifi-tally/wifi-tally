@@ -20,7 +20,7 @@ function useProgramPreview() {
       // cleanup
       programTracker.off("program", onChange)
     }
-  })
+  }, [])
 
   return [programs, previews]
 }

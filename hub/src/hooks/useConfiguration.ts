@@ -21,7 +21,7 @@ export function useMixerNameConfiguration() {
       // cleanup
       configTracker.off("mixer", onChange)
     }
-  })
+  }, [])
 
   return mixerName
 }
@@ -38,7 +38,7 @@ export function useAllowedMixersConfiguration() {
       // cleanup
       configTracker.off("allowedMixers", onChange)
     }
-  })
+  }, [])
 
   return allowedMixers
 }
@@ -57,7 +57,7 @@ export function useAtemConfiguration() {
       // cleanup
       configTracker.off("atem", onChange)
     }
-  })
+  }, [])
 
   return atemConfiguration
 }
@@ -76,7 +76,7 @@ export function useMockConfiguration() {
       // cleanup
       configTracker.off("mock", onChange)
     }
-  })
+  }, [])
 
   return mockConfiguration
 }
@@ -95,7 +95,7 @@ export function useObsConfiguration() {
       // cleanup
       configTracker.off("obs", onChange)
     }
-  })
+  }, [])
 
   return obsConfiguration
 }
@@ -114,7 +114,7 @@ export function useVmixConfiguration() {
       // cleanup
       configTracker.off("vmix", onChange)
     }
-  })
+  }, [])
 
   return vmixConfiguration
 }

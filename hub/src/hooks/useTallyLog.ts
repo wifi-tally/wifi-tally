@@ -17,7 +17,7 @@ function useTallyLog(tallyId: string) {
       // cleanup
       tallyLogTracker.off(`log.${tallyId}`, onChange)
     }
-  })
+  }, [tallyId])
 
   return logs
 }

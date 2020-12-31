@@ -17,7 +17,7 @@ function useChannels() {
       // cleanup
       channelTracker.off("channels", onChange)
     }
-  })
+  }, [])
 
   return channels
 }

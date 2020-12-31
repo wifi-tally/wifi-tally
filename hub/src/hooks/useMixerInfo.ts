@@ -18,7 +18,7 @@ function useMixerInfo() {
       // cleanup
       mixerTracker.off("connection", onConnectionChange)
     }
-  })
+  }, [])
 
   return isMixerConnected
 }

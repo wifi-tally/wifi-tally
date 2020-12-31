@@ -19,7 +19,7 @@ function useSocketInfo() {
       socketEventEmitter.off("connected", onConnection)
       socketEventEmitter.off("disconnected", onDisconnection)
     }
-  })
+  }, [])
 
   return isHubConnected
 }
