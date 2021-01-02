@@ -4,6 +4,7 @@ import { ServerSideSocket } from '../lib/SocketEvents'
 import TallyContainer from './TallyContainer'
 import socketIo from 'socket.io'
 import CommandCreator from './CommandCreator'
+import Log, { Severity } from '../domain/Log'
 
 
 // - handles connections with Web Tallies
@@ -61,6 +62,16 @@ class WebTallyDriver {
         const tally = this.container.get(tallyName, "web") as WebTally
         if (tally) {
           this.updateTallyConnections(tally)
+
+          let logLine = `A browser disconnected from ${(socket as socketIo.Socket).handshake.address}. `
+          if (tally.connectedClients.length === 0) {
+            logLine += "The Tally is disconnected."
+          } else if(tally.connectedClients.length === 1) {
+            logLine += `There is still one client connected from ${tally.connectedClients[0].address}.`
+          } else {
+            logLine += `There are still ${tally.connectedClients.length} clients connected from ${tally.connectedClients.map(client => client.address).join(',')}.`
+          }
+          this.container.addLog(tallyName, 'web', new Log(new Date(), Severity.STATUS, logLine))
         }
       }
     }
@@ -78,6 +89,9 @@ class WebTallyDriver {
         console.debug(`Connected ${tallyName} from ${socket.id}`)
         this.sockets.set(tallyName, [ ...sockets, socket ])
         this.updateTallyConnections(tally)
+        this.container.addLog(tallyName, 'web', new Log(new Date(), Severity.STATUS,
+         `A new browser connected from ${(socket as socketIo.Socket).handshake.address}.`
+        ))
       } else {
         console.error(`can not subscribe to unknown web tally "${tallyName}"`)
         socket.emit('webTally.invalid', tallyName)
