@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import IndexPage from './pages/IndexPage'
 import ConfigPage from './pages/ConfigPage'
 import TallyLogPage from './pages/TallyLogPage'
+import WebTallyPage from './pages/WebTallyPage'
 
 function App() {
   return (
@@ -12,10 +13,13 @@ function App() {
       <MyTheme>
         <CssBaseline />
         <Switch>
-          <Route path="/tally/:tallyId/log">
+          <Route exact path="/tally/:tallyId">
+            <WebTallyPage />
+          </Route>
+          <Route exact path="/tally/:tallyId/log">
             <TallyLogPage />
           </Route>
-          <Route path="/config">
+          <Route exact path="/config">
             <ConfigPage />
           </Route>
           <Route path="/">

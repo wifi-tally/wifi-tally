@@ -60,7 +60,7 @@ describe('toJson/fromJson', () => {
     })
     
     test('it can save and load a WebTally', () => {
-        const webTally = new WebTally("Web Tally", "123", [{address: "1.2.3.4", port: 1234}])
+        const webTally = new WebTally("Web Tally", "123", [{address: "1.2.3.4"}])
     
         const json = webTally.toJson()
         const tally = Tally.fromJson(json) as WebTally
@@ -69,6 +69,5 @@ describe('toJson/fromJson', () => {
         expect(tally.name).toEqual("Web Tally")
         expect(tally.channelId).toEqual("123")
         expect(tally.connectedClients[0].address).toEqual("1.2.3.4")
-        expect(tally.connectedClients[0].port).toEqual(1234)
     })
 })

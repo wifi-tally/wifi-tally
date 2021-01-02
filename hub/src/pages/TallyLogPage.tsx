@@ -54,7 +54,7 @@ const Log = ({log, idx, classes}: LogProps) => {
 }
 
 const TallyLogPage = () => {
-  const { tallyId } = useParams()
+  const { tallyId } = useParams<{tallyId: string}>()
   const logs = useTallyLog(tallyId)
   const tallies = useTallies()
   const tally = tallies?.find(tally => tally.getId() === tallyId)

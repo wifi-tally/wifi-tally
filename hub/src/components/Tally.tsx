@@ -56,26 +56,19 @@ const useStyles = makeStyles(theme => {
             padding: theme.spacing(1, 2),
             borderTop: "1px solid " + theme.palette.grey[800],
             fontSize: "0.75rem",
-            display: "table",
+            display: "flex",
+            justifyContent: "space-between",
             width: "100%",
             textTransform: "uppercase",
-            textAlign: "center",
             fontWeight: "bold",
-        },
-        tallyFootLeft: {
-            display: "table-cell",
-            width: "50%",
-            textAlign: "center",
         },
         tallyFootMissing: {
             backgroundColor: theme.palette.warning.main,
             color: theme.palette.getContrastText(theme.palette.warning.main)
         },
-        tallyFootRight: {
-            display: "table-cell",
-            width: "50%",
+        tallyFootItem: {
             textAlign: "center",
-            opacity: 0.5,
+            flexGrow: 1,
         },
     }
 })
@@ -131,10 +124,8 @@ function Tally({ tally, className }: TallyProps) {
                 <ChannelSelector value={tally.channelId} channels={channels} onChange={value => patchTally(tally, value)} />
             </div>
             <div className={classes.tallyFoot + (tally.isActive() && tally.isMissing() ? " " + classes.tallyFootMissing : "")}>
-                {tally.isActive() ? (<>
-                    <div className={classes.tallyFootLeft}>{ tally.isMissing() ? "missing": "connected" }</div>
-                    <div className={classes.tallyFootRight}>{tally.isUdpTally() ? `${tally.address}:${tally.port}` : "TODO"}</div>
-                </>) : "disconnected"}
+                <div className={classes.tallyFootItem}>{ tally.isActive() ? (tally.isMissing() ? "missing": "connected") : "disconnected" }</div>
+                {tally.isUdpTally() && tally.address && tally.port && (<div className={classes.tallyFootItem}>{tally.address}:{tally.port}</div>)}
             </div>
         </Paper>
     </>)

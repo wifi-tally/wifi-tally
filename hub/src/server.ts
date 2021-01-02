@@ -19,7 +19,6 @@ import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
-import { Socket } from 'dgram'
 import TestConfiguration from './mixer/test/TestConfiguration'
 import WebTallyDriver from './tally/WebTallyDriver'
 
@@ -177,6 +176,8 @@ io.on('connection', (socket: ServerSideSocket) => {
   socket.on('tally.create', (tallyName, channelId) => {
     myWebTallyDriver.create(tallyName, channelId)
   })
+  socket.on('events.webTally.subscribe', tallyName => myWebTallyDriver.subscribe(tallyName, socket))
+  socket.on('events.webTally.unsubscribe', tallyName => myWebTallyDriver.unsubscribe(tallyName, socket))
 
   const tallyLogEvents = [
     new SocketAwareEvent(myEmitter, 'tally.logged', socket, (socket, {tally, log}) => {

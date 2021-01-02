@@ -5,6 +5,7 @@ import SubjectIcon from '@material-ui/icons/Subject'
 import DeleteIcon from '@material-ui/icons/Delete'
 import HighlightIcon from '@material-ui/icons/Highlight'
 import MoreIcon from '@material-ui/icons/MoreVert'
+import LinkIcon from '@material-ui/icons/Link'
 import { socket } from '../hooks/useSocket'
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom'
 
@@ -78,10 +79,17 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
-      <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.getId()}/log`}><>
+      {tally.isWebTally() && (
+        <MenuItemLink testid={`tally-${tally.name}-web`} to={`/tally/${tally.getId()}`}>
+          <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Connect</ListItemText>
+        </MenuItemLink>
+      )}
+      
+      <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.getId()}/log`}>
         <ListItemIcon><SubjectIcon fontSize="small" /></ListItemIcon>
         <ListItemText>Logs</ListItemText>
-      </></MenuItemLink>
+      </MenuItemLink>
       <Tooltip data-testid={`tally-${tally.name}-highlight`} title={!allowHighlight ? "Tally is not connected" : ""}><div>
         <MenuItem component="div" disabled={!allowHighlight} onClick={handleHighlightTally}>
           <ListItemIcon><HighlightIcon fontSize="small" /></ListItemIcon>

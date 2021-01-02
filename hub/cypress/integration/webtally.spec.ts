@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 
 import { socket } from '../../src/hooks/useSocket'
+import TestConfiguration from '../../src/mixer/test/TestConfiguration'
 import randomTallyName from '../browserlib/randomTallyName'
 
 describe('Web Tally Creation', () => {
@@ -33,7 +34,10 @@ describe('Web Tally Creation', () => {
     // pop up should close
     cy.get('*[data-testid=tally-create-popup]').should('not.exist')
     cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched')
+    cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched').then(() => {
+      cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] select`).select("Channel 1")
+      cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] select`).should('have.value', "1")
+    })
   })
   it('can create a patched web tally', () => {
     const name = registerRandomTallyName()
@@ -46,7 +50,7 @@ describe('Web Tally Creation', () => {
     // pop up should close
     cy.get('*[data-testid=tally-create-popup]').should('not.exist')
     cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'idle')
+    cy.get(`*[data-testid=tally-${name}]`).should('not.have.attr', 'data-color', 'unpatched')
     cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] :selected`).contains("Channel 1")
   })
 
@@ -97,6 +101,127 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
 
     cy.get(`*[data-testid=tally-${name}]`).should('have.length', 2)
-
   })
+
+  it("Web Tallies are linked", () => {
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+
+    cy.get(`*[data-testid=tally-${name}]`).contains(name)
+    cy.get(`*[data-testid=tally-${name}-menu]`).click()
+    cy.get(`*[data-testid=tally-${name}-web]`).click()
+
+    cy.get(`*[data-testid=page-tally-web]`)
+    cy.get(`*[data-testid=page-tally-web]`).contains(name)
+  })
+
+  it("Web Tallies can be deep linked", () => {
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`)
+    cy.get(`*[data-testid=page-tally-web]`).contains(name)
+  })
+
+  it("Udp Tallies can not be used as web tallies", () => {
+    const name = randomTallyName()
+    cy.task('tally', name)
+
+    cy.get(`*[data-testid=tally-${name}]`).contains(name)
+    cy.get(`*[data-testid=tally-${name}-menu]`).click()
+    cy.get(`*[data-testid=tally-${name}-web]`).should('not.exist')
+
+    cy.visit(`/tally/udp-${name}`)
+    cy.get(`*[data-testid=page-404]`)
+  })
+
+  it("shows the correct connection status", () => {
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+
+    cy.get(`*[data-testid=tally-${name}]`).contains(name)
+    cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false').then(() => {
+      socket.emit('events.webTally.subscribe', name)
+      cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'true').then(() => {
+        socket.emit('events.webTally.unsubscribe', name)
+        cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false')
+      })
+    })
+  })
+
+  it("shows changes in the mixer", () => {
+    const setMixer = (programs, previews) => {
+      const config = new TestConfiguration()
+      config.setPrograms(programs)
+      config.setPreviews(previews)
+      socket.emit("config.change.test", config, "test")
+    }
+
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+    socket.emit('tally.patch', name, "web", "1")
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`)
+
+    // program
+    setMixer(["1"], ["2"])
+    cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'program').then(() => {
+      // preview
+      setMixer(["2"], ["1"])
+      cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'preview').then(() => {
+        // idle
+        setMixer(["2"], ["3"])
+        cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'idle')
+      })
+    })
+  })
+
+  it("shows changes when it is patched", () => {
+    const config = new TestConfiguration()
+    config.setPrograms(["1"])
+    config.setPreviews(["2"])
+    socket.emit("config.change.test", config, "test")
+
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+    socket.emit('tally.patch', name, "web", "1")
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`)
+
+    cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'program').then(() => {
+      socket.emit('tally.patch', name, "web", "2")
+      cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'preview').then(() => {
+        socket.emit('tally.patch', name, "web", "3")
+        cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'idle')
+      })
+    })
+  })
+
+  it("shows highlight", () => {
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+    socket.emit('tally.patch', name, "web", "1")
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`).then(() => {
+      socket.emit('tally.highlight', name, "web")
+      cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'highlight')
+    })
+  })
+
+  it("shows if mixer is disconnected", () => {
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+    socket.emit('tally.patch', name, "web", "1")
+    socket.emit('config.change.null', "null")
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`)
+
+    socket.emit('tally.highlight', name, "web")
+    cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'unknown')
+  })
+
+  it.skip("reconnects when its connection is cut")
+  it.skip("indicates when connection to server is broken")
+  it.skip("prevents screen lock on mobile devices when going into full screen")
 })

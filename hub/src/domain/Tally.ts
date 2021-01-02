@@ -8,7 +8,6 @@ export enum ConnectionState {
 
 type ClientAddress = {
     address: string
-    port: number
 }
 
 export type TallySaveObjectType = {

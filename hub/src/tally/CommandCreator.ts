@@ -1,8 +1,10 @@
 import Tally from "../domain/Tally";
 import { ChannelList } from "../lib/MixerCommunicator";
 
+export type StateCommand = "highlight" | "unknown" | "on-air" | "preview" | "release"
+
 class CommandCreator {
-  createStateCommand(tally: Tally, programs: ChannelList, previews: ChannelList): string {
+  getState(tally: Tally, programs: ChannelList, previews: ChannelList): StateCommand {
     if(tally.isHighlighted()) {
         return "highlight"
     } else if(programs === null && tally.isPatched()) {
@@ -15,6 +17,10 @@ class CommandCreator {
     }
 
     return "release"
+  }
+
+  createStateCommand(tally: Tally, programs: ChannelList, previews: ChannelList): string {
+    return this.getState(tally, programs, previews)
   }
 }
 

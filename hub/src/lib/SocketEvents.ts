@@ -3,16 +3,19 @@ import { MockConfigurationSaveType } from "../mixer/mock/MockConfiguration";
 import { ObsConfigurationSaveType } from "../mixer/obs/ObsConfiguration";
 import { VmixConfigurationSaveType } from "../mixer/vmix/VmixConfiguration";
 import { ChannelList } from "./MixerCommunicator";
-import { TallyObjectType, TallyType } from "../domain/Tally";
+import { TallyObjectType, TallyType, WebTallyObjectType } from "../domain/Tally";
 import { ChannelSaveObject } from "../domain/Channel";
 import { LogObjectType } from "../domain/Log";
 import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
+import { StateCommand } from "../tally/CommandCreator";
 
 // events the server sends to the client
 export interface ServerSentEvents {
     'tally.state': (data: {tallies: TallyObjectType[]}) => void
     'tally.log': (data: {tallyId: string, log: LogObjectType}) => void
     'tally.log.state': (data: {tallyId: string, logs: LogObjectType[]}[]) => void
+    'webTally.state': (data: {tally: WebTallyObjectType, command: StateCommand}) => void
+    'webTally.invalid': (tallyName: string) => void
 
     'mixer.state': (data: {isConnected: boolean}) => void
     'program.state': (data: {programs: ChannelList, previews: ChannelList}) => void
@@ -39,6 +42,8 @@ export interface ClientSentEvents {
     'events.channel.unsubscribe': () => void
     'events.tallyLog.subscribe': () => void
     'events.tallyLog.unsubscribe': () => void
+    'events.webTally.subscribe': (tallyName: string) =>  void
+    'events.webTally.unsubscribe': (tallyName: string) =>  void
 
     'tally.patch': (tallyName: string, tallyType: TallyType, channelId: string|null) => void
     'tally.highlight': (tallyName: string, tallyType: TallyType) => void
