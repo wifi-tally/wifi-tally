@@ -195,15 +195,6 @@ Your Tallies should also start popping up there. If not see the [Troubleshooting
 
 Select `Configuration` in the navigation and configure the settings for your Video Mixer.
 
-!!! info
-    Currently only ATEM video mixers are supported, but please [open an issue](https://github.com/wifi-tally/wifi-tally/issues)
-    if you want others to be supported too. It is really simple to integrate them
-    and the only reason they have not been integrated yet, is that nobody has needed it already. :D
-
-!!! info
-    If you want to try this at home and don't have a Video Mixer at hand you can run
-    `npm run dev` instead. It features a `Mock` Video Mixer that randomly switches channels.
-
 Switch back to `Tallies` in the navigation and assign the video channels of the Video Mixer to the according
 tallies.
 
