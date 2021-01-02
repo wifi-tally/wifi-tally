@@ -1,3 +1,7 @@
+# upcoming
+
+* [BUGFIX] Tallies and their configuration are stored again
+
 # v0.2.0
 
 There have been numerous technical changes on the hub and the way the release

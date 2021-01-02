@@ -42,7 +42,7 @@ class TallyContainer {
 
     const newConfigAsJson = this.get(tally.name)?.toJsonForSave()
     if (oldConfigAsJson !== newConfigAsJson) {
-      this.configuration.setTallies(Object.values(this.tallies))
+      this.configuration.setTallies(Array.from(this.tallies.values()))
     }
   }
 
@@ -65,10 +65,11 @@ class TallyContainer {
     let tally = this.tallies.get(tallyName)
     if (!tally) {
       tally = new Tally(tallyName)
+      this.tallies.set(tally.name, tally)
       this.updateTallyState(tally.name)
       console.debug(`Tally "${tallyName}" created`)
       this.emitter.emit('tally.created', tally)
-      this.configuration.setTallies(Object.values(this.tallies))
+      this.configuration.setTallies(Array.from(this.tallies.values()))
     }
     return tally
   }
