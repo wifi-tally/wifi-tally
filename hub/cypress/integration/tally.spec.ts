@@ -17,7 +17,7 @@ describe('Tally display', () => {
     const name = randomTallyName()
     cy.task('tally', name).then(() => {
       cy.get(`*[data-testid=tally-${name}]`).contains(name)
-      cy.get(`*[data-testid=tally-${name}]`).contains("connected", {matchCase: false})
+      cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'true')
       cy.get("*[data-testid=tallies-connected").contains("1")
     })
     
@@ -39,7 +39,7 @@ describe('Tally display', () => {
       cy.get(`*[data-testid=tally-${name3}]`).contains("missing", {matchCase: false})
       cy.get("*[data-testid=tallies-connected").contains("2")
 
-      cy.get(`*[data-testid=tally-${name3}]`).contains("disconnected", {matchCase: false})
+      cy.get(`*[data-testid=tally-${name3}]`).should('have.attr', 'data-isactive', 'false')
       cy.get("*[data-testid=tallies-connected").contains("2")
     })
 
