@@ -1,37 +1,20 @@
-# Getting started
+# Build and set up a WiFi Tally
 
-You need two parts to get the Tally Light operational: The Tally Lights themselves
-and the Hub that connects your video mixer and the Tallies.
+The WiFi Tally is a piece of hardware that connects to the Hub via WiFi.
 
-![Architecture Setup](images/architecture.png)
-<span style="font-size:smaller;opacity:0.8">uses icons from the Noun Project by 
-[Eucalyp](https://thenounproject.com/browse/?i=3151803),
-[Atif Arshad](https://thenounproject.com/browse/?i=1294543),
-[Hrbon](https://thenounproject.com/browse?i=3014911) and
-[ProSymbols](https://thenounproject.com/browse/?i=1086042), all licensed [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode)</span>
+You do not need any prior experience with hardware projects as this is really
+beginner friendly.
 
-## Things you need
+!!! info
+    Please note that this is the Getting Started Guide, and we follow *one* opinionated
+    path here. We don't want to confuse new readers with too many options and alternate paths
+    to choose from. If you are curious about alternatives, check out details in the 
+    [reference](../tally.md).
 
-### a trusted network that allows access via WiFi
-  
-Your video mixer, the Hub and the Tallies need to be able to connect to each other.
-You should take care that there is a close and stable WiFi hotspot near your Tallies
-for obvious reasons. The network you are using should be trusted as all communication
-is unencrypted.
+## Requirements
 
-The WiFi Chip supports `IEEE 802.11 b/g/n` and operates in the `2.4GHz` frequency band.
-The Wifi network should support that as well.
+You need a few parts to build the WiFi Tally.
 
-### a computer to run the Hub on
-  
-The application is rather light weight, so there are no special requirements here
-and it could run other applications in parallel. The Hub has a web interface for
-monitoring and configuration that can be shown on any browser that can connect to
-the computer.
-
-To keep latency to a minimum it would be perfect if this computer uses a wired
-connection.
-  
 ### a NodeMcu ESP8266
   
 This is an ESP8266 wifi chip on a development board that is typically used for IoT
@@ -39,7 +22,7 @@ applications. As it is an Open Hardware project there are lots of different boar
 available. They mostly differ in price and form factor and are all fit for the project.
 But they all look similar to this:
 
-![Photography of a NodeMCU](images/Nodemcu_amica_bot_02.jpg)
+![Photography of a NodeMCU](../images/Nodemcu_amica_bot_02.jpg)
 
 ["NodeMCU Amica"](https://commons.wikimedia.org/wiki/File:Nodemcu_amica_bot_02.png) 
 by "Make Magazin DE", [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
@@ -61,22 +44,7 @@ The whole setup draws far less than `200mA` and can be powered via USB.
 * `200mA` is little enough that even the smallest power bank can supply the Tally for hours
 * use any old USB charger
 
-## Setup
-
-Running the tally lights consists of two steps:
-
-* **Setup the Tally Light** This means connecting the hardware and flashing the software onto it.
-
-* **Setup the Hub** This is the piece of software that communicates with your video mixer and all
-  connected Tallies and runs on any computer you provide.
-
-### Download sources
-
-The latest releases can be found on [github.com/wifi-tally]({{ github_link }}/releases).
-
-### Setting up the Tally
-
-#### Connect the hardware
+## Connect the hardware
 
 All you need to do is connecting the LED strip to the NodeMCU board.
 
@@ -85,7 +53,7 @@ All you need to do is connecting the LED strip to the NodeMCU board.
     
     This will drain too much current through the board and potentially damaging it.
 
-![connection of the parts](images/tally-schematics-simple.png)
+![connection of the parts](../images/tally-schematics-simple.png)
 
 | board PIN | strip PIN |
 | --- | --- |
@@ -103,15 +71,15 @@ All you need to do is connecting the LED strip to the NodeMCU board.
 
 This is how the setup could look like on a breadboard.
 
-![WiFi Tally on a breaboard](images/on-breadboard.jpg)
+![WiFi Tally on a breaboard](../images/on-breadboard.jpg)
 
-##### Separate Operator and Stage Light
+### Separate Operator and Stage Light
 
 You can connect a second strip to use as an indicator for the speaker on stage.
 Connect the first LED as above and direct it in the direction of the camera operator.
 Then connect a second strip and let it face to the front of the camera. 
 
-![connection of the parts](images/tally-schematics-operator.png)
+![connection of the parts](../images/tally-schematics-operator.png)
 
 | board PIN | strip PIN |
 | --- | --- |
@@ -122,7 +90,7 @@ Then connect a second strip and let it face to the front of the camera.
 
 This light will only show preview and live states, but not any error states.
  
-#### Prepare the NodeMCU Toolchain
+## Prepare the NodeMCU Toolchain
 
 The NodeMCU documentation very nicely explains all the steps necessary to [start a NodeMCU project](https://nodemcu.readthedocs.io/en/master/getting-started/#getting-started-aka-nodemcu-quick-start).
 The documentation might seem overwhelming at first, but you only need to care of the two steps
@@ -139,13 +107,13 @@ and follow their installation instruction. Similarly select [ESPlorer](https://n
 or [NodeMCU Tool](https://nodemcu.readthedocs.io/en/master/getting-started/#nodemcu-tool) to upload code and follow
 their installation instruction.
 
-#### Flash the firmware
+## Flash the firmware
 
 When everything is set up flash the firmware with the tool selected in the previous step.
 
 The firmware is the `.bin` file in the `firmware` folder.
 
-#### Upload Code
+## Upload Code
 
 Use the tool you have selected to upload the following files from the `tally` folder to the NodeMCU board:
 
@@ -163,7 +131,7 @@ Use the tool you have selected to upload the following files from the `tally` fo
     | `hub.ip` | The IP address the hub is running on |
     | `tally.name` | How you want _this_ tally to be labeled in the hub. This name needs to be unique amongst all tallies in your network. It must not be longer than `26` characters. Use of ASCII characters is recommended. |
 
-    For a list for all configuration values see [tally-settings.ini Reference](tally.md).
+    For a list for all configuration values see [tally-settings.ini Reference](../tally.md).
 
 Reboot the NodeMCU board by pressing the `RST` button on the board or disconnecting it from power briefly.
 
@@ -171,38 +139,15 @@ Reboot the NodeMCU board by pressing the `RST` button on the board or disconnect
     If the LED strip starts blinking blue, this means you have correctly connected the hardware, flashed the firmware
     and uploaded the code.
     
+    After a few seconds it should show up in the Hub. Configure a channel there and the WiFi Tally should follow it.
+    
     **Well done!** 
 
-### Setting up the hub
-
-The hub requires [node.js](https://nodejs.org/en/) to run. Packages for Linux, MacOS and even Windows
-are offered on the [Download page](https://nodejs.org/en/download/). Get version `{{ hub_nodejs_version }}`.
-
-Open the terminal of your operating system, enter the `hub` directory and run
-
-````bash
-npm run start
-````
-
-!TODO: explain environment variables!
-
-Point your browser to the IP of your computer on port {{ hub_default_port }}, for instance http://127.0.0.1:{{ hub_default_port }} if
-you are on the same machine. You should see a screen similar to this
-
-![alt text](images/tally-hub.png "Tally Hub")
-
-Your Tallies should also start popping up there. If not see the [Troubleshooting Guide](troubleshooting.md). 
-
-Select `Configuration` in the navigation and configure the settings for your Video Mixer.
-
-Switch back to `Tallies` in the navigation and assign the video channels of the Video Mixer to the according
-tallies.
-
 !!! info
-    The Tallies and their assigned channels are automatically saved in `.wifi-tally.json` in your home directory.
-    So the configuration is restored when the Hub is restarted. 
+    If you run into problems, the [Troubleshooting Guide](../troubleshooting.md) should have you covered.
 
-!!! success
-    Your Tallies should start showing green, when they are in Preview and red when they are in Program.
-    
-    Congratulations, you made it.
+## Conclusion
+
+This concludes the [Getting Started Guide](index.md).
+
+To learn of other options for the Tally Light, see the [reference](../tally.md).

@@ -12,6 +12,7 @@ allows easy configuration and monitoring.
 <span style="font-size:smaller;opacity:0.8">uses icons from the Noun Project by 
 [Eucalyp](https://thenounproject.com/browse/?i=3151803),
 [Atif Arshad](https://thenounproject.com/browse/?i=1294543),
+[priyanka](https://thenounproject.com/browse/?i=1637910),
 [Hrbon](https://thenounproject.com/browse?i=3014911) and
 [ProSymbols](https://thenounproject.com/browse/?i=1086042), all licensed [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/us/legalcode)</span>
 
@@ -26,6 +27,7 @@ allows easy configuration and monitoring.
 * uses a central Hub to communicate, that allows easy monitoring
 * utilizes your local network and access points
 * support for RGB Leds (anode, cathode), WS2812, NeoPixel, etc
+* alternatively: turn any device with a browser (smartphone, tablet) into a Tally
 * Open Source / Open Hardware
 
 ## Supported Video Mixers
@@ -41,7 +43,7 @@ allows easy configuration and monitoring.
 
 ## Get Started
 
-Refer to [Getting Started](getting-started.md) to start running your own Wifi Tally.
+Refer to [Getting Started](getting-started/index.md) to start running your own Wifi Tally.
 
 ## Download
 

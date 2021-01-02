@@ -1,3 +1,7 @@
+# upcoming
+
+* [ADDED] The Hub allows to turn any device with a browser into a Tally Light ("Web Tally")
+
 # v0.2.1
 
 * [BUGFIX] Tallies and their configuration are stored again
