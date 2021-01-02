@@ -1,4 +1,4 @@
-# upcoming
+# v0.2.1
 
 * [BUGFIX] Tallies and their configuration are stored again
 
