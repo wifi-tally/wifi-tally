@@ -33,7 +33,7 @@ uses icons from the Noun Project by
 ## Status
 
 ![Build Status](https://github.com/wifi-tally/wifi-tally/workflows/build/badge.svg)
+[![Cypress Tests](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/detailed/1qd2ua/master&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/1qd2ua/runs)
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/wifi-tally/wifi-tally)
-
 ![GitHub (Pre-)Release Date](https://img.shields.io/github/release-date-pre/wifi-tally/wifi-tally?label=latest%20release)
