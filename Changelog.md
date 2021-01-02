@@ -1,6 +1,7 @@
 # upcoming
 
 * [ADDED] The Hub allows to turn any device with a browser into a Tally Light ("Web Tally")
+* [CHANGED] We recommend updating Node.js to version `14`. The hub will still run with Node.js `12` in the foreseeable though.
 
 # v0.2.1
 
