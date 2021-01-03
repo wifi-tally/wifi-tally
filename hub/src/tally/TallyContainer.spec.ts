@@ -1,12 +1,13 @@
 import TallyContainer from './TallyContainer'
-import { EventEmitter } from "events";
 import ServerEventEmitter from '../lib/ServerEventEmitter';
 import { AppConfiguration } from '../lib/AppConfiguration';
+import WebTallyDriver from './WebTallyDriver';
 
 test('it writes changes to configuration', () => {
     const emitter = new ServerEventEmitter()
     const configuration = new AppConfiguration(emitter)
     const container = new TallyContainer(configuration, emitter)
+    new WebTallyDriver(configuration, container)
 
     // check that it is initially empty
     expect(configuration.getTallies()).toEqual([])
