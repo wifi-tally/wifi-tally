@@ -30,6 +30,9 @@ class TallyContainer {
         this.lastPreviews = previews
         this.updateTallyStates()
       })
+      this.emitter.on("config.changed.tallyconfig", () => {
+        this.updateTallyStates()
+      })
   }
 
   addUdpTallyDriver(tallyDriver: UdpTallyDriver) {

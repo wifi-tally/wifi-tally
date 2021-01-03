@@ -9,6 +9,22 @@ test('Udp Tally defaults', () => {
     expect(tally.isDisconnected()).toEqual(true)
     expect(tally.isHighlighted()).toEqual(false)
     expect(tally.isMissing()).toEqual(false)
+    expect(tally.hasStageLight).toEqual(true)
+    expect(tally.configuration.getOperatorLightBrightness()).toBeUndefined()
+    expect(tally.configuration.getStageLightBrightness()).toBeUndefined()
+})
+test('Web Tally defaults', () => {
+    const tally = new WebTally("Test Dummy")
+
+    expect(tally.isPatched()).toEqual(false)
+    expect(tally.isActive()).toEqual(false)
+    expect(tally.isConnected()).toEqual(false)
+    expect(tally.isDisconnected()).toEqual(true)
+    expect(tally.isHighlighted()).toEqual(false)
+    expect(tally.isMissing()).toEqual(false)
+    expect(tally.hasStageLight).toEqual(false)
+    expect(tally.configuration.getOperatorLightBrightness()).toBeUndefined()
+    expect(tally.configuration.getStageLightBrightness()).toBeUndefined()
 })
 
 describe('toJsonForSave/fromJsonForSave', () => {
@@ -24,6 +40,8 @@ describe('toJsonForSave/fromJsonForSave', () => {
     })
     test('can save and load UdpTally', () => {
         const tally = new UdpTally("Udp", "123")
+        tally.configuration.setStageLightBrightness(42)
+        tally.configuration.setOperatorLightBrightness(21)
         const json = tally.toJsonForSave()
 
         const loadedTally = Tally.fromJsonForSave(json) as UdpTally
@@ -31,8 +49,34 @@ describe('toJsonForSave/fromJsonForSave', () => {
         expect(loadedTally.name).toEqual("Udp")
         expect(loadedTally.channelId).toEqual("123")
         expect(loadedTally.type).toEqual("udp")
+        expect(loadedTally.configuration.getStageLightBrightness()).toEqual(42)
+        expect(loadedTally.configuration.getOperatorLightBrightness()).toEqual(21)
+    })
+    test('can save and load UdpTally with defaults', () => {
+        const tally = new UdpTally("Udp", "123")
+        const json = tally.toJsonForSave()
+
+        const loadedTally = Tally.fromJsonForSave(json) as UdpTally
+
+        expect(loadedTally.name).toEqual("Udp")
+        expect(loadedTally.channelId).toEqual("123")
+        expect(loadedTally.type).toEqual("udp")
+        expect(loadedTally.configuration.getStageLightBrightness()).toBeUndefined()
+        expect(loadedTally.configuration.getOperatorLightBrightness()).toBeUndefined()
     })
     test('can save and load WebTally', () => {
+        const tally = new WebTally("Web", "123")
+        tally.configuration.setOperatorLightBrightness(42)
+        const json = tally.toJsonForSave()
+
+        const loadedTally = Tally.fromJsonForSave(json) as WebTally
+
+        expect(loadedTally.name).toEqual("Web")
+        expect(loadedTally.channelId).toEqual("123")
+        expect(loadedTally.type).toEqual("web")
+        expect(loadedTally.configuration.getOperatorLightBrightness()).toEqual(42)
+    })
+    test('can save and load WebTally with defaults', () => {
         const tally = new WebTally("Web", "123")
         const json = tally.toJsonForSave()
 
@@ -41,6 +85,7 @@ describe('toJsonForSave/fromJsonForSave', () => {
         expect(loadedTally.name).toEqual("Web")
         expect(loadedTally.channelId).toEqual("123")
         expect(loadedTally.type).toEqual("web")
+        expect(loadedTally.configuration.getOperatorLightBrightness()).toBeUndefined()
     })
 })
 

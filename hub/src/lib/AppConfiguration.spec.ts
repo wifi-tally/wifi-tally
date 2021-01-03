@@ -5,7 +5,8 @@ import AtemConfiguration from '../mixer/atem/AtemConfiguration'
 import MockConfiguration from '../mixer/mock/MockConfiguration'
 import ObsConfiguration from '../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
-import Tally from '../domain/Tally'
+import {UdpTally, WebTally} from '../domain/Tally'
+import { DefaultTallyConfiguration } from '../tally/TallyConfiguration'
 
 describe("toJson/fromJson", () => {
     test('it can persist atem configuration', () => {
@@ -73,10 +74,12 @@ describe("toJson/fromJson", () => {
     test('it can persist tallies', () => {
         const emitter = new EventEmitter()
         const config = new AppConfiguration(emitter)
-        config.setTallies([
-            new Tally("Tally 01", "Channel One"),
-            new Tally("Tally 02"),
-        ])
+        const tally1 = new UdpTally("Tally 01", "Channel One")
+        tally1.configuration.setOperatorLightBrightness(92)
+        tally1.configuration.setStageLightBrightness(91)
+        const tally2 = new WebTally("Tally 02")
+        tally2.configuration.setOperatorLightBrightness(90)
+        config.setTallies([tally1, tally2])
 
         const otherConfig = new AppConfiguration(emitter)
         otherConfig.fromJson(config.toJson())
@@ -84,8 +87,11 @@ describe("toJson/fromJson", () => {
         const tallies = otherConfig.getTallies()
         expect(tallies[0]?.name).toEqual("Tally 01")
         expect(tallies[0]?.channelId).toEqual("Channel One")
+        expect(tallies[0]?.configuration.getOperatorLightBrightness()).toEqual(92)
+        expect(tallies[0]?.configuration.getStageLightBrightness()).toEqual(91)
         expect(tallies[1]?.name).toEqual("Tally 02")
         expect(tallies[1]?.channelId).toBeFalsy()
+        expect(tallies[1]?.configuration.getOperatorLightBrightness()).toEqual(90)
     })
     test('it can persist channels', () => {
         const emitter = new EventEmitter()
@@ -102,5 +108,20 @@ describe("toJson/fromJson", () => {
         expect(channels[0]?.id).toEqual("one")
         expect(channels[0]?.name).toEqual("Channel One")
         expect(channels[1]?.id).toEqual("2")
+    })
+    test('it can persist default tally configuration', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+        const tallyConfig = new DefaultTallyConfiguration()
+        tallyConfig.setOperatorLightBrightness(42)
+        tallyConfig.setStageLightBrightness(21)
+        config.setTallyConfiguration(tallyConfig)
+
+        const otherConfig = new AppConfiguration(emitter)
+        otherConfig.fromJson(config.toJson())
+
+        const otherTallyConfig = otherConfig.getTallyConfiguration()
+        expect(otherTallyConfig.getOperatorLightBrightness()).toEqual(42)
+        expect(otherTallyConfig.getStageLightBrightness()).toEqual(21)
     })
 })

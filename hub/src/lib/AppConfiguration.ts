@@ -9,6 +9,7 @@ import NullConfiguration from '../mixer/null/NullConfiguration'
 import { Configuration } from '../mixer/interfaces'
 import Tally from '../domain/Tally'
 import TestConfiguration from '../mixer/test/TestConfiguration'
+import { DefaultTallyConfiguration } from '../tally/TallyConfiguration'
 
 export class AppConfiguration extends Configuration {
     emitter: ServerEventEmitter
@@ -18,6 +19,7 @@ export class AppConfiguration extends Configuration {
     obsConfiguration: ObsConfiguration
     testConfiguration: TestConfiguration
     vmixConfiguration: VmixConfiguration
+    tallyConfiguration: DefaultTallyConfiguration
     tallies: Tally[]
     channels: Channel[]
     mixerSelection?: string
@@ -36,6 +38,7 @@ export class AppConfiguration extends Configuration {
         this.obsConfiguration = new ObsConfiguration()
         this.testConfiguration = new TestConfiguration()
         this.vmixConfiguration = new VmixConfiguration()
+        this.tallyConfiguration = new DefaultTallyConfiguration()
         this.tallies = []
         this.channels = MixerDriver.defaultChannels
 
@@ -99,6 +102,9 @@ export class AppConfiguration extends Configuration {
         if (data.vmix) {
             this.vmixConfiguration.fromJson(data.vmix)
         }
+        if (data.tallyDefaults) {
+            this.tallyConfiguration.fromJson(data.tallyDefaults)
+        }
         this.loadString("mixer", this.setMixerSelection.bind(this), data)
         this.loadChannelArray("channels", this.setChannels.bind(this), data)
         this.loadTallyArray("tallies", this.setTallies.bind(this), data)
@@ -112,6 +118,7 @@ export class AppConfiguration extends Configuration {
             obs: this.obsConfiguration.toJson(),
             test: this.testConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
+            tallyDefaults: this.tallyConfiguration.toJson(),
             tallies: this.tallies.map(tally => tally.toJsonForSave()),
             channels: this.channels.map(channel => channel.toJson()),
         }
@@ -180,6 +187,16 @@ export class AppConfiguration extends Configuration {
         this.vmixConfiguration = vmixConfiguration.clone()
         this.emitter.emit("config.changed", this)
         this.emitter.emit("config.changed.vmix", this.vmixConfiguration)
+    }
+
+    getTallyConfiguration() {
+        return this.tallyConfiguration.clone()
+    }
+
+    setTallyConfiguration(configuration: DefaultTallyConfiguration) {
+        this.tallyConfiguration = configuration.clone()
+        this.emitter.emit("config.changed", this)
+        this.emitter.emit("config.changed.tallyconfig", this.tallyConfiguration)
     }
 
     setChannels(channels: Channel[]) {

@@ -8,6 +8,7 @@
     ],
     "types": [
       "cypress",
+      "jest-extended",
     ],
     "allowJs": true,
     "skipLibCheck": true,

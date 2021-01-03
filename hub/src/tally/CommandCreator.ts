@@ -1,5 +1,6 @@
-import Tally from "../domain/Tally";
+import Tally, { UdpTally } from "../domain/Tally";
 import { ChannelList } from "../lib/MixerCommunicator";
+import { DefaultTallyConfiguration } from "./TallyConfiguration";
 
 export type StateCommand = "highlight" | "unknown" | "on-air" | "preview" | "release"
 
@@ -19,8 +20,15 @@ class CommandCreator {
     return "release"
   }
 
-  createStateCommand(tally: Tally, programs: ChannelList, previews: ChannelList): string {
-    return this.getState(tally, programs, previews)
+  createStateCommand(tally: UdpTally, programs: ChannelList, previews: ChannelList, defaultConfiguration: DefaultTallyConfiguration): string {
+    let command = this.getState(tally, programs, previews)
+    command += ` ob=${tally.configuration.getOperatorLightBrightness() !== undefined ? tally.configuration.getOperatorLightBrightness() : defaultConfiguration.getOperatorLightBrightness()}`
+
+    if (tally.hasStageLight) {
+      command += ` sb=${tally.configuration.getStageLightBrightness() !== undefined ? tally.configuration.getStageLightBrightness() : defaultConfiguration.getStageLightBrightness()}`
+    }
+    
+    return command
   }
 }
 

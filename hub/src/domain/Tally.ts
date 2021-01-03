@@ -1,3 +1,4 @@
+import { TallyConfiguration, TallyConfigurationObjectType } from '../tally/TallyConfiguration'
 import Log from './Log'
 
 export enum ConnectionState {
@@ -14,7 +15,7 @@ export type TallySaveObjectType = {
     name: string
     type?: TallyType
     channelId?: string
-}
+} & TallyConfigurationObjectType
 
 export interface TallyObjectType {
     name: string
@@ -37,15 +38,16 @@ export type TallyType = "udp" | "web"
 export abstract class Tally {
     name: string
     channelId?: string
-    highlight: boolean
-    logs: Log[]
+    highlight: boolean = false
+    logs: Log[] = []
     readonly type: TallyType
+    configuration: TallyConfiguration
+    hasStageLight: boolean = true
 
     constructor(name: string, channelId?: string) {
         this.name = name
         this.channelId = channelId
-        this.highlight = false
-        this.logs = []
+        this.configuration = new TallyConfiguration()
     }
     isPatched() : boolean {
         return this.channelId !== undefined
@@ -88,21 +90,30 @@ export abstract class Tally {
         return channelNames.indexOf(this.channelId) !== -1
     }
 
+    setConfiguration(conf: TallyConfiguration) {
+        this.configuration = conf
+    }
+
     toJsonForSave(): TallySaveObjectType {
         return {
             name: this.name,
             type: this.type,
             channelId: this.channelId,
+            ...this.configuration.toJson(),
         }
     }
 
     static fromJsonForSave(valueObject: TallySaveObjectType) : UdpTally | WebTally {
-        if (valueObject.type === "web") {
-            return new WebTally(valueObject.name, valueObject.channelId)
-        } else {
+        const tally = valueObject.type === "web" ?
+            new WebTally(valueObject.name, valueObject.channelId):
             // UdpTally was the previous default. So if no type is set we also expect an Udp Tally
-            return new UdpTally(valueObject.name, valueObject.channelId)
-        }
+            new UdpTally(valueObject.name, valueObject.channelId)
+
+        const configuration = new TallyConfiguration()
+        configuration.fromJson(valueObject)
+        tally.setConfiguration(configuration)
+
+        return tally
     }
 
     toJson(): TallyObjectType {
@@ -176,6 +187,7 @@ export class WebTally extends Tally {
         super(name, channelId)
 
         this.connectedClients = connectedClients || []
+        this.hasStageLight = false
     }
 
     isConnected() : boolean {

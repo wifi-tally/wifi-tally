@@ -42,6 +42,7 @@
     "cross-env": "^7.0.3",
     "cypress": "^6.2.0",
     "eslint-plugin-cypress": "^2.11.2",
+    "jest-extended": "^0.11.5",
     "lato-font": "^3.0.0",
     "nosleep.js": "^0.12.0",
     "react": "^17.0.1",
