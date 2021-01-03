@@ -12,22 +12,66 @@ local listenSocket = nil
 
 local timeLastPackageReceived = nil
 
-local handleReceive = function(data)
-    timeLastPackageReceived = tmr.now()
+local splitMessage = function(data)
     data = data:match("^%s*(.-)%s*$") -- trim
-    if data == "preview" then
+
+    local command
+    local args = {}
+    while true do
+        local idx = data:find(" ")
+        local fragment
+        if idx == 0 then
+            -- it is a leading space
+            fragment = ""
+            data = data:sub(2)
+        elseif idx == nil then
+            fragment = data
+            data = ""
+        else
+            fragment = data:sub(1, idx-1)
+            data = data:sub(idx+1)
+        end
+        if fragment ~= "" then
+            if command == nil then
+                command = fragment
+            else
+                local idx = fragment:find("=")
+
+                if idx == nil then
+                    -- found an argument without "=" - this is invalid
+                    return
+                else
+                    local key = fragment:sub(1,idx-1)
+                    local value = fragment:sub(idx+1)
+                    args[key] = value
+                end
+            end
+        end
+        if data == "" then
+            return command, args
+        end
+    end
+end
+
+_G.myHandleReceive = function(data)
+    timeLastPackageReceived = tmr.now()
+    local command, args = splitMessage(data)
+    if command == "preview" then
         MyLed.onPreview()
-    elseif data == "on-air" then
+    elseif command == "on-air" then
         MyLed.onAir()
-    elseif data == "release" then
+    elseif command == "release" then
         MyLed.onRelease()
-    elseif data == "highlight" then
+    elseif command == "highlight" then
         MyLed.onHighlight()
-    elseif data == "unknown" then
+    elseif command == "unknown" then
         MyLed.onUnknown()
     else
         MyLog.warning("ignoring unknown package: " .. data)
+        return
     end
+    if args and args.sb then MySettings.setStageBrightness(args.sb) end
+    if args and args.ob then MySettings.setOperatorBrightness(args.ob) end
 end
 
 _G.MyTally = {
@@ -35,7 +79,7 @@ _G.MyTally = {
         if listenSocket == nil then
             listenSocket = net.createUDPSocket()
             listenSocket:on("receive", function(sck, c, port, ip)
-                handleReceive(c)
+                myHandleReceive(c)
             end)
             listenSocket:listen(listenPort)
         end

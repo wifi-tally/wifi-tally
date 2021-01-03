@@ -103,7 +103,10 @@ _G.tmr = {
                 _G.now = 0
             end
         }
-    end
+    end,
+    now = function()
+        return 1234567890
+    end,
 }
 
 _G.ws2812 = {
