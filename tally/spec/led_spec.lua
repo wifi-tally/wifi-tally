@@ -844,4 +844,377 @@ describe("Led", function()
             end)
         end)
     end)
+    describe("supports stageBrightness() of 0", function()
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageBrightness = function() return 0 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onAir()
+
+            it("not show onAir() on the stage light, but only operator light", function()
+                assert.is_same(1, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(0, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    0, 255,   0, --operator
+                    0, 0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageBrightness = function() return 0 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+            require "src.my-led"
+            _G.MyLed.onAir()
+
+            it("it plays nicely with rgb-", function()
+                assert.is_same(0, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(0, _G.pinByTime:get(pinMainB, 0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageBrightness = function() return 0 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onPreview()
+
+            it("not show onPreview() on the stage light, but only operator light", function()
+                assert.is_same(1, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(1, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    255, 0,   0, --operator
+                    0, 0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+    end)
+    describe("supports stageBrightness() of 20%", function()
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onAir()
+            it("dim onAir() on the stage light, but not operator light", function()
+                assert.is_same(0.8, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(0, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    0, 255,   0, --operator
+                    0, 51,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+            require "src.my-led"
+            _G.MyLed.onAir()
+            it("it plays nicely with rgb-", function()
+                assert.is_same(0.2, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(0, _G.pinByTime:get(pinMainB, 0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.stageBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onPreview()
+            it("dim onPreview() on the stage light, but not operator light", function()
+                assert.is_same(1, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(0.8, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(1, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    255, 0,   0, --operator
+                    51, 0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+    end)
+    describe("supports operatorBrightness() of 80%", function()
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 80 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onAir()
+            it("dim onAir() on the operator light, but not stage light", function()
+                assert.is_same(0, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(0.2, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    0, 204,   0, --operator
+                    0, 255,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 80 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+            require "src.my-led"
+            _G.MyLed.onAir()
+            it("it plays nicely with rgb-", function()
+                assert.is_same(0.8, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 80 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onPreview()
+            it("dim onPreview() on the operator light, but not stage light", function()
+                assert.is_same(1, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(1, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(0.2, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    204, 0,   0, --operator
+                    255, 0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 80 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.waitForWifiConnection()
+            it("dim waitForWifiConnection() on the operator light", function()
+                for time=0,1000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpG, time), time .. "s")
+                end
+                assert.is_same(0.2, _G.pinByTime:get(pinOpB, 0))
+                assert.is_same(0.76, _G.pinByTime:get(pinOpB, 500))
+                assert.is_same(0.2, _G.pinByTime:get(pinOpB, 1000))
+
+                assert.is_same({
+                    --g    r    b
+                    0,   0, 204, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+                assert.is_same({
+                    --g    r    b
+                    0,   0, 62, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(500))
+                assert.is_same({
+                    --g    r    b
+                    0,   0, 204, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(1000))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 80 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            require "src.my-led"
+            _G.MyLed.onRelease()
+            it("dim onRelease() is still barely visible", function()
+                for time=0,1000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(0.99, _G.pinByTime:get(pinOpG, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpB, time), time .. "s")
+                end
+                assert.is_same({
+                    --g    r    b
+                    3,   0,   0, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+    end)
+    describe("supports operatorBrightness() of 20%", function()
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-led"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            _G.MyLed.onAir()
+            it("dim onAir() on the stage light, but not operator light", function()
+                assert.is_same(0, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(0.8, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    0, 51,   0, --operator
+                    0, 255,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-led"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.operatorType = function() return LightTypes.COMMON_CATHODE end -- mock the setting
+            _G.MyLed.onAir()
+            it("it plays nicely with rgb-", function()
+                assert.is_same(0.2, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(0, _G.pinByTime:get(pinOpB, 0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-led"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            _G.MyLed.onPreview()
+            it("dim onPreview() on the stage light, but not operator light", function()
+                assert.is_same(1, _G.pinByTime:get(pinMainR, 0))
+                assert.is_same(0, _G.pinByTime:get(pinMainG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinMainB, 0))
+
+                assert.is_same(1, _G.pinByTime:get(pinOpR, 0))
+                assert.is_same(0.8, _G.pinByTime:get(pinOpG, 0))
+                assert.is_same(1, _G.pinByTime:get(pinOpB, 0))
+
+                assert.is_same({
+                    --g    r    b
+                    51, 0,   0, --operator
+                    255, 0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-led"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            _G.MyLed.waitForWifiConnection()
+            it("dim waitForWifiConnection() on the operator light", function()
+                for time=0,1000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpG, time), time .. "s")
+                end
+                assert.is_same(0.8, _G.pinByTime:get(pinOpB, 0))
+                assert.is_same(0.94, _G.pinByTime:get(pinOpB, 500))
+                assert.is_same(0.8, _G.pinByTime:get(pinOpB, 1000))
+
+                assert.is_same({
+                    --g    r    b
+                    0,   0, 51, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+                assert.is_same({
+                    --g    r    b
+                    0,   0, 16, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(500))
+                assert.is_same({
+                    --g    r    b
+                    0,   0, 51, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(1000))
+            end)
+        end)
+        insulate(function()
+            require "spec.nodemcu-mock"
+            require "src.my-led"
+            require "src.my-settings"
+            MySettings.operatorBrightness = function() return 20 end
+            MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+            MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+            _G.MyLed.onRelease()
+            it("dim onRelease() is still barely visible", function()
+                for time=0,1000,100 do
+                    assert.is_same(1, _G.pinByTime:get(pinOpR, time), time .. "s")
+                    assert.is_same(0.99, _G.pinByTime:get(pinOpG, time), time .. "s")
+                    assert.is_same(1, _G.pinByTime:get(pinOpB, time), time .. "s")
+                end
+                assert.is_same({
+                    --g    r    b
+                    3,   0,   0, --operator
+                    0,   0,   0, -- stage
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+    end)
 end)

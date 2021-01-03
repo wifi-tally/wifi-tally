@@ -76,13 +76,19 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
             darkness = 0
         end
 
+        local opB = MySettings.operatorBrightness()
+        -- math.floor prevents a light with darkness 99.5 to flip completely off
+        local operatorDarkness = math.floor(opB / 100 * darkness + 100 - opB)
+        local stB = MySettings.stageBrightness()
+        local stageDarkness = math.floor(stB / 100 * darkness + 100 - stB)
+
         --
         -- DRIVE THE OPERATOR LIGHT
         --
-        local operatorDuty = darkness
+        local operatorDuty = operatorDarkness
         local operatorOff = 100
         if MySettings.operatorType() == LightTypes.COMMON_CATHODE then
-            operatorDuty = 100 - darkness
+            operatorDuty = 100 - operatorDarkness
             operatorOff = 0
         end
         pwm2.set_duty(pinOpR, colorR and operatorDuty or operatorOff)
@@ -92,10 +98,10 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
         --
         -- DRIVE THE STAGE LIGHT
         --
-        local stageDuty = darkness
+        local stageDuty = stageDarkness
         local stageOff = 100
         if MySettings.stageType() == LightTypes.COMMON_CATHODE then
-            stageDuty = 100 - darkness
+            stageDuty = 100 - stageDarkness
             stageOff = 0
         end
         pwm2.set_duty(pinMainR, colorR and showOnMain and stageDuty or stageOff)
@@ -110,15 +116,15 @@ local flashPattern = function(pattern, color, seconds, showOnMain)
             local data = ""
             for _=1,MySettings.operatorNumberOfWs2812Lights() do
                 data = data ..
-                string.char(math.ceil(colorG and (100 - darkness)*2.55 or 0)) ..
-                string.char(math.ceil(colorR and (100 - darkness)*2.55 or 0)) ..
-                string.char(math.ceil(colorB and (100 - darkness)*2.55 or 0))
+                string.char(math.ceil(colorG and (100 - operatorDarkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorR and (100 - operatorDarkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorB and (100 - operatorDarkness)*2.55 or 0))
             end
             for _=1,MySettings.stageNumberOfWs2812Lights() do
                 data = data ..
-                string.char(math.ceil(colorG and showOnMain and (100 - darkness)*2.55 or 0)) ..
-                string.char(math.ceil(colorR and showOnMain and (100 - darkness)*2.55 or 0)) ..
-                string.char(math.ceil(colorB and showOnMain and (100 - darkness)*2.55 or 0))
+                string.char(math.ceil(colorG and showOnMain and (100 - stageDarkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorR and showOnMain and (100 - stageDarkness)*2.55 or 0)) ..
+                string.char(math.ceil(colorB and showOnMain and (100 - stageDarkness)*2.55 or 0))
             end
             ws2812.write(data)
         end
