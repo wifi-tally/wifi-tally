@@ -21,4 +21,7 @@ describe('Smoke Test', () => {
     cy.visit('/config')
     cy.get("*[data-testid=page-config]")
   })
+
+  it.skip('should not rely on resources from the internet')
+  it.skip('should instantly show the correct state when the server crashes and is restarted')
 })

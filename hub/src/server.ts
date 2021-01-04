@@ -47,10 +47,10 @@ if (myConfiguration.isTest()) {
   new AppConfigurationPersistence(myConfiguration, myEmitter)
 }
 
-const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
-
 const myTallyContainer = new TallyContainer(myConfiguration, myEmitter)
 new UdpTallyDriver(myConfiguration, myTallyContainer)
+
+const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
 
 // log stuff
 myEmitter.on('tally.logged', ({tally, log}) => {
