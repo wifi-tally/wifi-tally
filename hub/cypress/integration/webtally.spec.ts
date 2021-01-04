@@ -2,6 +2,7 @@
 
 import { socket } from '../../src/hooks/useSocket'
 import TestConfiguration from '../../src/mixer/test/TestConfiguration'
+import { DefaultTallyConfiguration, TallyConfiguration } from '../../src/tally/TallyConfiguration'
 import randomTallyName from '../browserlib/randomTallyName'
 
 describe('Web Tally Creation', () => {
@@ -219,6 +220,49 @@ describe('Web Tally Creation', () => {
 
     socket.emit('tally.highlight', name, "web")
     cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'unknown')
+  })
+
+  it("allows to configure a brightness", () => {
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`).then(() => {
+      socket.emit('tally.settings', name, "web", (new TallyConfiguration()).toJson())
+      // it should have full brightness by default
+      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '1')
+    }).then(() => {
+      cy.get("*[data-testid=tally-settings]").click()
+      cy.get("*[data-testid=tally-settings-popup]").should('exist')
+      cy.get("*[data-testid=tally-defaults-ob]").should('exist')
+      cy.get("*[data-testid=tally-defaults-sb]").should('not.exist')
+
+      // we test the form in tally-settings.spec. No need to do it here again
+    })
+  })
+
+  it("uses the operator brightness", () => {
+    socket.emit('config.change.tallyconfig', (new DefaultTallyConfiguration()).toJson())
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name)
+
+    cy.visit(`/tally/web-${name}`)
+    cy.get(`*[data-testid=page-tally-web]`).then(() => {
+      // it should have full brightness by default
+      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '1')
+    }).then(() => {
+      const config = new DefaultTallyConfiguration()
+      config.setOperatorLightBrightness(75)
+      socket.emit('config.change.tallyconfig', config.toJson())
+
+      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '0.75')
+    }).then(() => {
+      const config = new TallyConfiguration()
+      config.setOperatorLightBrightness(25)
+      socket.emit('tally.settings', name, "web", config.toJson())
+
+      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '0.25')
+    })
   })
 
   it.skip("reconnects when its connection is cut")

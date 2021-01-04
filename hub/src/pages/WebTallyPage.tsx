@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { withRouter } from "react-router"
 import { socket } from '../hooks/useSocket'
 import { WebTally, WebTallyObjectType } from '../domain/Tally'
-import { CircularProgress, fade, IconButton, makeStyles, Typography } from '@material-ui/core'
+import { CircularProgress, darken, fade, IconButton, makeStyles, Typography, useTheme } from '@material-ui/core'
 import { useParams } from "react-router-dom"
 import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
+import TuneIcon from '@material-ui/icons/Tune'
 import NoSleepJs from 'nosleep.js'
 import { StateCommand } from '../tally/CommandCreator'
 import PageNotFound from './PageNotFound'
+import TallySettings from '../components/TallySettings'
+import { useDefaultTallyConfiguration } from '../hooks/useConfiguration'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -24,18 +27,6 @@ const useStyles = makeStyles((theme) => ({
 
     backgroundColor: theme.palette.grey[800],
     color: fade(theme.palette.getContrastText(theme.palette.grey[800]), 0.7)
-  },
-  inPreview: {
-    backgroundColor: '#00ff00',
-    color: fade(theme.palette.getContrastText('#00ff00'), 0.7)
-  },
-  inProgram: {
-    backgroundColor: '#ff0000',
-    color: fade(theme.palette.getContrastText('#00ff00'), 0.7)
-  },
-  idle: {
-    backgroundColor: theme.palette.primary.main,
-    color: fade(theme.palette.getContrastText('#00ff00'), 0.7)
   },
   '@keyframes highlight': {
     from: {
@@ -72,6 +63,12 @@ const useStyles = makeStyles((theme) => ({
     bottom: theme.spacing(2),
     right: theme.spacing(2),
   },
+  settingsIcon: {
+    color: "inherit",
+    position: "absolute",
+    top: theme.spacing(2),
+    right: theme.spacing(2),
+  }
 }))
 
 function useWebTally(tallyName: string) {
@@ -130,8 +127,11 @@ function WebTallyPage() {
   const { tallyId } = useParams<{tallyId: string}>()
   const tallyName = tallyId.replace(/^web-/, "")
   const { tally, command, isValid } = useWebTally(tallyName)
+  const defaultTallyConfiguration = useDefaultTallyConfiguration()
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const isLoading = !tally || !command
   const classes = useStyles()
+  const theme = useTheme()
   const handle = useFullScreenHandle()
   // @TODO: nosleep is quite hacky, so use https://caniuse.com/?search=Wake%20Lock%20API sooner or later
   const [noSleep] = useState(new NoSleepJs())
@@ -146,6 +146,7 @@ function WebTallyPage() {
 
   const classRoot: string[] = [classes.root]
   let dataColor = ""
+  let bgColor = theme.palette.grey[800]
   let text = ""
   let showSpinner = false
   if (isLoading) {
@@ -157,17 +158,17 @@ function WebTallyPage() {
     dataColor = "highlight"
     text = "Highlight"
   } else if (command === "on-air") {
-    classRoot.push(classes.inProgram)
+    bgColor = '#f00'
     text = "On Program"
     dataColor = "program"
   } else if (command === "preview") {
-    classRoot.push(classes.inPreview)
+    bgColor = '#0f0'
     text = "On Preview"
     dataColor = "preview"
   } else if (command === "release") {
+    bgColor = theme.palette.primary.main
     dataColor = "idle"
     text = "Idle"
-    classRoot.push(classes.idle)
   } else if (command === "unknown") {
     dataColor = "unknown"
     text = "No connection to Mixer"
@@ -176,6 +177,10 @@ function WebTallyPage() {
     // if typescript fails here, we forgot a case
     ((a: never) => {})(command)
   }
+
+  const brightness = (tally?.configuration?.getOperatorLightBrightness() || defaultTallyConfiguration?.getOperatorLightBrightness() || 100) / 100
+  bgColor = darken(bgColor, 1 - brightness)
+  const textColor = theme.palette.getContrastText(bgColor)
 
   const enterFullScreen = () => {
     noSleep.enable()
@@ -187,11 +192,15 @@ function WebTallyPage() {
   }
 
   return <FullScreen handle={handle}>
-    <div data-testid="page-tally-web" data-color={dataColor} className={classRoot.join(" ")}>
+    <div data-testid="page-tally-web" data-color={dataColor} data-brightness={brightness} className={classRoot.join(" ")} style={{backgroundColor: bgColor, color: textColor}}>
       { showSpinner ? (
         <CircularProgress className={classes.spinner} color="inherit" size="min(30vw, 30vh)" />
       ) : (<>
         <Typography component="div" variant="h1" className={classes.name}>{(tally && tally.name) || ""}</Typography>
+        <IconButton data-testid="tally-settings" className={classes.settingsIcon} aria-label="Show settings" onClick={() => setSettingsOpen(true)}>
+          <TuneIcon />
+        </IconButton>
+        <TallySettings tally={tally} open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         { handle.active ? (
           <IconButton className={classes.fullscreenIcon} aria-label="Exit fullscreen" onClick={exitFullScreen}>
             <FullscreenExitIcon />
