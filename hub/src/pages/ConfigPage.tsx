@@ -7,6 +7,7 @@ import MockSettings from '../mixer/mock/react/MockSettings'
 import ObsSettings from '../mixer/obs/react/ObsSettings'
 import TestSettings from '../mixer/test/react/TestSettings'
 import VmixSettings from '../mixer/vmix/react/VmixSettings'
+import TallySettings from '../components/config/TallySettings'
 
 const ConfigPage = () => {
   return (
@@ -19,6 +20,7 @@ const ConfigPage = () => {
         <TestSettings />
         <VmixSettings />
       </MixerSelection>
+      <TallySettings />
     </Layout>
   )
 }

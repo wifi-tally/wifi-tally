@@ -21,6 +21,7 @@ import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
 import WebTallyDriver from './tally/WebTallyDriver'
+import { DefaultTallyConfiguration } from './tally/TallyConfiguration'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -128,6 +129,9 @@ io.on('connection', (socket: ServerSideSocket) => {
     new SocketAwareEvent(myEmitter, 'config.changed.vmix', socket, (socket, vmixConfiguration) => {
       socket.emit('config.state.vmix', vmixConfiguration.toJson())
     }),
+    new SocketAwareEvent(myEmitter, 'config.changed.tallyconfig', socket, (socket, tallyConfiguration) => {
+      socket.emit('config.state.tallyconfig', tallyConfiguration.toJson())
+    }),
     new SocketAwareEvent(myEmitter, 'config.changed.mixer', socket, (socket, mixerName) => {
       socket.emit('config.state.mixer', {mixerName, allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev(), myConfiguration.isTest())})
     }),
@@ -140,6 +144,7 @@ io.on('connection', (socket: ServerSideSocket) => {
     socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
+    socket.emit('config.state.tallyconfig', myConfiguration.getTallyConfiguration().toJson())
   })
   socket.on('events.program.unsubscribe', () => {
     // @TODO: not used yet
@@ -266,6 +271,11 @@ io.on('connection', (socket: ServerSideSocket) => {
     if (newMixerName) {
       myConfiguration.setMixerSelection(newMixerName)
     }
+  })
+  socket.on('config.change.tallyconfig', (conf) => {
+    const configuration = new DefaultTallyConfiguration()
+    configuration.fromJson(conf)
+    myConfiguration.setTallyConfiguration(configuration)
   })
 })
 

@@ -8,6 +8,7 @@ import { ChannelSaveObject } from "../domain/Channel";
 import { LogObjectType } from "../domain/Log";
 import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
 import { StateCommand } from "../tally/CommandCreator";
+import { TallyConfigurationObjectType } from "../tally/TallyConfiguration";
 
 // events the server sends to the client
 export interface ServerSentEvents {
@@ -25,6 +26,7 @@ export interface ServerSentEvents {
     'config.state.mock': (mockConfiguration: MockConfigurationSaveType) => void
     'config.state.obs': (obsConfiguration: ObsConfigurationSaveType) => void
     'config.state.vmix': (vmixConfiguration: VmixConfigurationSaveType) => void
+    'config.state.tallyconfig': (defaultTallyConfiguration: TallyConfigurationObjectType) => void
     'config.state.mixer': (data: {mixerName: string, allowedMixers: string[]}) => void
 }
 
@@ -56,6 +58,7 @@ export interface ClientSentEvents {
     'config.change.test': (testConfiguration: TestConfigurationSaveType, newMixer?: "test") => void
     'config.change.obs': (obsConfiguration: ObsConfigurationSaveType, newMixer?: "obs") => void
     'config.change.vmix': (vmixConfiguration: VmixConfigurationSaveType, newMixer?: "vmix") => void
+    'config.change.tallyconfig': (configuration: TallyConfigurationObjectType) => void
 }
 
 export interface ServerSideSocket {

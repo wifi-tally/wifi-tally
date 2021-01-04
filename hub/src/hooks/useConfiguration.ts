@@ -5,6 +5,7 @@ import VmixConfiguration from '../mixer/vmix/VmixConfiguration';
 import ObsConfiguration from '../mixer/obs/ObsConfiguration';
 import MockConfiguration from '../mixer/mock/MockConfiguration';
 import AtemConfiguration from '../mixer/atem/AtemConfiguration';
+import { DefaultTallyConfiguration } from '../tally/TallyConfiguration';
 
 const configTracker = new ConfigTracker(socket)
 
@@ -117,4 +118,23 @@ export function useVmixConfiguration() {
   }, [])
 
   return vmixConfiguration
+}
+
+export function useDefaultTallyConfiguration() {
+  const [configuration, setConfiguration] = useState<DefaultTallyConfiguration|undefined>(undefined)
+
+  const onChange = newConf => {
+    setConfiguration(newConf)
+  }
+
+  useEffect(() => {
+    configTracker.on("tally", onChange)
+    setConfiguration(configTracker.defaultTallyConfiguration)
+    return () => {
+      // cleanup
+      configTracker.off("tally", onChange)
+    }
+  }, [])
+
+  return configuration
 }

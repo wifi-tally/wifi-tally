@@ -5,6 +5,7 @@ import MockConfiguration from '../../mixer/mock/MockConfiguration'
 import NullConfiguration from '../../mixer/null/NullConfiguration'
 import ObsConfiguration from '../../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../../mixer/vmix/VmixConfiguration'
+import { DefaultTallyConfiguration } from '../../tally/TallyConfiguration'
 
 class ConfigTracker extends EventEmitter{
     allowedMixers?: string[]
@@ -15,6 +16,7 @@ class ConfigTracker extends EventEmitter{
     mockConfiguration?: MockConfiguration
     obsConfiguration?: ObsConfiguration
     vmixConfiguration?: VmixConfiguration
+    defaultTallyConfiguration?: DefaultTallyConfiguration
 
     constructor(socket: ClientSideSocket) {
         super()
@@ -44,6 +46,11 @@ class ConfigTracker extends EventEmitter{
             this.vmixConfiguration = new VmixConfiguration()
             this.vmixConfiguration.fromJson(vmix)
             this.emit('vmix', this.vmixConfiguration)
+        })
+        socket.on('config.state.tallyconfig', (conf) => {
+            this.defaultTallyConfiguration = new DefaultTallyConfiguration()
+            this.defaultTallyConfiguration.fromJson(conf)
+            this.emit('tally', this.defaultTallyConfiguration)
         })
         socket.emit('events.config.subscribe')
     }
