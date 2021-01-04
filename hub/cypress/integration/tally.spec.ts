@@ -179,5 +179,7 @@ describe('Tally display', () => {
   it.skip('can remove a tally')
   it.skip('can handle web tally and udp tally with the same name')
   it.skip('shows a channel even when it is not available anymore')
+  it.skip('updates a tally when defaults are changed')
+  
 
 })

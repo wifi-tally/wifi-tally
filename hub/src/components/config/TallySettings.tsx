@@ -1,10 +1,10 @@
-import { Button, makeStyles } from '@material-ui/core'
+import { Button, FormControl, FormLabel, makeStyles } from '@material-ui/core'
 import React, { useState } from 'react'
 import { useDefaultTallyConfiguration } from '../../hooks/useConfiguration'
 import { socket } from '../../hooks/useSocket'
 import { DefaultTallyConfiguration } from '../../tally/TallyConfiguration'
 import MiniPage from '../layout/MiniPage'
-import Spinner from '../Spinner'
+import Spinner from '../layout/Spinner'
 import BrightnessSlider from './BrightnessSlider'
 
 const useStyle = makeStyles((theme) => ({
@@ -32,22 +32,22 @@ function TallySettings() {
 
   return <MiniPage data-testid="tally-defaults" title="Tally Defaults">
     { isLoading ? <Spinner /> : (<form onSubmit={handleSubmit}>
-      <BrightnessSlider
-        minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
-        minMessage="Operator Light can not be turned off."
-        className={classes.input} 
-        defaultValue={settings.getOperatorLightBrightness()} 
-        label="Operator Light Brightness" 
-        testId="tally-defaults-ob" 
-        onChange={(value) => {setOperatorBrightness(value)}}
-      />
-      <BrightnessSlider 
-        className={classes.input} 
-        defaultValue={settings.getStageLightBrightness()} 
-        label="Stage Light Brightness" 
-        testId="tally-defaults-sb" 
-        onChange={(value) => {setStageBrightness(value)}}
-      />
+      <FormControl data-testid="tally-defaults-ob" classes={{root: classes.input}}>
+        <FormLabel>Operator Light Brightness</FormLabel>
+        <BrightnessSlider
+          minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
+          minMessage="Operator Light can not be turned off."
+          defaultValue={settings.getOperatorLightBrightness()} 
+          onChange={(value) => {setOperatorBrightness(value)}}
+        />
+      </FormControl>
+      <FormControl data-testid="tally-defaults-sb"  classes={{root: classes.input}}>
+        <FormLabel>Stage Light Brightness</FormLabel>
+        <BrightnessSlider 
+          defaultValue={settings.getStageLightBrightness()} 
+          onChange={(value) => {setStageBrightness(value)}}
+        />
+      </FormControl>
       <Button data-testid="tally-defaults-submit" type="submit" variant="contained" color="primary">Save</Button>
     </form>)}
   </MiniPage> 

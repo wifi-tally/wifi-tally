@@ -17,11 +17,11 @@ export type TallySaveObjectType = {
     channelId?: string
 } & TallyConfigurationObjectType
 
-export interface TallyObjectType {
+export type TallyObjectType = {
     name: string
     type: TallyType
     channelId?: string
-}
+} & TallyConfigurationObjectType
 
 export interface UdpTallyObjectType extends TallyObjectType {
     address?: string
@@ -121,6 +121,7 @@ export abstract class Tally {
             name: this.name,
             type: this.type,
             channelId: this.channelId,
+            ...this.configuration.toJson(),
         }
     }
     static fromJson(valueObject: TallyObjectType) {
@@ -174,6 +175,7 @@ export class UdpTally extends Tally {
             valueObject.port,
             valueObject.state
         )
+        tally.configuration.fromJson(valueObject)
         return tally
     }
 
@@ -216,6 +218,7 @@ export class WebTally extends Tally {
             valueObject.channelId,
             valueObject.connectedClients
         )
+        tally.configuration.fromJson(valueObject)
         return tally
     }
 }

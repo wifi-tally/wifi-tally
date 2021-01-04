@@ -3,6 +3,7 @@ import Tally, { TallyType, UdpTally, WebTally } from "../domain/Tally"
 import { AppConfiguration } from "../lib/AppConfiguration"
 import { ChannelList } from "../lib/MixerCommunicator"
 import ServerEventEmitter from "../lib/ServerEventEmitter"
+import { TallyConfiguration } from "./TallyConfiguration"
 import UdpTallyDriver from "./UdpTallyDriver"
 import WebTallyDriver from "./WebTallyDriver"
 
@@ -100,6 +101,16 @@ class TallyContainer {
     this.getOrCreate(tally.name, tally.type)
     this.setAndAnnounceTally(tally)
     console.debug(`Tally "${tally.name}" updated`)
+  }
+
+  updateSettings(tallyName: string, tallyType: TallyType, settings: TallyConfiguration) {
+    let tally = this.get(tallyName, tallyType)
+    if (tally) {
+      tally.configuration = settings
+      this.update(tally)
+    } else {
+      console.warn(`Can not update settings for unknown tally named "${tallyName}"`)
+    }
   }
 
   highlight(tallyName: string, tallyType: TallyType) {

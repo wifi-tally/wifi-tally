@@ -6,8 +6,10 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import HighlightIcon from '@material-ui/icons/Highlight'
 import MoreIcon from '@material-ui/icons/MoreVert'
 import LinkIcon from '@material-ui/icons/Link'
+import TuneIcon from '@material-ui/icons/Tune'
 import { socket } from '../hooks/useSocket'
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom'
+import TallySettings from './TallySettings';
 
 type TallyMenuProps = {
   tally: Tally
@@ -41,6 +43,7 @@ function MenuItemLink(props: MenuItemLinkProps) {
 
 function TallyMenu({ tally, className }: TallyMenuProps) {
   const [anchorEl, setAnchorEl] = useState(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const allowHighlight = tally.isActive()
   const allowRemove = !tally.isConnected()
 
@@ -79,13 +82,17 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
+      <MenuItem data-testid={`tally-${tally.name}-settings`} onClick={() => {setSettingsOpen(true); handleClose()}}>
+        <ListItemIcon><TuneIcon fontSize="small" /></ListItemIcon>
+        <ListItemText>Settings</ListItemText>
+      </MenuItem>
+      <TallySettings tally={tally} open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {tally.isWebTally() && (
         <MenuItemLink testid={`tally-${tally.name}-web`} to={`/tally/${tally.getId()}`}>
           <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Connect</ListItemText>
         </MenuItemLink>
       )}
-      
       <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.getId()}/log`}>
         <ListItemIcon><SubjectIcon fontSize="small" /></ListItemIcon>
         <ListItemText>Logs</ListItemText>

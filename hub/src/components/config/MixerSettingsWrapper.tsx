@@ -1,5 +1,5 @@
 import React from 'react'
-import Spinner from '../Spinner'
+import Spinner from '../layout/Spinner'
 import { Button, makeStyles, Tooltip, Typography } from '@material-ui/core'
 
 const useStyles = makeStyles(theme => ({

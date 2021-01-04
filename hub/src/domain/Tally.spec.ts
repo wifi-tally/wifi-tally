@@ -92,6 +92,8 @@ describe('toJsonForSave/fromJsonForSave', () => {
 describe('toJson/fromJson', () => {
     test('it can serialize an UdpTally', () => {
         const udpTally = new UdpTally("Udp Tally", "123", "1.2.3.4", 1234, ConnectionState.CONNECTED)
+        udpTally.configuration.setOperatorLightBrightness(42)
+        udpTally.configuration.setStageLightBrightness(21)
     
         const json = udpTally.toJson()
         const tally = Tally.fromJson(json) as UdpTally
@@ -102,10 +104,13 @@ describe('toJson/fromJson', () => {
         expect(tally.address).toEqual("1.2.3.4")
         expect(tally.port).toEqual(1234)
         expect(tally.state).toEqual(ConnectionState.CONNECTED)
+        expect(tally.configuration.getOperatorLightBrightness()).toEqual(42)
+        expect(tally.configuration.getStageLightBrightness()).toEqual(21)
     })
     
     test('it can save and load a WebTally', () => {
         const webTally = new WebTally("Web Tally", "123", [{address: "1.2.3.4"}])
+        webTally.configuration.setOperatorLightBrightness(42)
     
         const json = webTally.toJson()
         const tally = Tally.fromJson(json) as WebTally
@@ -114,5 +119,6 @@ describe('toJson/fromJson', () => {
         expect(tally.name).toEqual("Web Tally")
         expect(tally.channelId).toEqual("123")
         expect(tally.connectedClients[0].address).toEqual("1.2.3.4")
+        expect(tally.configuration.getOperatorLightBrightness()).toEqual(42)
     })
 })

@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText, FormLabel, makeStyles, Slider } from '@material-ui/core'
+import { FormHelperText, makeStyles, Slider } from '@material-ui/core'
 import React, { useState } from 'react'
 
 const useStyle = makeStyles(theme => ({
@@ -8,13 +8,11 @@ const useStyle = makeStyles(theme => ({
 }))
 
 type BrightnessSliderProps = {
-  label: string
-  testId: string
   defaultValue: number|null
-  className?: string
   onChange: (value: number) => void
   minValue?: number
   minMessage?: string
+  disabled?: boolean
 }
 
 const marks = [
@@ -26,8 +24,9 @@ const marks = [
   {value: 100},
 ]
 
-function BrightnessSlider({label, testId, defaultValue, className, onChange, minValue, minMessage}: BrightnessSliderProps) {
+function BrightnessSlider({defaultValue, onChange, minValue, minMessage, disabled}: BrightnessSliderProps) {
   minValue = minValue || 0
+  disabled = disabled || false
   const [oldDefaultValue, setOldDefaultValue] = useState(defaultValue)
   const [value, setValue] = useState(defaultValue)
   const [isFocused, setFocused] = useState(false)
@@ -48,25 +47,23 @@ function BrightnessSlider({label, testId, defaultValue, className, onChange, min
   }
 
   return (
-    <FormControl data-testid={testId} className={className}>
-      <FormLabel>{label}</FormLabel>
-      <div className={classes.slider}>
-        <Slider 
-          value={value} 
-          min={0} 
-          max={100}
-          marks={marks}
-          color="primary"
-          valueLabelDisplay="auto" 
-          valueLabelFormat={val => val === 0 ? "off" : `${val}%`} 
-          onChange={handleChange}
-          onChangeCommitted={handleChangeCommitted}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-        />
-        {minMessage && isFocused && value === minValue && (<FormHelperText disabled={true}>{minMessage}</FormHelperText>)}
-      </div>
-    </FormControl>
+    <div className={classes.slider}>
+      <Slider 
+        value={value} 
+        min={0} 
+        max={100}
+        marks={marks}
+        disabled={disabled}
+        color="primary"
+        valueLabelDisplay="auto" 
+        valueLabelFormat={val => val === 0 ? "off" : `${val}%`} 
+        onChange={handleChange}
+        onChangeCommitted={handleChangeCommitted}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      />
+      {minMessage && isFocused && value === minValue && (<FormHelperText disabled={true}>{minMessage}</FormHelperText>)}
+    </div>
   )
 }
 

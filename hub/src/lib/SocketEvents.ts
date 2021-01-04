@@ -51,6 +51,7 @@ export interface ClientSentEvents {
     'tally.highlight': (tallyName: string, tallyType: TallyType) => void
     'tally.remove': (tallyName: string, tallyType: TallyType) => void
     'tally.create': (tallyName: string, channelId?: string) => void
+    'tally.settings': (tallyName: string, tallyType: TallyType, settings: TallyConfigurationObjectType) => void
 
     'config.change.atem': (atemConfiguration: AtemConfigurationSaveType, newMixer?: "atem") => void
     'config.change.mock': (mockConfiguration: MockConfigurationSaveType, newMixer?: "mock") => void

@@ -224,4 +224,5 @@ describe('Web Tally Creation', () => {
   it.skip("reconnects when its connection is cut")
   it.skip("indicates when connection to server is broken")
   it.skip("prevents screen lock on mobile devices when going into full screen")
+  it.skip('updates a tally when defaults are changed')
 })

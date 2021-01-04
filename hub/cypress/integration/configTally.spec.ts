@@ -1,33 +1,13 @@
 /// <reference types="Cypress" />
 import { socket } from '../../src/hooks/useSocket'
 import { DefaultTallyConfiguration } from '../../src/tally/TallyConfiguration'
+import { setSliderValue, validateSliderValue } from '../browserlib/sliderTestTool'
 
 describe('Check Default Tally Configuration', () => {
   beforeEach(() => {
     cy.visit('/config')
     cy.get("*[data-testid=page-config]")
   })
-
-  const setSliderValue = (selector: string, value: number) => {
-    // eslint-disable-next-line cypress/no-assigning-return-values
-    let chain = cy.get(`${selector} *[role=slider]`)
-      .trigger('keydown', { keyCode: 35, which: 35 }) // End
-    let currentValue = 100
-    while (value < currentValue) {
-      if (currentValue - value >= 10) {
-        chain = chain.trigger('keydown', { keyCode: 34, which: 34 }) // PageDown
-        currentValue -= 10
-      } else {
-        chain = chain.trigger('keydown', { keyCode: 37, which: 37 }) // ArrowLeft
-        currentValue -= 1
-      }
-    }
-    return chain
-  }
-
-  const validateSliderValue = (selector: string, value: number) => {
-    return cy.get(`${selector} *[role=slider]`).should('have.attr', 'aria-valuenow', value.toString())
-  }
 
   it('can save', () => {
     setSliderValue("*[data-testid=tally-defaults-ob]", 80)
@@ -84,4 +64,5 @@ describe('Check Default Tally Configuration', () => {
 
   it.skip('operator light brightness should dim an operator light')
   it.skip('stage light brightness should dim a stage light')
+  it.skip('it persists the settings through restart')
 })

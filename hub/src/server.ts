@@ -21,7 +21,7 @@ import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
 import WebTallyDriver from './tally/WebTallyDriver'
-import { DefaultTallyConfiguration } from './tally/TallyConfiguration'
+import { DefaultTallyConfiguration, TallyConfiguration } from './tally/TallyConfiguration'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -180,6 +180,11 @@ io.on('connection', (socket: ServerSideSocket) => {
   })
   socket.on('tally.create', (tallyName, channelId) => {
     myWebTallyDriver.create(tallyName, channelId)
+  })
+  socket.on('tally.settings', (tallyName, tallyType, settings) => {
+    const configuration = new TallyConfiguration()
+    configuration.fromJson(settings)
+    myTallyContainer.updateSettings(tallyName, tallyType, configuration)
   })
   socket.on('events.webTally.subscribe', tallyName => myWebTallyDriver.subscribe(tallyName, socket))
   socket.on('events.webTally.unsubscribe', tallyName => myWebTallyDriver.unsubscribe(tallyName, socket))
