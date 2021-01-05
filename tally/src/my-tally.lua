@@ -12,66 +12,54 @@ local listenSocket = nil
 
 local timeLastPackageReceived = nil
 
-local splitMessage = function(data)
+local parseMessage = function(data)
     data = data:match("^%s*(.-)%s*$") -- trim
-
-    local command
-    local args = {}
-    while true do
-        local idx = data:find(" ")
-        local fragment
-        if idx == 0 then
-            -- it is a leading space
-            fragment = ""
-            data = data:sub(2)
-        elseif idx == nil then
-            fragment = data
-            data = ""
-        else
-            fragment = data:sub(1, idx-1)
-            data = data:sub(idx+1)
-        end
-        if fragment ~= "" then
-            if command == nil then
-                command = fragment
+    local len = string.len(data)
+    if len ~= 25 and len ~=34 then
+        return
+    end
+    if data:sub(1, 1) ~= "O" or data:sub(5,5) ~= "/" or data:sub(9,9) ~= "/" or data:sub(13,14) ~= " S" or data:sub(18,18) ~= "/" or data:sub(22,22) ~= "/" then
+        return
+    end
+    local opR = tonumber(data:sub(2, 4), 10)
+    local opG = tonumber(data:sub(6, 8), 10)
+    local opB = tonumber(data:sub(10, 12), 10)
+    local stR = tonumber(data:sub(15, 17), 10)
+    local stG = tonumber(data:sub(19, 21), 10)
+    local stB = tonumber(data:sub(23, 25), 10)
+    local pattern
+    local duration
+    if len == 34 then
+        if data:sub(26,28) ~= " 0x" or data:sub(31, 31) ~= " " then return end
+        local patternNumber = tonumber(data:sub(29, 30), 16)
+        pattern = {}
+        -- @TODO: Lua 5.3 comes with bit operators, but 5.1 does not yet
+        for _, num in pairs({128,64,32,16,8,4,2,1}) do
+            if patternNumber >= num then
+                patternNumber = patternNumber - num
+                table.insert(pattern, true)
             else
-                local idx = fragment:find("=")
-
-                if idx == nil then
-                    -- found an argument without "=" - this is invalid
-                    return
-                else
-                    local key = fragment:sub(1,idx-1)
-                    local value = fragment:sub(idx+1)
-                    args[key] = value
-                end
+                table.insert(pattern, false)
             end
         end
-        if data == "" then
-            return command, args
-        end
+        duration = tonumber(data:sub(32, 34), 10)
     end
+    return opR, opG, opB, stR, stG, stB, pattern, duration
 end
 
 _G.myHandleReceive = function(data)
     timeLastPackageReceived = tmr.now()
-    local command, args = splitMessage(data)
-    if command == "preview" then
-        MyLed.onPreview()
-    elseif command == "on-air" then
-        MyLed.onAir()
-    elseif command == "release" then
-        MyLed.onRelease()
-    elseif command == "highlight" then
-        MyLed.onHighlight()
-    elseif command == "unknown" then
-        MyLed.onUnknown()
-    else
-        MyLog.warning("ignoring unknown package: " .. data)
+    local opR, opG, opB, stR, stG, stB, pattern, duration = parseMessage(data)
+    if not opR then
+        MyLog.warning(string.format('invalid package: %s', data))
         return
     end
-    if args and args.sb then MySettings.setStageBrightness(args.sb) end
-    if args and args.ob then MySettings.setOperatorBrightness(args.ob) end
+    if pattern ~= nil and duration ~= nil then
+        MyLed.flash(opR, opG, opB, stR, stG, stB, pattern, duration)
+    else
+        -- a static color
+        MyLed.static(opR, opG, opB, stR, stG, stB)
+    end
 end
 
 _G.MyTally = {

@@ -3,74 +3,98 @@ import CommandCreator from './CommandCreator'
 import { DefaultTallyConfiguration } from './TallyConfiguration'
 import 'jest-extended'
 
-describe('createStateCommand', () => {
-    const defaultConfig = new DefaultTallyConfiguration()
 
+describe('default case', () => {
+    const defaultConfig = new DefaultTallyConfiguration()
     test('it shows HIGHLIGHT regardless of anything else', () => {
         const tally = new UdpTally("test", "channel")
         tally.setHighlight(true)
-        expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toStartWith("highlight ")
+        expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/255/255 S255/255/255 0xAA 125")
     })
-    test('it shows PREVIEW', () => {
+    test('it shows PREVIEW in green by default', () => {
         const tally = new UdpTally("test", "channel")
-        expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toStartWith("preview ")
+        expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/255/000")
     })
-    test('it shows ON-AIR', () => {
+    test('it shows PROGRAM', () => {
         const tally = new UdpTally("test", "channel")
-        expect(CommandCreator.createStateCommand(tally, ["channel"], ["other-channel"], defaultConfig)).toStartWith("on-air ")
+        expect(CommandCreator.createStateCommand(tally, ["channel"], ["other-channel"], defaultConfig)).toEqual("O255/000/000 S255/000/000")
     })
-    test('it shows ON-AIR if channel is in preview and on-air', () => {
+    test('it shows PROGRAM if channel is in preview and on-air', () => {
         const tally = new UdpTally("test", "channel")
-        expect(CommandCreator.createStateCommand(tally, ["channel"], ["channel"], defaultConfig)).toStartWith("on-air ")
+        expect(CommandCreator.createStateCommand(tally, ["channel"], ["channel"], defaultConfig)).toEqual("O255/000/000 S255/000/000")
     })
     test('it shows RELEASE if tally is patched and it is not on-air or in preview', () => {
         const tally = new UdpTally("test", "channel")
-        expect(CommandCreator.createStateCommand(tally, ["other-channel"], [], defaultConfig)).toStartWith("release ")
+        expect(CommandCreator.createStateCommand(tally, ["other-channel"], [], defaultConfig)).toEqual("O000/001/000 S000/000/000")
     })
     test('it shows RELEASE if tally is not patched', () => {
         const tally = new UdpTally("test")
-        expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toStartWith("release ")
+        expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/001/000 S000/000/000")
     })
     test('it shows UNKNOWN if program is null and tally is patched', () => {
         const tally = new UdpTally("test", "channel")
-        expect(CommandCreator.createStateCommand(tally, null, null, defaultConfig)).toStartWith("unknown ")
+        expect(CommandCreator.createStateCommand(tally, null, null, defaultConfig)).toEqual("O000/000/255 S000/000/000 0x80 250")
     })
     test('it shows RELEASE if program is null and tally is NOT patched', () => {
         const tally = new UdpTally("test")
-        expect(CommandCreator.createStateCommand(tally, null, null, defaultConfig)).toStartWith("release ")
+        expect(CommandCreator.createStateCommand(tally, null, null, defaultConfig)).toEqual("O000/001/000 S000/000/000")
     })
+})
 
-    test('it sends individual settings', () => {
+
+describe("stageLightBrightness()", () => {
+    const defaultConfig = new DefaultTallyConfiguration()
+    defaultConfig.setStageLightBrightness(50)
+    describe('it uses the default', () => {
         const tally = new UdpTally("test", "channel")
-        tally.configuration.setStageLightBrightness(21)
-        tally.configuration.setOperatorLightBrightness(42)
-
-        const command = CommandCreator.createStateCommand(tally, [], [], defaultConfig) + " "
-        expect(command).toInclude(" sb=21 ")
-        expect(command).toInclude(" ob=42 ")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/128/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S128/000/000")
+        })
     })
-
-    test('it uses default settings if tally does not override them', () => {
+    describe('it can be overridden by a tally configuration', () => {
         const tally = new UdpTally("test", "channel")
-        const defaultConfig = new DefaultTallyConfiguration()
-        defaultConfig.setStageLightBrightness(21)
-        defaultConfig.setOperatorLightBrightness(42)
-
-        const command = CommandCreator.createStateCommand(tally, [], [], defaultConfig) + " "
-        expect(command).toInclude(" sb=21 ")
-        expect(command).toInclude(" ob=42 ")
+        tally.configuration.setStageLightBrightness(25)
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/064/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S064/000/000")
+        })
     })
-
-    test('it can turn the stage light completely off for a single tally', () => {
+    describe('it can be turned completely off', () => {
         const tally = new UdpTally("test", "channel")
         tally.configuration.setStageLightBrightness(0)
-        tally.configuration.setOperatorLightBrightness(20)
-        const defaultConfig = new DefaultTallyConfiguration()
-        defaultConfig.setStageLightBrightness(100)
-        defaultConfig.setOperatorLightBrightness(100)
-
-        const command = CommandCreator.createStateCommand(tally, [], [], defaultConfig) + " "
-        expect(command).toInclude(" sb=0 ")
-        expect(command).toInclude(" ob=20 ")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/000/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S000/000/000")
+        })
+    })
+})
+describe("operatorLightBrightness()", () => {
+    const defaultConfig = new DefaultTallyConfiguration()
+    defaultConfig.setOperatorLightBrightness(50)
+    describe('it uses the default', () => {
+        const tally = new UdpTally("test", "channel")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/128/000 S000/255/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O128/000/000 S255/000/000")
+        })
+    })
+    describe('it can be overridden by a tally configuration', () => {
+        const tally = new UdpTally("test", "channel")
+        tally.configuration.setOperatorLightBrightness(25)
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/064/000 S000/255/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O064/000/000 S255/000/000")
+        })
     })
 })

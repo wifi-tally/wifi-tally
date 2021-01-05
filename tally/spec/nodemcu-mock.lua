@@ -38,7 +38,7 @@ _G.pinByTime ={
                 value = theValue
             end
         end
-        return value
+        return math.floor(value * 100 + 0.5) / 100
     end,
     print = function(self, pin)
         for k,v in pairs(self.data[pin]) do

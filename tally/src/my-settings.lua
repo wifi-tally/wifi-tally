@@ -16,10 +16,8 @@ local hubPort = 7411
 local name = string.format("%x", node.chipid())
 local operatorType = LightTypes.COMMON_ANODE
 local operatorWs2812Lights = 5
-local operatorBrightness = 100
 local stageType = LightTypes.COMMON_ANODE
 local stageWs2812Lights = 0
-local stageBrightness = 100
 
 local trim = function(s)
     return s:match("^%s*(.-)%s*$")
@@ -66,19 +64,6 @@ _G.MySettings = {
     end,
     stageNumberOfWs2812Lights = function()
         return stageWs2812Lights
-    end,
-    stageBrightness = function()
-        return stageBrightness
-    end,
-    setStageBrightness = function(brightness)
-        -- @TODO: dynamic settings should be persisted somehow in case the Hub goes down
-        stageBrightness = math.min(math.max(0, brightness), 100)
-    end,
-    operatorBrightness = function()
-        return operatorBrightness
-    end,
-    setOperatorBrightness = function(brightness)
-        operatorBrightness = math.min(math.max(20, brightness), 100)
     end,
     isValid = function()
         return staSsid ~= nil and hubIp ~= nil
