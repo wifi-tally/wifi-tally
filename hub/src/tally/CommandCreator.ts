@@ -1,46 +1,9 @@
 import Tally, { UdpTally } from "../domain/Tally";
 import { ChannelList } from "../lib/MixerCommunicator";
+import ColorSchemes, { Black, Color } from "./ColorScheme";
 import { DefaultTallyConfiguration } from "./TallyConfiguration";
 
 export type StateCommand = "highlight" | "unknown" | "on-air" | "preview" | "release"
-
-
-
-class Color {
-  r: number
-  g: number
-  b: number
-
-  constructor(r: number, g: number, b: number) {
-    this.r = r
-    this.g = g
-    this.b = b
-  }
-
-  private calculateChannel(value: number, brightness: number) {
-    return Math.ceil(value * brightness / 100)
-  }
-
-  // brightness: 0-100
-  withBrightness(brightness: number) {
-    return new Color(this.calculateChannel(this.r, brightness), this.calculateChannel(this.g, brightness), this.calculateChannel(this.b, brightness))
-  }
-}
-type ColorScheme = {
-  program: Color
-  preview: Color
-  highlight: Color
-  unknown: Color
-  idle: Color
-}
-const black : Color = new Color(0, 0, 0)
-const defaultColorScheme: ColorScheme = {
-  program: new Color(255, 0, 0),
-  preview: new Color(0, 255, 0),
-  highlight: new Color(255, 255, 255),
-  unknown: new Color(0, 0, 255),
-  idle: new Color(0, 1, 0),
-}
 
 class CommandCreator {
   getState(tally: Tally, programs: ChannelList, previews: ChannelList): StateCommand {
@@ -65,24 +28,25 @@ class CommandCreator {
     let stepDuration: number = 0
 
     const state = this.getState(tally, programs, previews)
-    const colorScheme = defaultColorScheme
+    const stColorScheme = ColorSchemes.getById(tally.configuration.getStageColorScheme() || defaultConfiguration.getStageColorScheme())
+    const opColorScheme = ColorSchemes.getById(tally.configuration.getOperatorColorScheme() || defaultConfiguration.getOperatorColorScheme())
     if(state === "highlight") {
-      opColor = colorScheme.highlight
-      stColor = colorScheme.highlight
+      opColor = opColorScheme.highlight
+      stColor = stColorScheme.highlight
       flashPattern = 0xAA
       stepDuration = 125
     } else if (state === "on-air") {
-      opColor = colorScheme.program
-      stColor = colorScheme.program
+      opColor = opColorScheme.program
+      stColor = stColorScheme.program
     } else if (state === "preview") {
-      opColor = colorScheme.preview
-      stColor = colorScheme.preview
+      opColor = opColorScheme.preview
+      stColor = stColorScheme.preview
     } else if (state === "release") {
-      opColor = colorScheme.idle
-      stColor = black
+      opColor = opColorScheme.idle
+      stColor = Black
     } else if (state === "unknown") {
-      opColor = colorScheme.unknown
-      stColor = black
+      opColor = opColorScheme.unknown
+      stColor = Black
       flashPattern = 0x80
       stepDuration = 250
     } else {

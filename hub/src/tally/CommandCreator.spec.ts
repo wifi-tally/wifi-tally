@@ -98,3 +98,49 @@ describe("operatorLightBrightness()", () => {
         })
     })
 })
+describe("stageColorScheme()", () => {
+    const defaultConfig = new DefaultTallyConfiguration()
+    defaultConfig.setStageColorScheme("yellow-pink")
+    describe('it uses the default', () => {
+        const tally = new UdpTally("test", "channel")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S255/000/255")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/255/000")
+        })
+    })
+    describe('it can be overridden by a tally configuration', () => {
+        const tally = new UdpTally("test", "channel")
+        tally.configuration.setStageColorScheme("default")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/255/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+    })
+})
+describe("operatorColorScheme()", () => {
+    const defaultConfig = new DefaultTallyConfiguration()
+    defaultConfig.setOperatorColorScheme("yellow-pink")
+    describe('it uses the default', () => {
+        const tally = new UdpTally("test", "channel")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O255/000/255 S000/255/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/255/000 S255/000/000")
+        })
+    })
+    describe('it can be overridden by a tally configuration', () => {
+        const tally = new UdpTally("test", "channel")
+        tally.configuration.setOperatorColorScheme("default")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/255/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+    })
+})
