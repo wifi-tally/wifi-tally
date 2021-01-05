@@ -120,16 +120,18 @@ export function useVmixConfiguration() {
   return vmixConfiguration
 }
 
-export function useDefaultTallyConfiguration() {
+export function useDefaultTallyConfiguration(callback?: (newConf: DefaultTallyConfiguration) => void) {
+
   const [configuration, setConfiguration] = useState<DefaultTallyConfiguration|undefined>(undefined)
 
-  const onChange = newConf => {
-    setConfiguration(newConf)
-  }
-
   useEffect(() => {
+    const onChange = newConf => {
+      setConfiguration(newConf)
+      callback && newConf && callback(newConf)
+    }
     configTracker.on("tally", onChange)
     setConfiguration(configTracker.defaultTallyConfiguration)
+    callback && configTracker.defaultTallyConfiguration && callback(configTracker.defaultTallyConfiguration)
     return () => {
       // cleanup
       configTracker.off("tally", onChange)

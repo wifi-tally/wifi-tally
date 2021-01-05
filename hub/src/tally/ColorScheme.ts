@@ -20,6 +20,10 @@ export class Color {
   withBrightness(brightness: number) {
     return new Color(this.calculateChannel(this.r, brightness), this.calculateChannel(this.g, brightness), this.calculateChannel(this.b, brightness))
   }
+
+  toCss() {
+    return `rgb(${this.r},${this.g},${this.b})`
+  }
 }
 
 export type ColorScheme = {
@@ -38,7 +42,7 @@ export const Black : Color = new Color(0, 0, 0)
 export const DefaultColorScheme: ColorScheme = {
   id: "default",
   name: "Default",
-  description: "The traditional color scheme for Tally Lights: Red signalizes Live status and Green signalizes Preview status.",
+  description: "The traditional color scheme for Tally Lights.",
   program: new Color(255, 0, 0),
   preview: new Color(0, 255, 0),
   highlight: new Color(255, 255, 255),

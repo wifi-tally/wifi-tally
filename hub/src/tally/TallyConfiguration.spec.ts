@@ -29,7 +29,7 @@ describe('DefaultTallyConfiguration', () => {
       })
     })
   })
-
+  
   describe('getOperatorLightBrightness', () => {
     const testData: [number, number][] = [
       [0, 20], // it should not be possible to turn of the operator light. Prevent a Tally looks "broken" because of misconfiguration.
