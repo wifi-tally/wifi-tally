@@ -15,6 +15,13 @@ describe('Web Tally Creation', () => {
     return name
   }
 
+  const setMixer = (programs, previews) => {
+    const config = new TestConfiguration()
+    config.setPrograms(programs)
+    config.setPreviews(previews)
+    socket.emit("config.change.test", config, "test")
+  }
+
   beforeEach(() => {
     cy.visit('/')
     cy.getTestId("page-index")
@@ -153,13 +160,6 @@ describe('Web Tally Creation', () => {
   })
 
   it("shows changes in the mixer", () => {
-    const setMixer = (programs, previews) => {
-      const config = new TestConfiguration()
-      config.setPrograms(programs)
-      config.setPreviews(previews)
-      socket.emit("config.change.test", config, "test")
-    }
-
     const name = registerRandomTallyName()
     socket.emit('tally.create', name)
     socket.emit('tally.patch', name, "web", "1")
@@ -265,6 +265,36 @@ describe('Web Tally Creation', () => {
       socket.emit('tally.settings', name, "web", config.toJson())
 
       cy.getTestId("page-tally-web").should('have.attr', 'data-brightness', '0.25')
+    })
+  })
+
+  it.skip("should not reset settings when mixer state changes", () => {
+    // this was a bug at one point
+    const name = registerRandomTallyName()
+    socket.emit('tally.create', name, "1")
+
+    cy.visit(`/tally/web-${name}`)
+    cy.getTestId(`page-tally-web`).then(() => {
+      socket.emit('tally.settings', name, "web", (new TallyConfiguration()).toJson())
+      setMixer(["1"], ["2"])
+    }).then(() => {
+      cy.getTestId("tally-settings-link").click()
+      cy.getTestId("tally-settings").should('exist')
+
+      cy.getTestId("tally-settings-ob-toggle")
+        .should('have.attr', 'data-selected', 'true')
+      cy.getTestId("tally-settings-ob-toggle")
+        .click()
+    }).then(() => {
+      setMixer(["2"], ["1"])
+      
+      // waiting here is appropriate here. We need to make sure that the state has not
+      // changed even after some time.
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(500).then(() => {
+        cy.getTestId("tally-settings-ob-toggle")
+        .should('have.attr', 'data-selected', 'false')
+      })
     })
   })
 
