@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles, FormLabel, Switch, FormControlLabel, fade, Typography } from '@material-ui/core';
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Tally from '../domain/Tally';
 import { useDefaultTallyConfiguration } from '../hooks/useConfiguration';
 import { socket } from '../hooks/useSocket';
@@ -26,8 +26,6 @@ type TallySettingsProps = {
 function TallySettings({ tally, open, onClose }: TallySettingsProps) {
   const defaultSettings = useDefaultTallyConfiguration()
   const settings = tally.configuration
-  const [oldDefaultSettings, setOldDefaultSettings] = useState(undefined)
-  const [oldSettings, setOldSettings] = useState(undefined)
   // operatorBrightness
   const [ob, setOb] = useState<number>(settings && settings.getOperatorLightBrightness())
   const [isObDefault, setObDefault] = useState(settings && settings.getOperatorLightBrightness() === undefined)
@@ -40,19 +38,17 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
   // stageColor
   const [sc, setSc] = useState<ColorSchemeId>(settings ? settings.getStageColorScheme() : undefined)
   const [isScDefault, setScDefault] = useState(settings && settings.getStageColorScheme() === undefined)
-
-  if (defaultSettings !== oldDefaultSettings) {
-    setOldDefaultSettings(defaultSettings)
+  useMemo(() => {
+    // when default settings change
     if (defaultSettings) {
       if (isObDefault) { setOb(defaultSettings.getOperatorLightBrightness()) }
       if (isSbDefault) { setSb(defaultSettings.getStageLightBrightness()) }
       if (isOcDefault) { setOc(defaultSettings.getOperatorColorScheme()) }
       if (isScDefault) { setSc(defaultSettings.getStageColorScheme()) }
     }
-  }
-  if (settings !== oldSettings) {
-    setOldSettings(settings)
-
+  }, [defaultSettings])
+  useMemo(() => {
+    // when settings are changed
     if (settings) {
       const newIsObDefault = settings.getOperatorLightBrightness() === undefined
       const newIsSbDefault = settings.getStageLightBrightness() === undefined
@@ -68,7 +64,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
       if (!newIsOcDefault) { setOc(settings.getOperatorColorScheme()) }
       if (!newIsScDefault) { setSc(settings.getStageColorScheme()) }
     }
-  }
+  }, [settings])
 
   const isLoading = !defaultSettings || !tally
   const classes = useStyles()
@@ -105,7 +101,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
             disabled={isObDefault}
             minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
             minMessage="Operator Light can not be turned off."
-            defaultValue={isObDefault ? defaultSettings.getOperatorLightBrightness() : ob}
+            value={isObDefault ? defaultSettings.getOperatorLightBrightness() : ob}
             onChange={(value) => { setOb(value) }}
           />
         </TallySettingsField>
@@ -134,7 +130,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
             <BrightnessSlider
               testId="tally-settings-sb"
               disabled={isSbDefault}
-              defaultValue={isSbDefault ? defaultSettings.getStageLightBrightness() : sb}
+              value={isSbDefault ? defaultSettings.getStageLightBrightness() : sb}
               onChange={(value) => { setSb(value) }}
             />
             </TallySettingsField>

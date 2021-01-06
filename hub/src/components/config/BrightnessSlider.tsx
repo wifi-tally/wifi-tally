@@ -1,4 +1,4 @@
-import { darken, fade, FormHelperText, makeStyles, Slider } from '@material-ui/core'
+import { darken, FormHelperText, makeStyles, Slider } from '@material-ui/core'
 import React, { useState } from 'react'
 
 const useStyle = makeStyles(theme => ({
@@ -13,7 +13,7 @@ const useStyle = makeStyles(theme => ({
 }))
 
 type BrightnessSliderProps = {
-  defaultValue: number|null
+  value: number|null
   testId: string
   onChange: (value: number) => void
   minValue?: number
@@ -30,24 +30,13 @@ const marks = [
   {value: 100},
 ]
 
-function BrightnessSlider({defaultValue, testId, onChange, minValue, minMessage, disabled}: BrightnessSliderProps) {
+function BrightnessSlider({value, testId, onChange, minValue, minMessage, disabled}: BrightnessSliderProps) {
   minValue = minValue || 0
   disabled = disabled || false
-  const [oldDefaultValue, setOldDefaultValue] = useState(defaultValue)
-  const [value, setValue] = useState(defaultValue)
   const [isFocused, setFocused] = useState(false)
   const classes = useStyle()
 
-  if (defaultValue !== oldDefaultValue) {
-    setOldDefaultValue(defaultValue)
-    setValue(defaultValue)
-  }
-
   const handleChange = (e, value) => {
-    value = Math.max(value as number, minValue)
-    setValue(value)
-  }
-  const handleChangeCommitted = (e, value) => {
     value = Math.max(value as number, minValue)
     onChange && onChange(value)
   }
@@ -65,7 +54,6 @@ function BrightnessSlider({defaultValue, testId, onChange, minValue, minMessage,
         valueLabelDisplay="auto" 
         valueLabelFormat={val => val === 0 ? "off" : `${val}%`} 
         onChange={handleChange}
-        onChangeCommitted={handleChangeCommitted}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         classes={{disabled: classes.sliderDisabled}}

@@ -1,5 +1,5 @@
 import { Button, FormControl, FormLabel, makeStyles } from '@material-ui/core'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDefaultTallyConfiguration } from '../../hooks/useConfiguration'
 import { socket } from '../../hooks/useSocket'
 import { ColorSchemeId } from '../../tally/ColorScheme'
@@ -27,16 +27,18 @@ const useStyle = makeStyles((theme) => ({
 }))
 
 function TallySettings() {
-  const settings = useDefaultTallyConfiguration((newSettings) => {
-    setOperatorBrightness(newSettings.getOperatorLightBrightness())
-    setStageBrightness(newSettings.getStageLightBrightness())
-    setOperatorColorScheme(newSettings.getOperatorColorScheme())
-    setStageColorScheme(newSettings.getStageColorScheme())
-  })
+  const settings = useDefaultTallyConfiguration()
   const [operatorBrightness, setOperatorBrightness] = useState<number>(undefined)
   const [stageBrightness, setStageBrightness] = useState<number>(undefined)
   const [operatorColorScheme, setOperatorColorScheme] = useState<ColorSchemeId>(undefined)
   const [stageColorScheme, setStageColorScheme] = useState<ColorSchemeId>(undefined)
+  useMemo(() => {
+    // called when setting changed
+    setOperatorBrightness(settings?.getOperatorLightBrightness())
+    setStageBrightness(settings?.getStageLightBrightness())
+    setOperatorColorScheme(settings?.getOperatorColorScheme())
+    setStageColorScheme(settings?.getStageColorScheme())
+  }, [settings])
 
   const classes = useStyle()
   const isLoading = !settings
@@ -59,7 +61,7 @@ function TallySettings() {
           testId="tally-defaults-ob"
           minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
           minMessage="Operator Light can not be turned off."
-          defaultValue={settings.getOperatorLightBrightness()} 
+          value={operatorBrightness} 
           onChange={(value) => {setOperatorBrightness(value)}}
         />
       </FormControl>
@@ -74,8 +76,8 @@ function TallySettings() {
       <FormControl classes={{root: classes.input}}>
         <FormLabel className={classes.label}>Stage Light Brightness</FormLabel>
         <BrightnessSlider 
-        testId="tally-defaults-sb"
-          defaultValue={settings.getStageLightBrightness()} 
+          testId="tally-defaults-sb"
+          value={stageBrightness} 
           onChange={(value) => {setStageBrightness(value)}}
         />
       </FormControl>

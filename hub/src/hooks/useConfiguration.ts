@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {socket} from './useSocket'
 import ConfigTracker from './tracker/config'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration';
@@ -120,18 +120,15 @@ export function useVmixConfiguration() {
   return vmixConfiguration
 }
 
-export function useDefaultTallyConfiguration(callback?: (newConf: DefaultTallyConfiguration) => void) {
-
+export function useDefaultTallyConfiguration() {
   const [configuration, setConfiguration] = useState<DefaultTallyConfiguration|undefined>(undefined)
 
   useEffect(() => {
     const onChange = newConf => {
       setConfiguration(newConf)
-      callback && newConf && callback(newConf)
     }
     configTracker.on("tally", onChange)
     setConfiguration(configTracker.defaultTallyConfiguration)
-    callback && configTracker.defaultTallyConfiguration && callback(configTracker.defaultTallyConfiguration)
     return () => {
       // cleanup
       configTracker.off("tally", onChange)

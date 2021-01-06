@@ -7,11 +7,10 @@ const tallyTracker = new TallyTracker(socket, socketEventEmitter)
 function useTallies() {
   const [tallies, setTallies] = useState(tallyTracker.tallies)
 
-  const onChange = (tallies) => {
-    setTallies(Array.from(tallies))
-  }
-
   useEffect(() => {
+    const onChange = (tallies) => {
+      setTallies(Array.from(tallies))
+    }
     tallyTracker.on("tallies", onChange)
     return () => {
       // cleanup

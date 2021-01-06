@@ -8,11 +8,10 @@ const mixerTracker = new MixerTracker(socket)
 function useMixerInfo() {
   const [isMixerConnected, setIsMixerConnected] = useState(mixerTracker.connectionState)
 
-  const onConnectionChange = (isConnected: boolean) => {
-    setIsMixerConnected(isConnected)
-  }
-
   useEffect(() => {
+    const onConnectionChange = (isConnected: boolean) => {
+      setIsMixerConnected(isConnected)
+    }
     mixerTracker.on("connection", onConnectionChange)
     return () => {
       // cleanup

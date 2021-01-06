@@ -9,12 +9,12 @@ function useProgramPreview() {
   const [programs, setPrograms] = useState(programTracker.programs)
   const [previews, setPreviews] = useState(programTracker.previews)
 
-  const onChange = (programs, previews) => {
-    setPrograms(programs)
-    setPreviews(previews)
-  }
-
   useEffect(() => {
+    const onChange = (programs, previews) => {
+      setPrograms(programs)
+      setPreviews(previews)
+    }
+
     programTracker.on("program", onChange)
     return () => {
       // cleanup
