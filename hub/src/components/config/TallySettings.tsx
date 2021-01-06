@@ -17,6 +17,12 @@ const useStyle = makeStyles((theme) => ({
   input: {
     margin: theme.spacing(0, 2, 2, 0),
     display: "block",
+  },
+  footer: {
+    borderTop: "solid 1px " + theme.palette.background.default,
+    margin: theme.spacing(0, -2),
+    padding: theme.spacing(2, 2, 0, 2),
+    textAlign: "right",
   }
 }))
 
@@ -47,16 +53,17 @@ function TallySettings() {
 
   return <MiniPage data-testid="tally-defaults" title="Tally Defaults">
     { isLoading ? <Spinner /> : (<form onSubmit={handleSubmit}>
-      <FormControl data-testid="tally-defaults-ob" classes={{root: classes.input}}>
+      <FormControl classes={{root: classes.input}}>
         <FormLabel className={classes.label}>Operator Light Brightness</FormLabel>
         <BrightnessSlider
+          testId="tally-defaults-ob"
           minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
           minMessage="Operator Light can not be turned off."
           defaultValue={settings.getOperatorLightBrightness()} 
           onChange={(value) => {setOperatorBrightness(value)}}
         />
       </FormControl>
-      <FormControl data-testid="tally-defaults-oc" data-value={operatorColorScheme} classes={{root: classes.input}}>
+      <FormControl classes={{root: classes.input}}>
         <FormLabel className={classes.label}>Operator Light Colors</FormLabel>
         <ColorSchemeSelector 
           testId="tally-defaults-oc"
@@ -64,14 +71,15 @@ function TallySettings() {
           onChange={(value) => {setOperatorColorScheme(value)}}
         />
       </FormControl>
-      <FormControl data-testid="tally-defaults-sb"  classes={{root: classes.input}}>
+      <FormControl classes={{root: classes.input}}>
         <FormLabel className={classes.label}>Stage Light Brightness</FormLabel>
         <BrightnessSlider 
+        testId="tally-defaults-sb"
           defaultValue={settings.getStageLightBrightness()} 
           onChange={(value) => {setStageBrightness(value)}}
         />
       </FormControl>
-      <FormControl data-testid="tally-defaults-sc" data-value={stageColorScheme} classes={{root: classes.input}}>
+      <FormControl classes={{root: classes.input}}>
         <FormLabel className={classes.label}>Stage Light Colors</FormLabel>
         <ColorSchemeSelector
           testId="tally-defaults-sc"
@@ -79,7 +87,9 @@ function TallySettings() {
           onChange={(value) => {setStageColorScheme(value)}}
         />
       </FormControl>
-      <Button data-testid="tally-defaults-submit" type="submit" variant="contained" color="primary">Save</Button>
+      <div className={classes.footer}>
+        <Button data-testid="tally-defaults-submit" type="submit" variant="contained" color="primary">Save</Button>
+      </div>
     </form>)}
   </MiniPage> 
 }

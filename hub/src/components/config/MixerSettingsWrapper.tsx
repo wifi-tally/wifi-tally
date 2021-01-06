@@ -10,6 +10,12 @@ const useStyles = makeStyles(theme => ({
     // @see https://github.com/mui-org/material-ui/issues/8416
     tooltipWrapFix: {
         display: "inline-block",
+    },
+    footer: {
+      borderTop: "solid 1px " + theme.palette.background.default,
+      margin: theme.spacing(0, -2),
+      padding: theme.spacing(2, 2, 0, 2),
+      textAlign: "right",
     }
 }))
 
@@ -44,11 +50,13 @@ function MixerSettingsWrapper({title, testId, description, canBeSaved, isLoading
                     <Typography variant="h4" paragraph>{title}</Typography>
                     <div>{children}</div>
                 </>) }
+                <div className={classes.footer}>
                 { onSave ? (canBeSaved === false ? (
                     <Tooltip title="The form contains errors"><div className={classes.tooltipWrapFix}><Button data-testid={`${testId}-submit`} variant="contained" disabled>{buttonLabel}</Button></div></Tooltip>
                 ) : (
                     <Button data-testid={`${testId}-submit`} type="submit" variant="contained" color="primary">{buttonLabel}</Button>
                 )) : "" }
+                </div>
             </form>  
         </div>)
     }

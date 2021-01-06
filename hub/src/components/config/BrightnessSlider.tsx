@@ -1,14 +1,20 @@
-import { FormHelperText, makeStyles, Slider } from '@material-ui/core'
+import { darken, fade, FormHelperText, makeStyles, Slider } from '@material-ui/core'
 import React, { useState } from 'react'
 
 const useStyle = makeStyles(theme => ({
   slider: {
     padding: theme.spacing(2, 0, 0, 0)
-  }
+  },
+  sliderDisabled: {
+    "&.MuiSlider-root": {
+      color: darken(theme.palette.common.white, 0.6)
+    }
+  },
 }))
 
 type BrightnessSliderProps = {
   defaultValue: number|null
+  testId: string
   onChange: (value: number) => void
   minValue?: number
   minMessage?: string
@@ -24,7 +30,7 @@ const marks = [
   {value: 100},
 ]
 
-function BrightnessSlider({defaultValue, onChange, minValue, minMessage, disabled}: BrightnessSliderProps) {
+function BrightnessSlider({defaultValue, testId, onChange, minValue, minMessage, disabled}: BrightnessSliderProps) {
   minValue = minValue || 0
   disabled = disabled || false
   const [oldDefaultValue, setOldDefaultValue] = useState(defaultValue)
@@ -49,6 +55,7 @@ function BrightnessSlider({defaultValue, onChange, minValue, minMessage, disable
   return (
     <div className={classes.slider}>
       <Slider 
+        data-testid={testId}
         value={value} 
         min={0} 
         max={100}
@@ -61,6 +68,7 @@ function BrightnessSlider({defaultValue, onChange, minValue, minMessage, disable
         onChangeCommitted={handleChangeCommitted}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        classes={{disabled: classes.sliderDisabled}}
       />
       {minMessage && isFocused && value === minValue && (<FormHelperText disabled={true}>{minMessage}</FormHelperText>)}
     </div>

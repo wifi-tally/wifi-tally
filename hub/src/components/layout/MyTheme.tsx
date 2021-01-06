@@ -53,26 +53,32 @@ const myTheme = createMuiTheme({
     h1: {
       fontSize: "3rem",
       letterSpacing: "0",
+      fontWeight: 300,
     },
     h2: {
       fontSize: "2.5rem",
       letterSpacing: "0",
+      fontWeight: 300,
     },
     h3: {
       fontSize: "2rem",
       letterSpacing: "0",
+      fontWeight: 400,
     },
     h4: {
       fontSize: "1.5rem",
       letterSpacing: "0",
+      fontWeight: 400,
     },
     h5: {
       fontSize: "1.25rem",
       letterSpacing: "0",
+      fontWeight: 500,
     },
     h6: {
       fontSize: "1rem",
       letterSpacing: "0",
+      fontWeight: 500,
     },
   },
   props: {

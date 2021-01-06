@@ -13,6 +13,7 @@ import { StateCommand } from '../tally/CommandCreator'
 import PageNotFound from './PageNotFound'
 import TallySettings from '../components/TallySettings'
 import { useDefaultTallyConfiguration } from '../hooks/useConfiguration'
+import ColorSchemes from '../tally/ColorScheme'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -144,6 +145,7 @@ function WebTallyPage() {
     return <PageNotFound>Tally with name <strong>{tallyName}</strong> not found.</PageNotFound>
   }
 
+  const colorScheme = tally ? ColorSchemes.getById(tally.configuration.getOperatorColorScheme() || defaultTallyConfiguration.getOperatorColorScheme()) : undefined
   const classRoot: string[] = [classes.root]
   let dataColor = ""
   let bgColor = theme.palette.grey[800]
@@ -158,15 +160,15 @@ function WebTallyPage() {
     dataColor = "highlight"
     text = "Highlight"
   } else if (command === "on-air") {
-    bgColor = '#f00'
+    bgColor = colorScheme.program.toCss()
     text = "On Program"
     dataColor = "program"
   } else if (command === "preview") {
-    bgColor = '#0f0'
+    bgColor = colorScheme.preview.toCss()
     text = "On Preview"
     dataColor = "preview"
   } else if (command === "release") {
-    bgColor = theme.palette.primary.main
+    bgColor = colorScheme.idle.toCss()
     dataColor = "idle"
     text = "Idle"
   } else if (command === "unknown") {
@@ -197,7 +199,7 @@ function WebTallyPage() {
         <CircularProgress className={classes.spinner} color="inherit" size="min(30vw, 30vh)" />
       ) : (<>
         <Typography component="div" variant="h1" className={classes.name}>{(tally && tally.name) || ""}</Typography>
-        <IconButton data-testid="tally-settings" className={classes.settingsIcon} aria-label="Show settings" onClick={() => setSettingsOpen(true)}>
+        <IconButton data-testid="tally-settings-link" className={classes.settingsIcon} aria-label="Show settings" onClick={() => setSettingsOpen(true)}>
           <TuneIcon />
         </IconButton>
         <TallySettings tally={tally} open={settingsOpen} onClose={() => setSettingsOpen(false)} />

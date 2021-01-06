@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles, FormLabel, Switch, FormControlLabel, fade } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles, FormLabel, Switch, FormControlLabel, fade, Typography } from '@material-ui/core';
 import React, { useState } from 'react'
 import Tally from '../domain/Tally';
 import { useDefaultTallyConfiguration } from '../hooks/useConfiguration';
@@ -7,31 +7,14 @@ import { ColorSchemeId } from '../tally/ColorScheme';
 import { DefaultTallyConfiguration } from '../tally/TallyConfiguration';
 import BrightnessSlider from './config/BrightnessSlider';
 import ColorSchemeSelector from './config/ColorSchemeSelector';
+import FormDialog from './layout/FormDialog';
 import Spinner from './layout/Spinner';
+import TallySettingsField from './TallySettingsField';
 
 const useStyles = makeStyles(theme => ({
   input: {
     margin: theme.spacing(0, 0, 2, 0),
   },
-  label: {
-    marginBottom: theme.spacing(2),
-  },
-  toggleLabelActive: {
-    fontSize: "smaller",
-    color: fade(theme.palette.common.white, 0.7),
-  },
-  toggleLabelInactive: {
-    fontSize: "smaller",
-    color: fade(theme.palette.common.white, 0.3),
-  },
-  toggleLabelPlacementStart: {
-    marginLeft: theme.spacing(4),
-  },
-  labels: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-  }
 }))
 
 type TallySettingsProps = {
@@ -40,7 +23,7 @@ type TallySettingsProps = {
   onClose?: () => void
 }
 
-function TallySettings({tally, open, onClose}: TallySettingsProps) {
+function TallySettings({ tally, open, onClose }: TallySettingsProps) {
   const defaultSettings = useDefaultTallyConfiguration()
   const settings = tally.configuration
   const [oldDefaultSettings, setOldDefaultSettings] = useState(undefined)
@@ -89,9 +72,8 @@ function TallySettings({tally, open, onClose}: TallySettingsProps) {
 
   const isLoading = !defaultSettings || !tally
   const classes = useStyles()
-  
-  const handleSave = (e) => {
-    e.preventDefault()
+
+  const handleSave = () => {
     if (!tally) { return }
     const settings = tally.configuration
     settings.setOperatorLightBrightness(isObDefault ? undefined : ob)
@@ -103,88 +85,76 @@ function TallySettings({tally, open, onClose}: TallySettingsProps) {
   }
 
   return (
-    <Dialog data-testid="tally-settings-popup" fullWidth={true} maxWidth="xs" open={open} onClose={onClose}>
-      <DialogTitle>Configure {tally.name}</DialogTitle>
-      <form onSubmit={handleSave}>
-      <DialogContent>
-        { isLoading ? (<Spinner />) : (<>
-        <div data-testid="tally-defaults-ob" className={classes.input}>
-          <div className={classes.labels}>
-            <FormLabel className={classes.label}>Operator Light Brightness</FormLabel>
-            <FormControlLabel
-              classes={{label: isObDefault ? classes.toggleLabelActive : classes.toggleLabelInactive, labelPlacementStart: classes.toggleLabelPlacementStart}}
-              labelPlacement="start"
-              control={<Switch data-testid="tally-defaults-ob-toggle" size="small" color="primary" checked={isObDefault} onChange={(e, checked) => setObDefault(checked)} />}
-              label="Use default"
-            />
-          </div>
+    <FormDialog
+      data-testid="tally-settings"
+      open={open}
+      onClose={onClose}
+      onSubmit={handleSave}
+      label={`${tally.name} Settings`}
+    >
+      { isLoading ? (<Spinner />) : (<>
+        <TallySettingsField
+          label="Operator Light Brightness"
+          isDefault={isObDefault}
+          onChange={setObDefault}
+          testId="tally-settings-ob"
+          className={classes.input}
+        >
           <BrightnessSlider
+            testId="tally-settings-ob"
             disabled={isObDefault}
             minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
             minMessage="Operator Light can not be turned off."
             defaultValue={isObDefault ? defaultSettings.getOperatorLightBrightness() : ob}
-            onChange={(value) => {setOb(value)}}
+            onChange={(value) => { setOb(value) }}
           />
-        </div>
-        <div data-testid="tally-defaults-oc" data-value={oc} className={classes.input}>
-          <div className={classes.labels}>
-            <FormLabel className={classes.label}>Operator Light Colors</FormLabel>
-            <FormControlLabel
-              classes={{label: isOcDefault ? classes.toggleLabelActive : classes.toggleLabelInactive, labelPlacementStart: classes.toggleLabelPlacementStart}}
-              labelPlacement="start"
-              control={<Switch data-testid="tally-defaults-oc-toggle" size="small" color="primary" checked={isOcDefault} onChange={(e, checked) => setOcDefault(checked)} />}
-              label="Use default"
-            />
-          </div>
-          <ColorSchemeSelector 
-            testId="tally-defaults-oc"
+        </TallySettingsField>
+        <TallySettingsField
+          label="Operator Light Colors"
+          isDefault={isOcDefault}
+          onChange={setOcDefault}
+          testId="tally-settings-oc"
+          className={classes.input}
+        >
+          <ColorSchemeSelector
+            testId="tally-settings-oc"
             value={oc}
-            onChange={(value) => {setOc(value)}}
+            onChange={(value) => { setOc(value) }}
             disabled={isOcDefault}
           />
-        </div>
+        </TallySettingsField>
         { tally.hasStageLight && (<>
-          <div data-testid="tally-defaults-sb" className={classes.input}>
-            <div className={classes.labels}>
-              <FormLabel className={classes.label}>Stage Light Brightness</FormLabel>
-              <FormControlLabel
-                classes={{label: isSbDefault ? classes.toggleLabelActive : classes.toggleLabelInactive, labelPlacementStart: classes.toggleLabelPlacementStart}}
-                labelPlacement="start"
-                control={<Switch data-testid="tally-defaults-sb-toggle" size="small" color="primary" checked={isSbDefault} onChange={(e, checked) => setSbDefault(checked)} />}
-                label="Use default"
-              />
-            </div>
+        <TallySettingsField
+          label="Stage Light Brightness"
+          isDefault={isSbDefault}
+          onChange={setSbDefault}
+          testId="tally-settings-sb"
+          className={classes.input}
+        >
             <BrightnessSlider
+              testId="tally-settings-sb"
               disabled={isSbDefault}
               defaultValue={isSbDefault ? defaultSettings.getStageLightBrightness() : sb}
-              onChange={(value) => {setSb(value)}}
+              onChange={(value) => { setSb(value) }}
             />
-          </div>
-          <div data-testid="tally-defaults-sc" data-value={sc} className={classes.input}>
-            <div className={classes.labels}>
-              <FormLabel className={classes.label}>Stage Light Colors</FormLabel>
-              <FormControlLabel
-                classes={{label: isScDefault ? classes.toggleLabelActive : classes.toggleLabelInactive, labelPlacementStart: classes.toggleLabelPlacementStart}}
-                labelPlacement="start"
-                control={<Switch data-testid="tally-defaults-sc-toggle" size="small" color="primary" checked={isScDefault} onChange={(e, checked) => setScDefault(checked)} />}
-                label="Use default"
-              />
-            </div><ColorSchemeSelector
-              testId="tally-defaults-sc"
+            </TallySettingsField>
+        <TallySettingsField
+          label="Stage Light Colors"
+          isDefault={isScDefault}
+          onChange={setScDefault}
+          testId="tally-settings-sc"
+          className={classes.input}
+        >
+          <ColorSchemeSelector
+              testId="tally-settings-sc"
               value={sc}
-              onChange={(value) => {setSc(value)}}
+              onChange={(value) => { setSc(value) }}
               disabled={isScDefault}
             />
-          </div>
+        </TallySettingsField>
         </>)}
-        </>) }
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="default" data-testid="tally-settings-close">Cancel</Button>
-        <Button disabled={isLoading} color="primary" variant="contained" data-testid="tally-settings-submit" type="submit">Save</Button>
-      </DialogActions>
-      </form>
-    </Dialog>
+      </>)}
+    </FormDialog>
   )
 }
 

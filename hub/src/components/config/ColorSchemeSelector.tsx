@@ -1,9 +1,14 @@
-import { Button, ButtonGroup, makeStyles, FormHelperText, Tooltip } from '@material-ui/core'
+import { makeStyles, FormHelperText, Tooltip } from '@material-ui/core'
 import React, { useState } from 'react'
 import ColorSchemes, { ColorSchemeId } from '../../tally/ColorScheme'
+import ChipLikeButton from '../ChipLikeButton'
 
 const useStyle = makeStyles(theme => ({
-  root: {},
+  root: {
+    "&:hover $previewContainer": {
+      opacity: 1
+    }
+  },
   selection: {
     display: "flex",
     verticalAlign: "center",
@@ -12,7 +17,9 @@ const useStyle = makeStyles(theme => ({
   buttonGroup: {
     display: "inline-block",
     marginBottom: theme.spacing(1),
-    color: theme.palette.grey[500],
+  },
+  button: {
+    marginRight: theme.spacing(1),
   },
   preview: {
     padding: theme.spacing(1, 1.6),
@@ -35,13 +42,10 @@ const useStyle = makeStyles(theme => ({
   },
   previewContainer: {
     opacity: 1,
-    transition: "opacity .5s",
-    "&:hover": {
-      opacity: 1
-    }
+    transition: "opacity .5s"
   },
   previewContainerDim: {
-    opacity: 0.3,
+    opacity: 0,
   }
 }))
 
@@ -71,28 +75,25 @@ function ColorSchemeSelector({value, onChange, disabled, testId}: ColorSchemeSel
   }
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} data-testid={testId} data-value={value}>
       <div className={classes.selection}>
-        <ButtonGroup 
-          className={classes.buttonGroup} 
-          size="small"
-          disableElevation={true}
-        >
+        <div className={classes.buttonGroup}>
           {schemes.map(scheme => {
             const isSelected = scheme.id === value
-            return (<Button 
+            return (<ChipLikeButton 
+              className={classes.button}
               data-testid={`${testId}-${scheme.id}`}
-              variant={isSelected ? "contained" : "outlined" }
-              color={isSelected ? "primary" : "inherit" }
+              data-value={value}
+              selected={isSelected}
               onClick={() => {onChange(scheme.id)}}
               onFocus={() => {handleFocus(scheme)}}
               onBlur={() => {handleBlur(scheme)}}
               disabled={disabled}
               key={scheme.id}>
                 {scheme.name}
-              </Button>)
+              </ChipLikeButton>)
           })}
-        </ButtonGroup>
+        </div>
         { selectedScheme && (
           <div className={classes.previewContainer + (isFocussed ? "" : (" " + classes.previewContainerDim))}>
             <Tooltip title="On-Air color"><span className={classes.preview} style={{backgroundColor: selectedScheme.program.toCss()}}></span></Tooltip>

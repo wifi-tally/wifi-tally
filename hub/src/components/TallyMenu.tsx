@@ -82,17 +82,17 @@ function TallyMenu({ tally, className }: TallyMenuProps) {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
-      <MenuItem data-testid={`tally-${tally.name}-settings`} onClick={() => {setSettingsOpen(true); handleClose()}}>
-        <ListItemIcon><TuneIcon fontSize="small" /></ListItemIcon>
-        <ListItemText>Settings</ListItemText>
-      </MenuItem>
-      <TallySettings tally={tally} open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {tally.isWebTally() && (
         <MenuItemLink testid={`tally-${tally.name}-web`} to={`/tally/${tally.getId()}`}>
           <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Connect</ListItemText>
         </MenuItemLink>
       )}
+      <MenuItem data-testid={`tally-${tally.name}-settings`} onClick={() => {handleClose(); setSettingsOpen(true)}}>
+        <ListItemIcon><TuneIcon fontSize="small" /></ListItemIcon>
+        <ListItemText>Settings</ListItemText>
+      </MenuItem>
+      <TallySettings tally={tally} open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <MenuItemLink testid={`tally-${tally.name}-logs`} to={`/tally/${tally.getId()}/log`}>
         <ListItemIcon><SubjectIcon fontSize="small" /></ListItemIcon>
         <ListItemText>Logs</ListItemText>

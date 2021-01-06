@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+/// <reference types="../support" />
 
 import randomTallyName from '../browserlib/randomTallyName'
 
@@ -10,7 +11,7 @@ describe('Tally Log display', () => {
     tallyName = randomTallyName()
     cy.task('tally', tallyName)
     cy.visit(`/tally/udp-${tallyName}/log`)
-    cy.get(`*[data-testid=page-tally-log]`)
+    cy.getTestId(`page-tally-log`)
   })
   afterEach(() => {
     cy.task('tallyCleanup')
@@ -19,11 +20,11 @@ describe('Tally Log display', () => {
   it('should be linked from the tally list', () => {
     cy.visit('/')
     
-    cy.get(`*[data-testid=tally-${tallyName}]`).contains(tallyName)
-    cy.get(`*[data-testid=tally-${tallyName}-menu]`).click()
-    cy.get(`*[data-testid=tally-${tallyName}-logs]`).click()
+    cy.getTestId(`tally-${tallyName}`).contains(tallyName)
+    cy.getTestId(`tally-${tallyName}-menu`).click()
+    cy.getTestId(`tally-${tallyName}-logs`).click()
 
-    cy.get(`*[data-testid=page-tally-log]`)
+    cy.getTestId(`page-tally-log`)
   })
 
   it('should show logs', () => {

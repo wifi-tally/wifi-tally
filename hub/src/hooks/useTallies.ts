@@ -9,7 +9,6 @@ function useTallies() {
 
   const onChange = (tallies) => {
     setTallies(Array.from(tallies))
-    console.log(Array.from(tallies))
   }
 
   useEffect(() => {

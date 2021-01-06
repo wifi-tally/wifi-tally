@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+/// <reference types="../support" />
 
 import { socket } from '../../src/hooks/useSocket'
 import TestConfiguration from '../../src/mixer/test/TestConfiguration'
@@ -16,7 +17,7 @@ describe('Web Tally Creation', () => {
 
   beforeEach(() => {
     cy.visit('/')
-    cy.get("*[data-testid=page-index]")
+    cy.getTestId("page-index")
     createdTallies = []
   })
   afterEach(() => {
@@ -27,73 +28,73 @@ describe('Web Tally Creation', () => {
 
   it('can create an unpatched web tally', () => {
     const name = registerRandomTallyName()
-    cy.get('*[data-testid=tally-create]').click()
-    cy.get('*[data-testid=tally-create-popup]')
-    cy.get('*[data-testid=tally-create-name]').type('{selectall}' + name)
-    cy.get('*[data-testid=tally-create-ok]').click()
+    cy.getTestId("tally-create").click()
+    cy.getTestId("tally-create-popup")
+    cy.getTestId("tally-create-name").type('{selectall}' + name)
+    cy.getTestId("tally-create-ok").click()
 
     // pop up should close
-    cy.get('*[data-testid=tally-create-popup]').should('not.exist')
-    cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-color', 'unpatched').then(() => {
+    cy.getTestId("tally-create-popup").should('not.exist')
+    cy.getTestId(`tally-${name}`).contains(name)
+    cy.getTestId(`tally-${name}`).should('have.attr', 'data-color', 'unpatched').then(() => {
       cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] select`).select("Channel 1")
       cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] select`).should('have.value', "1")
     })
   })
   it('can create a patched web tally', () => {
     const name = registerRandomTallyName()
-    cy.get('*[data-testid=tally-create]').click()
-    cy.get('*[data-testid=tally-create-popup]')
-    cy.get('*[data-testid=tally-create-name]').type('{selectall}' + name)
+    cy.getTestId("tally-create").click()
+    cy.getTestId("tally-create-popup")
+    cy.getTestId("tally-create-name").type('{selectall}' + name)
     cy.get(`*[data-testid=tally-create-popup] *[data-testid=channel-selector] select`).select("Channel 1")
-    cy.get('*[data-testid=tally-create-ok]').click()
+    cy.getTestId("tally-create-ok").click()
 
     // pop up should close
-    cy.get('*[data-testid=tally-create-popup]').should('not.exist')
-    cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}]`).should('not.have.attr', 'data-color', 'unpatched')
+    cy.getTestId("tally-create-popup").should('not.exist')
+    cy.getTestId(`tally-${name}`).contains(name)
+    cy.getTestId(`tally-${name}`).should('not.have.attr', 'data-color', 'unpatched')
     cy.get(`*[data-testid=tally-${name}] *[data-testid=channel-selector] :selected`).contains("Channel 1")
   })
 
   it('only shows the warning when no UDP tallies are configured', () => {
     // it should be shown if no UDP tally exists
-    cy.get('*[data-testid=tally-create]').click()
-    cy.get('*[data-testid=tally-create-popup]')
-    cy.get('*[data-testid=tally-create-warning]').should('exist')
-    cy.get('*[data-testid=tally-create-cancel]').click()
-    cy.get('*[data-testid=tally-create-popup]').should('not.exist')
+    cy.getTestId("tally-create").click()
+    cy.getTestId("tally-create-popup")
+    cy.getTestId("tally-create-warning").should('exist')
+    cy.getTestId("tally-create-cancel").click()
+    cy.getTestId("tally-create-popup").should('not.exist')
 
     // it should not be shown if UDP tallies exist
     const udpName = randomTallyName()
     cy.task('tally', udpName)
-    cy.get('*[data-testid=tally-create]').click()
-    cy.get('*[data-testid=tally-create-warning]').should('not.exist')
+    cy.getTestId("tally-create").click()
+    cy.getTestId("tally-create-warning").should('not.exist')
   })
 
   it('can not create tallies with invalid names', () => {
     const udpName = randomTallyName()
     cy.task('tally', udpName)
 
-    cy.get('*[data-testid=tally-create]').click()
+    cy.getTestId("tally-create").click()
     // disabled because empty
-    cy.get('*[data-testid=tally-create-name]').type('{selectall}{del}')
-    cy.get('*[data-testid=tally-create-ok]').should('be.disabled')
+    cy.getTestId("tally-create-name").type('{selectall}{del}')
+    cy.getTestId("tally-create-ok").should('be.disabled')
 
     // allowed because ok name
-    cy.get('*[data-testid=tally-create-name]').type('{selectall}' + randomTallyName())
-    cy.get('*[data-testid=tally-create-ok]').should('not.be.disabled')
+    cy.getTestId("tally-create-name").type('{selectall}' + randomTallyName())
+    cy.getTestId("tally-create-ok").should('not.be.disabled')
 
     // disabled because too long
-    cy.get('*[data-testid=tally-create-name]').type('123456788901234567890')
-    cy.get('*[data-testid=tally-create-ok]').should('be.disabled')
+    cy.getTestId("tally-create-name").type('123456788901234567890')
+    cy.getTestId("tally-create-ok").should('be.disabled')
 
     // disabled because already existant name
-    cy.get('*[data-testid=tally-create-name]').type('{selectall}' + udpName)
-    cy.get('*[data-testid=tally-create-ok]').should('be.disabled')
+    cy.getTestId("tally-create-name").type('{selectall}' + udpName)
+    cy.getTestId("tally-create-ok").should('be.disabled')
 
     // ok, because does not match an existant name
-    cy.get('*[data-testid=tally-create-name]').type('{backspace}')
-    cy.get('*[data-testid=tally-create-ok]').should('not.be.disabled')
+    cy.getTestId("tally-create-name").type('{backspace}')
+    cy.getTestId("tally-create-ok").should('not.be.disabled')
   })
 
   it('Udp Tally and Web Tally with same name can co-exist', () => {
@@ -101,19 +102,19 @@ describe('Web Tally Creation', () => {
     cy.task('tally', name)
     socket.emit('tally.create', name)
 
-    cy.get(`*[data-testid=tally-${name}]`).should('have.length', 2)
+    cy.getTestId(`tally-${name}`).should('have.length', 2)
   })
 
   it("Web Tallies are linked", () => {
     const name = registerRandomTallyName()
     socket.emit('tally.create', name)
 
-    cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}-menu]`).click()
-    cy.get(`*[data-testid=tally-${name}-web]`).click()
+    cy.getTestId(`tally-${name}`).contains(name)
+    cy.getTestId(`tally-${name}-menu`).click()
+    cy.getTestId(`tally-${name}-web`).click()
 
-    cy.get(`*[data-testid=page-tally-web]`)
-    cy.get(`*[data-testid=page-tally-web]`).contains(name)
+    cy.getTestId(`page-tally-web`)
+    cy.getTestId(`page-tally-web`).contains(name)
   })
 
   it("Web Tallies can be deep linked", () => {
@@ -121,32 +122,32 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
 
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`)
-    cy.get(`*[data-testid=page-tally-web]`).contains(name)
+    cy.getTestId(`page-tally-web`)
+    cy.getTestId(`page-tally-web`).contains(name)
   })
 
   it("Udp Tallies can not be used as web tallies", () => {
     const name = randomTallyName()
     cy.task('tally', name)
 
-    cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}-menu]`).click()
-    cy.get(`*[data-testid=tally-${name}-web]`).should('not.exist')
+    cy.getTestId(`tally-${name}`).contains(name)
+    cy.getTestId(`tally-${name}-menu`).click()
+    cy.getTestId(`tally-${name}-web`).should('not.exist')
 
     cy.visit(`/tally/udp-${name}`)
-    cy.get(`*[data-testid=page-404]`)
+    cy.getTestId(`page-404`)
   })
 
   it("shows the correct connection status", () => {
     const name = registerRandomTallyName()
     socket.emit('tally.create', name)
 
-    cy.get(`*[data-testid=tally-${name}]`).contains(name)
-    cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false').then(() => {
+    cy.getTestId(`tally-${name}`).contains(name)
+    cy.getTestId(`tally-${name}`).should('have.attr', 'data-isactive', 'false').then(() => {
       socket.emit('events.webTally.subscribe', name)
-      cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'true').then(() => {
+      cy.getTestId(`tally-${name}`).should('have.attr', 'data-isactive', 'true').then(() => {
         socket.emit('events.webTally.unsubscribe', name)
-        cy.get(`*[data-testid=tally-${name}]`).should('have.attr', 'data-isactive', 'false')
+        cy.getTestId(`tally-${name}`).should('have.attr', 'data-isactive', 'false')
       })
     })
   })
@@ -163,17 +164,17 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
     socket.emit('tally.patch', name, "web", "1")
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`)
+    cy.getTestId(`page-tally-web`)
 
     // program
     setMixer(["1"], ["2"])
-    cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'program').then(() => {
+    cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'program').then(() => {
       // preview
       setMixer(["2"], ["1"])
-      cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'preview').then(() => {
+      cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'preview').then(() => {
         // idle
         setMixer(["2"], ["3"])
-        cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'idle')
+        cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'idle')
       })
     })
   })
@@ -188,13 +189,13 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
     socket.emit('tally.patch', name, "web", "1")
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`)
+    cy.getTestId(`page-tally-web`)
 
-    cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'program').then(() => {
+    cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'program').then(() => {
       socket.emit('tally.patch', name, "web", "2")
-      cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'preview').then(() => {
+      cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'preview').then(() => {
         socket.emit('tally.patch', name, "web", "3")
-        cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'idle')
+        cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'idle')
       })
     })
   })
@@ -204,9 +205,9 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
     socket.emit('tally.patch', name, "web", "1")
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`).then(() => {
+    cy.getTestId(`page-tally-web`).then(() => {
       socket.emit('tally.highlight', name, "web")
-      cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'highlight')
+      cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'highlight')
     })
   })
 
@@ -216,10 +217,10 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.patch', name, "web", "1")
     socket.emit('config.change.null', "null")
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`)
+    cy.getTestId(`page-tally-web`)
 
     socket.emit('tally.highlight', name, "web")
-    cy.get(`*[data-testid=page-tally-web]`).should('have.attr', 'data-color', 'unknown')
+    cy.getTestId(`page-tally-web`).should('have.attr', 'data-color', 'unknown')
   })
 
   it("allows to configure a brightness", () => {
@@ -227,15 +228,17 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
 
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`).then(() => {
+    cy.getTestId(`page-tally-web`).then(() => {
       socket.emit('tally.settings', name, "web", (new TallyConfiguration()).toJson())
       // it should have full brightness by default
-      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '1')
+      cy.getTestId("page-tally-web").should('have.attr', 'data-brightness', '1')
     }).then(() => {
-      cy.get("*[data-testid=tally-settings]").click()
-      cy.get("*[data-testid=tally-settings-popup]").should('exist')
-      cy.get("*[data-testid=tally-defaults-ob]").should('exist')
-      cy.get("*[data-testid=tally-defaults-sb]").should('not.exist')
+      cy.getTestId("tally-settings-link").click()
+      cy.getTestId("tally-settings").should('exist')
+      cy.getTestId("tally-settings-ob").should('exist')
+      cy.getTestId("tally-settings-sb").should('not.exist')
+      cy.getTestId("tally-settings-oc").should('exist')
+      cy.getTestId("tally-settings-sc").should('not.exist')
 
       // we test the form in tally-settings.spec. No need to do it here again
     })
@@ -247,24 +250,25 @@ describe('Web Tally Creation', () => {
     socket.emit('tally.create', name)
 
     cy.visit(`/tally/web-${name}`)
-    cy.get(`*[data-testid=page-tally-web]`).then(() => {
+    cy.getTestId(`page-tally-web`).then(() => {
       // it should have full brightness by default
-      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '1')
+      cy.getTestId("page-tally-web").should('have.attr', 'data-brightness', '1')
     }).then(() => {
       const config = new DefaultTallyConfiguration()
       config.setOperatorLightBrightness(75)
       socket.emit('config.change.tallyconfig', config.toJson())
 
-      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '0.75')
+      cy.getTestId("page-tally-web").should('have.attr', 'data-brightness', '0.75')
     }).then(() => {
       const config = new TallyConfiguration()
       config.setOperatorLightBrightness(25)
       socket.emit('tally.settings', name, "web", config.toJson())
 
-      cy.get("*[data-testid=page-tally-web]").should('have.attr', 'data-brightness', '0.25')
+      cy.getTestId("page-tally-web").should('have.attr', 'data-brightness', '0.25')
     })
   })
 
+  it.skip("uses the operator color scheme")
   it.skip("reconnects when its connection is cut")
   it.skip("indicates when connection to server is broken")
   it.skip("prevents screen lock on mobile devices when going into full screen")
