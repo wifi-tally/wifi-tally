@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles, FormLabel, Switch, FormControlLabel, fade, Typography } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles, FormLabel, Switch, FormControlLabel, fade, Typography, Checkbox } from '@material-ui/core';
 import React, { useMemo, useState } from 'react'
 import Tally from '../domain/Tally';
 import { useDefaultTallyConfiguration } from '../hooks/useConfiguration';
@@ -15,6 +15,9 @@ const useStyles = makeStyles(theme => ({
   input: {
     margin: theme.spacing(0, 0, 2, 0),
   },
+  checkboxLabel: {
+    fontSize: "1em",
+  }
 }))
 
 type TallySettingsProps = {
@@ -38,6 +41,9 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
   // stageColor
   const [sc, setSc] = useState<ColorSchemeId>(settings ? settings.getStageColorScheme() : undefined)
   const [isScDefault, setScDefault] = useState(settings && settings.getStageColorScheme() === undefined)
+  // stageShowPreview
+  const [sp, setSp] = useState<boolean>(settings ? settings.getStageShowsPreview() : undefined)
+  const [isSpDefault, setSpDefault] = useState(settings && settings.getStageShowsPreview() === undefined)
   useMemo(() => {
     // when default settings change
     if (defaultSettings) {
@@ -45,6 +51,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
       if (isSbDefault) { setSb(defaultSettings.getStageLightBrightness()) }
       if (isOcDefault) { setOc(defaultSettings.getOperatorColorScheme()) }
       if (isScDefault) { setSc(defaultSettings.getStageColorScheme()) }
+      if (isSpDefault) { setSp(defaultSettings.getStageShowsPreview()) }
     }
   }, [defaultSettings])
   useMemo(() => {
@@ -54,15 +61,18 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
       const newIsSbDefault = settings.getStageLightBrightness() === undefined
       const newIsOcDefault = settings.getOperatorColorScheme() === undefined
       const newIsScDefault = settings.getStageColorScheme() === undefined
+      const newIsSpDefault = settings.getStageShowsPreview() === undefined
       setObDefault(newIsObDefault)
       setSbDefault(newIsSbDefault)
       setOcDefault(newIsOcDefault)
       setScDefault(newIsScDefault)
+      setSpDefault(newIsSpDefault)
 
       if (!newIsObDefault) { setOb(settings.getOperatorLightBrightness()) }
       if (!newIsSbDefault) { setSb(settings.getStageLightBrightness()) }
       if (!newIsOcDefault) { setOc(settings.getOperatorColorScheme()) }
       if (!newIsScDefault) { setSc(settings.getStageColorScheme()) }
+      if (!newIsSpDefault) { setSp(settings.getStageShowsPreview()) }
     }
   }, [settings])
 
@@ -76,6 +86,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
     settings.setOperatorColorScheme((isOcDefault) ? undefined : oc)
     settings.setStageLightBrightness((!tally.hasStageLight || isSbDefault) ? undefined : sb)
     settings.setStageColorScheme((!tally.hasStageLight || isScDefault) ? undefined : sc)
+    settings.setStageShowsPreview((!tally.hasStageLight || isSpDefault) ? undefined : sp)
     socket.emit('tally.settings', tally.name, tally.type, settings.toJson())
     onClose && onClose()
   }
@@ -147,6 +158,27 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
               onChange={(value) => { setSc(value) }}
               disabled={isScDefault}
             />
+        </TallySettingsField>
+        <TallySettingsField
+          label="Stage Display"
+          isDefault={isSpDefault}
+          onChange={setSpDefault}
+          testId="tally-settings-sp"
+          className={classes.input}
+        >
+          <FormControlLabel
+            classes={{label: classes.checkboxLabel}}
+            control={<Checkbox
+              data-testid="tally-settings-sp"
+              data-value={isSpDefault ? defaultSettings.getStageShowsPreview() : sp}
+              checked={isSpDefault ? defaultSettings.getStageShowsPreview() : sp}
+              disabled={isSpDefault}
+              color="primary"
+              onChange={(e) => {setSp(e.target.checked)}}
+              size="small"
+            />}
+            label="Shows Preview State"
+          />
         </TallySettingsField>
         </>)}
       </>)}

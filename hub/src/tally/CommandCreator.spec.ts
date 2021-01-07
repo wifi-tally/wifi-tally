@@ -144,3 +144,28 @@ describe("operatorColorScheme()", () => {
         })
     })
 })
+describe("stageShowPreview()", () => {
+    describe('it uses the default', () => {
+        const defaultConfig = new DefaultTallyConfiguration()
+        defaultConfig.setStageShowsPreview(false)
+        const tally = new UdpTally("test", "channel")
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/000/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+    })
+    describe('it can be overridden by a tally configuration', () => {
+        const defaultConfig = new DefaultTallyConfiguration()
+        defaultConfig.setStageShowsPreview(true)
+        const tally = new UdpTally("test", "channel")
+        tally.configuration.setStageShowsPreview(false)
+        test('for PREVIEW', () => {
+            expect(CommandCreator.createStateCommand(tally, ["other-channel"], ["channel"], defaultConfig)).toEqual("O000/255/000 S000/000/000")
+        })
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+    })
+})

@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, makeStyles } from '@material-ui/core'
+import { Button, Checkbox, FormControl, FormControlLabel, FormLabel, makeStyles, Typography } from '@material-ui/core'
 import React, { useMemo, useState } from 'react'
 import { useDefaultTallyConfiguration } from '../../hooks/useConfiguration'
 import { socket } from '../../hooks/useSocket'
@@ -10,10 +10,6 @@ import BrightnessSlider from './BrightnessSlider'
 import ColorSchemeSelector from './ColorSchemeSelector'
 
 const useStyle = makeStyles((theme) => ({
-  label: {
-    display: "block",
-    marginBottom: theme.spacing(2),
-  },
   input: {
     margin: theme.spacing(0, 2, 2, 0),
     display: "block",
@@ -23,6 +19,9 @@ const useStyle = makeStyles((theme) => ({
     margin: theme.spacing(0, -2),
     padding: theme.spacing(2, 2, 0, 2),
     textAlign: "right",
+  },
+  checkboxLabel: {
+    fontSize: "1em",
   }
 }))
 
@@ -32,12 +31,15 @@ function TallySettings() {
   const [stageBrightness, setStageBrightness] = useState<number>(undefined)
   const [operatorColorScheme, setOperatorColorScheme] = useState<ColorSchemeId>(undefined)
   const [stageColorScheme, setStageColorScheme] = useState<ColorSchemeId>(undefined)
+  const [stageShowsPreview, setStageShowsPreview] = useState<boolean>(undefined)
   useMemo(() => {
     // called when setting changed
     setOperatorBrightness(settings?.getOperatorLightBrightness())
     setStageBrightness(settings?.getStageLightBrightness())
     setOperatorColorScheme(settings?.getOperatorColorScheme())
     setStageColorScheme(settings?.getStageColorScheme())
+    setStageShowsPreview(settings?.getStageShowsPreview())
+    
   }, [settings])
 
   const classes = useStyle()
@@ -49,14 +51,15 @@ function TallySettings() {
     stageBrightness !== undefined && settings.setStageLightBrightness(stageBrightness)
     operatorColorScheme !== undefined && settings.setOperatorColorScheme(operatorColorScheme)
     stageColorScheme !== undefined && settings.setStageColorScheme(stageColorScheme)
+    stageShowsPreview !== undefined && settings.setStageShowsPreview(stageShowsPreview)
 
     socket.emit('config.change.tallyconfig', settings.toJson())
   }
 
   return <MiniPage data-testid="tally-defaults" title="Tally Defaults">
     { isLoading ? <Spinner /> : (<form onSubmit={handleSubmit}>
-      <FormControl classes={{root: classes.input}}>
-        <FormLabel className={classes.label}>Operator Light Brightness</FormLabel>
+      <div className={classes.input}>
+        <Typography paragraph variant="h6">Operator Light Brightness</Typography>
         <BrightnessSlider
           testId="tally-defaults-ob"
           minValue={DefaultTallyConfiguration.minOperatorLightBrightness}
@@ -64,31 +67,46 @@ function TallySettings() {
           value={operatorBrightness} 
           onChange={(value) => {setOperatorBrightness(value)}}
         />
-      </FormControl>
-      <FormControl classes={{root: classes.input}}>
-        <FormLabel className={classes.label}>Operator Light Colors</FormLabel>
+      </div>
+      <div className={classes.input}>
+        <Typography paragraph variant="h6">Operator Light Colors</Typography>
         <ColorSchemeSelector 
           testId="tally-defaults-oc"
           value={operatorColorScheme}
           onChange={(value) => {setOperatorColorScheme(value)}}
         />
-      </FormControl>
-      <FormControl classes={{root: classes.input}}>
-        <FormLabel className={classes.label}>Stage Light Brightness</FormLabel>
+      </div>
+      <div className={classes.input}>
+        <Typography paragraph variant="h6">Stage Light Brightness</Typography>
         <BrightnessSlider 
           testId="tally-defaults-sb"
           value={stageBrightness} 
           onChange={(value) => {setStageBrightness(value)}}
         />
-      </FormControl>
-      <FormControl classes={{root: classes.input}}>
-        <FormLabel className={classes.label}>Stage Light Colors</FormLabel>
+      </div>
+      <div className={classes.input}>
+        <Typography paragraph variant="h6">Stage Light Colors</Typography>
         <ColorSchemeSelector
           testId="tally-defaults-sc"
           value={stageColorScheme}
           onChange={(value) => {setStageColorScheme(value)}}
         />
-      </FormControl>
+      </div>
+      <div className={classes.input}>
+        <Typography paragraph variant="h6">Stage Display</Typography>
+        <FormControlLabel
+          classes={{label: classes.checkboxLabel}}
+          control={<Checkbox
+            data-testid="tally-defaults-sp"
+            data-value={stageShowsPreview}
+            checked={stageShowsPreview}
+            color="primary"
+            onChange={(e) => {setStageShowsPreview(e.target.checked)}}
+            size="small"
+          />}
+          label="Shows Preview State"
+        />
+      </div>
       <div className={classes.footer}>
         <Button data-testid="tally-defaults-submit" type="submit" variant="contained" color="primary">Save</Button>
       </div>

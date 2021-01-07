@@ -11,12 +11,15 @@ describe('Check Default Tally Configuration', () => {
   })
 
   it('can save', () => {
+    socket.emit('config.change.tallyconfig', (new DefaultTallyConfiguration()).toJson())
+
     setSliderValue("*[data-testid=tally-defaults-ob]", 80)
     validateSliderValue("*[data-testid=tally-defaults-ob]", 80)
     setSliderValue("*[data-testid=tally-defaults-sb]", 70)
     validateSliderValue("*[data-testid=tally-defaults-sb]", 70)
     cy.getTestId("tally-defaults-oc-yellow-pink").click()
     cy.getTestId("tally-defaults-sc-yellow-pink").click()
+    cy.getTestId("tally-defaults-sp").click()
     cy.getTestId("tally-defaults-submit").click()
 
     cy.reload().then(() => {
@@ -24,6 +27,7 @@ describe('Check Default Tally Configuration', () => {
       validateSliderValue("*[data-testid=tally-defaults-sb]", 70)
       cy.getTestId("tally-defaults-oc").should('have.attr', 'data-value', 'yellow-pink')
       cy.getTestId("tally-defaults-sc").should('have.attr', 'data-value', 'yellow-pink')
+      cy.getTestId("tally-defaults-sp").should('have.attr', 'data-value', 'false')
     })
   })
 
@@ -41,14 +45,11 @@ describe('Check Default Tally Configuration', () => {
   it('updates the UI when configuration changes', () => {
     // setup
     const config = new DefaultTallyConfiguration()
-    config.setOperatorLightBrightness(100)
-    config.setStageLightBrightness(100)
-    config.setOperatorColorScheme("default")
-    config.setStageColorScheme("default")
     socket.emit('config.change.tallyconfig', config.toJson())
 
     cy.getTestId("tally-defaults-oc").should('have.attr', 'data-value', 'default')
     cy.getTestId("tally-defaults-sc").should('have.attr', 'data-value', 'default')
+    cy.getTestId("tally-defaults-sp").should('have.attr', 'data-value', 'true')
     validateSliderValue("*[data-testid=tally-defaults-ob]", 100)
     validateSliderValue("*[data-testid=tally-defaults-sb]", 100).then(() => {
       // change settings from server
@@ -56,14 +57,17 @@ describe('Check Default Tally Configuration', () => {
       config.setStageLightBrightness(21)
       config.setOperatorColorScheme("yellow-pink")
       config.setStageColorScheme("default")
+      config.setStageShowsPreview(false)
       socket.emit('config.change.tallyconfig', config.toJson())
 
       cy.getTestId("tally-defaults-oc").should('have.attr', 'data-value', 'yellow-pink')
       cy.getTestId("tally-defaults-sc").should('have.attr', 'data-value', 'default')
+      cy.getTestId("tally-defaults-sp").should('have.attr', 'data-value', 'false')
       validateSliderValue("*[data-testid=tally-defaults-ob]", 42)
       validateSliderValue("*[data-testid=tally-defaults-sb]", 21).then(() => {
         cy.getTestId("tally-defaults-oc-default").click()
         cy.getTestId("tally-defaults-sc-default").click()
+        cy.getTestId("tally-defaults-sp").click()
         setSliderValue("*[data-testid=tally-defaults-ob]", 80)
         setSliderValue("*[data-testid=tally-defaults-sb]", 70).then(() => {
           // ... then change settings from server again
@@ -71,10 +75,12 @@ describe('Check Default Tally Configuration', () => {
           config.setStageLightBrightness(75)
           config.setOperatorColorScheme("yellow-pink")
           config.setStageColorScheme("yellow-pink")
+          config.setStageShowsPreview(false)
           socket.emit('config.change.tallyconfig', config.toJson())
 
           cy.getTestId("tally-defaults-oc").should('have.attr', 'data-value', 'yellow-pink')
           cy.getTestId("tally-defaults-sc").should('have.attr', 'data-value', 'yellow-pink')
+          cy.getTestId("tally-defaults-sp").should('have.attr', 'data-value', 'false')
           validateSliderValue("*[data-testid=tally-defaults-ob]", 75)
           validateSliderValue("*[data-testid=tally-defaults-sb]", 75)
         })

@@ -40,7 +40,8 @@ class CommandCreator {
       stColor = stColorScheme.program
     } else if (state === "preview") {
       opColor = opColorScheme.preview
-      stColor = stColorScheme.preview
+      const showPreview = tally.configuration.getStageShowsPreview() === undefined ? defaultConfiguration.getStageShowsPreview() : tally.configuration.getStageShowsPreview()
+      stColor = showPreview ? stColorScheme.preview : Black
     } else if (state === "release") {
       opColor = opColorScheme.idle
       stColor = Black

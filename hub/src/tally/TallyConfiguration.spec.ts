@@ -8,6 +8,7 @@ describe('DefaultTallyConfiguration', () => {
     expect(config.getOperatorLightBrightness()).toEqual(100)
     expect(config.getStageColorScheme()).toEqual("default")
     expect(config.getOperatorColorScheme()).toEqual("default")
+    expect(config.getStageShowsPreview()).toEqual(true)
   })
 
   describe('getStageLightBrightness', () => {
@@ -58,6 +59,7 @@ describe('DefaultTallyConfiguration', () => {
         conf.setStageLightBrightness(21)
         conf.setOperatorColorScheme("yellow-pink")
         conf.setStageColorScheme("yellow-pink")
+        conf.setStageShowsPreview(false)
 
         const loadedConf = new DefaultTallyConfiguration()
         loadedConf.fromJson(conf.toJson())
@@ -66,15 +68,18 @@ describe('DefaultTallyConfiguration', () => {
         expect(loadedConf.getStageLightBrightness()).toEqual(21)
         expect(loadedConf.getOperatorColorScheme()).toEqual("yellow-pink")
         expect(loadedConf.getOperatorColorScheme()).toEqual("yellow-pink")
+        expect(loadedConf.getStageShowsPreview()).toEqual(false)
     })
     it("handles falsy values correctly", () => {
         const conf = new DefaultTallyConfiguration()
         conf.setStageLightBrightness(0)
+        conf.setStageShowsPreview(false)
 
         const loadedConf = new DefaultTallyConfiguration()
         loadedConf.fromJson(conf.toJson())
         
         expect(loadedConf.getStageLightBrightness()).toBe(0)
+        expect(loadedConf.getStageShowsPreview()).toBe(false)
     })
   })
 
@@ -100,6 +105,7 @@ describe('TallyConfiguration', () => {
     expect(config.getOperatorLightBrightness()).toBeUndefined()
     expect(config.getStageColorScheme()).toBeUndefined()
     expect(config.getOperatorColorScheme()).toBeUndefined()
+    expect(config.getStageShowsPreview()).toBeUndefined()
   })
 
   describe('getStageLightBrightness', () => {
@@ -150,6 +156,7 @@ describe('TallyConfiguration', () => {
         conf.setStageLightBrightness(21)
         conf.setStageColorScheme("yellow-pink")
         conf.setOperatorColorScheme("yellow-pink")
+        conf.setStageShowsPreview(false)
 
         const loadedConf = new TallyConfiguration()
         loadedConf.fromJson(conf.toJson())
@@ -158,15 +165,18 @@ describe('TallyConfiguration', () => {
         expect(loadedConf.getStageLightBrightness()).toEqual(21)
         expect(loadedConf.getStageColorScheme()).toEqual("yellow-pink")
         expect(loadedConf.getOperatorColorScheme()).toEqual("yellow-pink")
+        expect(loadedConf.getStageShowsPreview()).toEqual(false)
     })
     it("handles falsy values correctly", () => {
         const conf = new TallyConfiguration()
         conf.setStageLightBrightness(0)
+        conf.setStageShowsPreview(false)
 
         const loadedConf = new TallyConfiguration()
         loadedConf.fromJson(conf.toJson())
         
         expect(loadedConf.getStageLightBrightness()).toBe(0)
+        expect(loadedConf.getStageShowsPreview()).toBe(false)
     })
     it("loads undefined correctly", () => {
         const conf = new TallyConfiguration()
@@ -174,6 +184,7 @@ describe('TallyConfiguration', () => {
         conf.setOperatorLightBrightness(undefined)
         conf.setStageColorScheme(undefined)
         conf.setOperatorColorScheme(undefined)
+        conf.setStageShowsPreview(undefined)
 
         const loadedConf = new TallyConfiguration()
         loadedConf.fromJson(conf.toJson())
@@ -182,6 +193,7 @@ describe('TallyConfiguration', () => {
         expect(loadedConf.getOperatorLightBrightness()).toBeUndefined()
         expect(loadedConf.getStageColorScheme()).toBeUndefined()
         expect(loadedConf.getOperatorColorScheme()).toBeUndefined()
+        expect(loadedConf.getStageShowsPreview()).toBeUndefined()
     })
   })
 })

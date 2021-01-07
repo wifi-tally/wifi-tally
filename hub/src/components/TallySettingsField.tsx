@@ -1,10 +1,9 @@
-import { FormLabel, makeStyles } from '@material-ui/core'
+import { FormLabel, makeStyles, Typography } from '@material-ui/core'
 import React from 'react'
 import ChipLikeButton from './ChipLikeButton'
 
 const useStyle = makeStyles((theme) => ({
   label: {
-    marginBottom: theme.spacing(2),
     color: theme.palette.common.white,
   },
   labels: {
@@ -27,7 +26,7 @@ function TallySettingsField({label, testId, isDefault, children, className, onCh
 
   return <div className={className}>
     <div className={classes.labels}>
-      <FormLabel className={classes.label}>{label}</FormLabel>
+      <Typography variant="h6" paragraph className={classes.label}>{label}</Typography>
       <ChipLikeButton data-testid={`${testId}-toggle`} size="small" selected={isDefault} onClick={() => onChange(!isDefault)}>{isDefault ? "default" : "custom"}</ChipLikeButton>
     </div>
     {children}

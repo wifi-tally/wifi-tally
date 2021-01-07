@@ -5,6 +5,7 @@ export type TallyConfigurationObjectType = {
   opBrightness?: number
   stColor?: ColorSchemeId
   opColor?: ColorSchemeId
+  stPreview: boolean
 }
 
 /**
@@ -15,6 +16,7 @@ export class DefaultTallyConfiguration {
   private _stageColorScheme: ColorSchemeId = DefaultTallyConfiguration.defaultColorScheme
   private _operatorLightBrightness?: number = DefaultTallyConfiguration.defaultBrightness
   private _operatorColorScheme: ColorSchemeId = DefaultTallyConfiguration.defaultColorScheme
+  private _stageShowsPreview: boolean = true
 
   static readonly defaultColorScheme : ColorSchemeId = DefaultColorScheme.id
   static readonly minOperatorLightBrightness = 20
@@ -46,12 +48,16 @@ export class DefaultTallyConfiguration {
   getOperatorColorScheme() : ColorSchemeId { return this._operatorColorScheme }
   setOperatorColorScheme(scheme: ColorSchemeId) { this._operatorColorScheme = scheme }
 
+  getStageShowsPreview() { return this._stageShowsPreview }
+  setStageShowsPreview(shouldItShow: boolean) { this._stageShowsPreview = shouldItShow }
+
   toJson() : TallyConfigurationObjectType {
     return {
       stBrightness: this._stageLightBrightness,
       opBrightness: this._operatorLightBrightness,
       stColor: this._stageColorScheme,
       opColor: this._operatorColorScheme,
+      stPreview: this._stageShowsPreview,
     }
   }
   fromJson(valueObject: TallyConfigurationObjectType) {
@@ -59,6 +65,7 @@ export class DefaultTallyConfiguration {
     valueObject.stBrightness !== undefined && this.setStageLightBrightness(valueObject.stBrightness)
     valueObject.stColor !== undefined && this.setStageColorScheme(valueObject.stColor)
     valueObject.opColor !== undefined && this.setOperatorColorScheme(valueObject.opColor)
+    valueObject.stPreview !== undefined && this.setStageShowsPreview(valueObject.stPreview)
   }
 
   clone(): DefaultTallyConfiguration {
@@ -76,6 +83,7 @@ export class TallyConfiguration {
   private _operatorLightBrightness?: number = undefined
   private _stageColorScheme: ColorSchemeId = undefined
   private _operatorColorScheme: ColorSchemeId = undefined
+  private _stageShowsPreview: boolean = undefined
 
   getStageLightBrightness() { return this._stageLightBrightness }
   setStageLightBrightness(value: number) { 
@@ -105,12 +113,16 @@ export class TallyConfiguration {
   getOperatorColorScheme() : ColorSchemeId { return this._operatorColorScheme }
   setOperatorColorScheme(scheme: ColorSchemeId) { this._operatorColorScheme = scheme }
 
+  getStageShowsPreview() { return this._stageShowsPreview }
+  setStageShowsPreview(shouldItShow: boolean) { this._stageShowsPreview = shouldItShow }
+
   toJson() : TallyConfigurationObjectType {
     return {
       stBrightness: this._stageLightBrightness,
       opBrightness: this._operatorLightBrightness,
       stColor: this._stageColorScheme,
       opColor: this._operatorColorScheme,
+      stPreview: this._stageShowsPreview,
     }
   }
   fromJson(valueObject: TallyConfigurationObjectType) {
@@ -118,6 +130,7 @@ export class TallyConfiguration {
     this.setStageLightBrightness(valueObject.stBrightness)
     this.setStageColorScheme(valueObject.stColor)
     this.setOperatorColorScheme(valueObject.opColor)
+    this.setStageShowsPreview(valueObject.stPreview)
   }
 }
 
