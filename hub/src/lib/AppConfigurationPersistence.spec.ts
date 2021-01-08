@@ -73,6 +73,74 @@ describe('load()', () => {
             expect(errorsLogged).toEqual(1)
             done()
         })
+    })  
+})
+
+describe('it can load configuration files from previous versions', () => {
+    it('can load from v0.2.1', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+
+        expect(() => {
+            new AppConfigurationPersistence(config, emitter, `${__dirname}/../../fixtures/settings-v0.2.1.json`)
+        }).not.toThrow(SyntaxError)
+
+        expect(config.getMixerSelection()).toEqual("obs")
+        expect(config.getObsConfiguration().getIp().toString()).toEqual("127.0.0.1")
+        expect(config.getObsConfiguration().getPort().toString()).toEqual("4444")
+        expect(config.getTallies()).toHaveLength(4)
+        expect(config.getTallies()[0].name).toEqual("Tally01")
+        expect(config.getTallies()[0].channelId).toEqual("1")
+        expect(config.getChannels()).toHaveLength(8)
+        expect(config.getChannels()[0].id).toEqual("1")
+        expect(config.getChannels()[0].name).toEqual("Dave's Cam")
+    })
+    it('can load from v0.3.0', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+
+        expect(() => {
+            new AppConfigurationPersistence(config, emitter, `${__dirname}/../../fixtures/settings-v0.3.0.json`)
+        }).not.toThrow(SyntaxError)
+
+        expect(config.getMixerSelection()).toEqual("atem")
+        expect(config.getAtemConfiguration().getIp().toString()).toEqual("192.168.99.200")
+        expect(config.getAtemConfiguration().getPort().toString()).toEqual("9910")
+        expect(config.getTallies()).toHaveLength(4)
+        expect(config.getTallies()[0].name).toEqual("Tally01")
+        expect(config.getTallies()[0].channelId).toEqual("1")
+        expect(config.getTallies()[0].type).toEqual("udp")
+        expect(config.getTallies()[3].name).toEqual("Tally04")
+        expect(config.getTallies()[3].type).toEqual("web")
+        expect(config.getChannels()).toHaveLength(4)
+        expect(config.getChannels()[0].id).toEqual("1")
+        expect(config.getChannels()[0].name).toEqual("Dave's Cam")
+    })
+    it('can load from v0.4.0', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+
+        expect(() => {
+            new AppConfigurationPersistence(config, emitter, `${__dirname}/../../fixtures/settings-v0.4.0.json`)
+        }).not.toThrow(SyntaxError)
+
+        expect(config.getMixerSelection()).toEqual("vmix")
+        expect(config.getVmixConfiguration().getIp().toString()).toEqual("127.0.0.1")
+        expect(config.getVmixConfiguration().getPort().toString()).toEqual("8099")
+        expect(config.getTallyConfiguration().getOperatorLightBrightness()).toEqual(80)
+        expect(config.getTallyConfiguration().getStageLightBrightness()).toEqual(60)
+        expect(config.getTallies()).toHaveLength(4)
+        expect(config.getTallies()[0].name).toEqual("Tally01")
+        expect(config.getTallies()[0].channelId).toEqual("1")
+        expect(config.getTallies()[0].type).toEqual("udp")
+        expect(config.getTallies()[0].configuration.getStageLightBrightness()).toEqual(100)
+        expect(config.getTallies()[0].configuration.getOperatorLightBrightness()).toEqual(100)
+        expect(config.getTallies()[0].configuration.getStageShowsPreview()).toEqual(true)
+        expect(config.getTallies()[3].name).toEqual("Tally04")
+        expect(config.getTallies()[3].type).toEqual("web")
+        expect(config.getChannels()).toHaveLength(4)
+        expect(config.getChannels()[0].id).toEqual("1")
+        expect(config.getChannels()[0].name).toEqual("Dave's Cam")
     })
 })
 

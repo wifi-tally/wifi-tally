@@ -1,0 +1,56 @@
+{
+	"_warning": "This file was automatically generated.",
+	"_warning2": "Do not edit it while the hub is running. Your changes will be lost.",
+	"mixer": "atem",
+	"atem": {
+		"ip": "192.168.99.200",
+		"port": 9910
+	},
+	"null": {},
+	"obs": {
+		"ip": "127.0.0.1",
+		"port": 4444
+	},
+	"vmix": {
+		"ip": "127.0.0.1",
+		"port": 8099
+	},
+	"tallies": [
+		{
+			"name": "Tally01",
+			"type": "udp",
+			"channelId": "1"
+		},
+		{
+			"name": "Tally02",
+			"type": "udp",
+			"channelId": "2"
+		},
+		{
+			"name": "Tally03",
+			"type": "udp",
+			"channelId": "3"
+		},
+		{
+			"name": "Tally04",
+			"type": "web",
+			"channelId": "4"
+		}
+	],
+	"channels": [
+		{
+			"id": "1",
+			"name": "Dave's Cam"
+		},
+		{
+			"id": "2",
+			"name": "Judy's Cam"
+		},
+		{
+			"id": "3"
+		},
+		{
+			"id": "4"
+		}
+	]
+}
