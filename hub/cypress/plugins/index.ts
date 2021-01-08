@@ -14,6 +14,7 @@
 
 import tallyTasks from './tally'
 import atemTasks from './atem'
+import mixerTasks from './mixer'
 
 /**
  * @type {Cypress.PluginConfig}
@@ -24,7 +25,8 @@ const tasks = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) =>
 
   on('task', {
     ...tallyTasks(config),
-    ...atemTasks(config)
+    ...atemTasks(config),
+    ...mixerTasks(config)
   })
 }
 

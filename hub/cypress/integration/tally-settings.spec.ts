@@ -5,6 +5,7 @@ import randomTallyName from '../browserlib/randomTallyName'
 import { socket } from '../../src/hooks/useSocket'
 import { DefaultTallyConfiguration, TallyConfiguration } from '../../src/tally/TallyConfiguration'
 import { setSliderValue, validateSliderValue } from '../browserlib/sliderTestTool'
+import TestConfiguration from '../../src/mixer/test/TestConfiguration'
 
 describe('Tally Settings', () => {
 
@@ -296,6 +297,122 @@ describe('Tally Settings', () => {
       cy.getTestId("tally-settings-oc").should('have.attr', 'data-value', 'yellow-pink')
       cy.getTestId("tally-settings-sc").should('have.attr', 'data-value', 'yellow-pink')
       cy.getTestId("tally-settings-sp").should('have.attr', 'data-value', 'false')
+    })
+  })
+
+  context("correctly implements settings into udp commands", () => {
+
+    let name = randomTallyName()
+
+    beforeEach(() => {
+      name = randomTallyName()
+      cy.task('tally', name)
+      
+      cy.getTestId(`tally-${name}`).contains(name).then(() => {
+        socket.emit('config.change.tallyconfig', (new DefaultTallyConfiguration()).toJson())
+        socket.emit('tally.patch', name, "udp", "1")
+        cy.task("mixerProgPrev", {programs: ["1"], previews: ["2"]})
+      })
+      cy.getTestId(`tally-${name}-menu`).click()
+      cy.getTestId(`tally-${name}-settings`).click()
+  
+      cy.getTestId(`tally-settings`)
+    })
+
+    it("works with the default", () => {
+      cy.task('tallyLastCommand', name).then((lastCommand) => {
+        expect(lastCommand).to.eq("O255/000/000 S255/000/000")
+      }).then(() => {
+        cy.task("mixerProgPrev", {programs: ["2"], previews: ["1"]})
+        cy.task('tallyLastCommand', name).then((lastCommand) => {
+          expect(lastCommand).to.eq("O000/255/000 S000/255/000")
+        })
+      })
+    })
+
+    it("operator brightness", () => {
+      cy.getTestId("tally-settings-ob-toggle")
+        .should('have.attr', 'data-selected', 'true')
+        .click()
+      setSliderValue("*[data-testid=tally-settings-ob]", 50)
+      cy.getTestId(`tally-settings-submit`).click()
+
+      cy.task('tallyLastCommand', name).then((lastCommand) => {
+        expect(lastCommand).to.eq("O128/000/000 S255/000/000")
+      }).then(() => {
+        cy.task("mixerProgPrev", {programs: ["2"], previews: ["1"]})
+        cy.task('tallyLastCommand', name).then((lastCommand) => {
+          expect(lastCommand).to.eq("O000/128/000 S000/255/000")
+        })
+      })
+    })
+
+    it("operator color scheme", () => {
+      cy.getTestId("tally-settings-oc-toggle")
+        .should('have.attr', 'data-selected', 'true')
+        .click()
+      cy.getTestId("tally-settings-oc-yellow-pink").click()
+      cy.getTestId(`tally-settings-submit`).click()
+
+      cy.task('tallyLastCommand', name).then((lastCommand) => {
+        expect(lastCommand).to.eq("O255/255/000 S255/000/000")
+      }).then(() => {
+        cy.task("mixerProgPrev", {programs: ["2"], previews: ["1"]})
+        cy.task('tallyLastCommand', name).then((lastCommand) => {
+          expect(lastCommand).to.eq("O255/000/255 S000/255/000")
+        })
+      })
+    })
+
+    it("stage brightness", () => {
+      cy.getTestId("tally-settings-sb-toggle")
+        .should('have.attr', 'data-selected', 'true')
+        .click()
+      setSliderValue("*[data-testid=tally-settings-sb]", 50)
+      cy.getTestId(`tally-settings-submit`).click()
+
+      cy.task('tallyLastCommand', name).then((lastCommand) => {
+        expect(lastCommand).to.eq("O255/000/000 S128/000/000")
+      }).then(() => {
+        cy.task("mixerProgPrev", {programs: ["2"], previews: ["1"]})
+        cy.task('tallyLastCommand', name).then((lastCommand) => {
+          expect(lastCommand).to.eq("O000/255/000 S000/128/000")
+        })
+      })
+    })
+
+    it("stage color scheme", () => {
+      cy.getTestId("tally-settings-sc-toggle")
+        .should('have.attr', 'data-selected', 'true')
+        .click()
+      cy.getTestId("tally-settings-sc-yellow-pink").click()
+      cy.getTestId(`tally-settings-submit`).click()
+
+      cy.task('tallyLastCommand', name).then((lastCommand) => {
+        expect(lastCommand).to.eq("O255/000/000 S255/255/000")
+      }).then(() => {
+        cy.task("mixerProgPrev", {programs: ["2"], previews: ["1"]})
+        cy.task('tallyLastCommand', name).then((lastCommand) => {
+          expect(lastCommand).to.eq("O000/255/000 S255/000/255")
+        })
+      })
+    })
+
+    it("stage preview", () => {
+      cy.getTestId("tally-settings-sp-toggle")
+        .should('have.attr', 'data-selected', 'true')
+        .click()
+      cy.getTestId("tally-settings-sp").click()
+      cy.getTestId(`tally-settings-submit`).click()
+
+      cy.task('tallyLastCommand', name).then((lastCommand) => {
+        expect(lastCommand).to.eq("O255/000/000 S255/000/000")
+      }).then(() => {
+        cy.task("mixerProgPrev", {programs: ["2"], previews: ["1"]})
+        cy.task('tallyLastCommand', name).then((lastCommand) => {
+          expect(lastCommand).to.eq("O000/255/000 S000/000/000")
+        })
+      })
     })
   })
 

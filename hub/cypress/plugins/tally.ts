@@ -52,11 +52,20 @@ const tallies = function(config: Cypress.PluginConfigOptions) {
     return null
   }
 
+  function tallyLastCommand(name: string) {
+    const tally = mockTallies.find(tally => tally.name === name)
+    if (tally) {
+      return tally.messages[tally.messages.length - 1]
+    }
+    return null
+  }
+
   return {
     tally,
     tallyCleanup,
     tallyDisconnect,
     tallyKill,
+    tallyLastCommand,
     tallyLog,
   }
 }
