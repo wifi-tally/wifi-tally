@@ -1,9 +1,14 @@
-# Upcoming
+# v0.4.0
 
-!!!TODO!!! Code on the Tally HAS changed. It will NOT work with previous versions of the hub.
+**IMPORTANT**: Code on the Tally **HAS** changed. Tallies and the Hub will not be able to communicate
+unless you also update the `.lc` files on the Tallies.
 
+* [BREAKING] The protocol between Tally and Hub has been modified. The hub now sends specific information on what colors to show. This step was necessary because we reached the memory limit on NodeMCU with the newly added features.
+* [ADDED] Tallies can use a pink-yellow color scheme to be better distinguishable for people with a red-green weakness (Protanopia, Deuteranopia)
+* [ADDED] Tallies can be dimmed and the stage light can be turned off completely
+* [ADDED] Tallies have an option to hide preview state on the stage light.
+* [ADDED] All of the settings above can be changed for ALL Tallies or on a per-Tally basis.
 * [ADDED] OBS support to only show on-air status when actually recording or streaming. The Tally Lights will show up as "in preview" when this is not the case.
-
 
 # v0.3.0
 
