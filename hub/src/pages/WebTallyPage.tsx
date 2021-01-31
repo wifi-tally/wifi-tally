@@ -145,7 +145,8 @@ function WebTallyPage() {
     return <PageNotFound>Tally with name <strong>{tallyName}</strong> not found.</PageNotFound>
   }
 
-  const colorScheme = tally ? ColorSchemes.getById(tally.configuration.getOperatorColorScheme() || defaultTallyConfiguration.getOperatorColorScheme()) : undefined
+  const colorSchemeId = tally?.configuration?.getOperatorColorScheme() || defaultTallyConfiguration?.getOperatorColorScheme() || "default"
+  const colorScheme = ColorSchemes.getById(colorSchemeId)
   const classRoot: string[] = [classes.root]
   let dataColor = ""
   let bgColor = theme.palette.grey[800]
