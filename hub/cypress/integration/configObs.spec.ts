@@ -38,15 +38,23 @@ describe('Check OBS Configuration', () => {
     cy.getTestId("obs-submit").should('be.disabled')
     cy.getTestId("obs-port").type("{selectall}1234")
     cy.getTestId("obs-submit").should('be.enabled')
+
+    // liveMode
+    cy.getTestId("obs-liveMode").find("select").select('record')
+    cy.getTestId("obs-submit").should('be.enabled')
+    cy.getTestId("obs-liveMode").find("select").select('always')
+    cy.getTestId("obs-submit").should('be.enabled')
   })
 
   it('can save', () => {
     cy.getTestId("obs-ip").type("{selectall}127.0.0.1")
     cy.getTestId("obs-port").type("{selectall}9876")
+    cy.getTestId("obs-liveMode").find("select").select('stream')
     cy.getTestId("obs-submit").click()
 
     cy.reload()
     cy.get("*[data-testid=obs-ip] input").should('have.value', "127.0.0.1")
     cy.get("*[data-testid=obs-port] input").should("have.value", "9876")
+    cy.get("*[data-testid=obs-liveMode] select :selected").should("have.value", "stream")
   })
 })

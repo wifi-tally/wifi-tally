@@ -1,3 +1,10 @@
+# Upcoming
+
+!!!TODO!!! Code on the Tally HAS changed. It will NOT work with previous versions of the hub.
+
+* [ADDED] OBS support to only show on-air status when actually recording or streaming. The Tally Lights will show up as "in preview" when this is not the case.
+
+
 # v0.3.0
 
 A feature release.

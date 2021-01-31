@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
 import ValidatingInput from '../../../components/config/ValidatingInput'
 import ExternalLink from '../../../components/ExternalLink'
 import { useObsConfiguration } from '../../../hooks/useConfiguration'
 import { socket } from '../../../hooks/useSocket'
+import ObsConfiguration, { ObsConfigurationLiveMode } from '../ObsConfiguration'
 import ObsConnector from '../ObsConnector'
+import ObsLiveModeSelect from './ObsLiveModeSelect'
 
 type ObsSettingsProps = {
     id: typeof ObsConnector.ID,
@@ -17,8 +19,17 @@ function ObsSettings(props: ObsSettingsProps) {
     const [ipValid, setIpValid] = useState(true)
     const [port, setPort] = useState<string|null>(null)
     const [portValid, setPortValid] = useState(true)
+    const [liveMode, setLiveMode] = useState<ObsConfigurationLiveMode|null>(null)
+    const liveModeValid = liveMode !== null
     const isLoading = !configuration
-    const isValid = ipValid && portValid
+    const isValid = ipValid && portValid && liveModeValid
+
+    useMemo(() => {
+        // when default settings change
+        if (configuration) {
+            setLiveMode(configuration.getLiveMode())
+        }
+    }, [configuration])
 
     const handleSave = () => {
         if (configuration === undefined) {
@@ -29,6 +40,7 @@ function ObsSettings(props: ObsSettingsProps) {
             const config = configuration.clone()
             config.setIp(ip)
             config.setPort(port)
+            config.setLiveMode(liveMode)
 
             socket.emit('config.change.obs', config.toJson(), props.id)
         }
@@ -46,6 +58,7 @@ function ObsSettings(props: ObsSettingsProps) {
             { configuration && (<>
                 <ValidatingInput label="Obs IP" testId="obs-ip" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
                 <ValidatingInput label="Obs Port" testId="obs-port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
+                <ObsLiveModeSelect label="On-Air Status" testId="obs-liveMode" value={liveMode} onChange={setLiveMode} />
             </>)}
         </MixerSettingsWrapper>
     )

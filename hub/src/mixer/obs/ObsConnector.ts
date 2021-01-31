@@ -11,18 +11,19 @@ const reconnectTimeoutMs = 1000
 class ObsConnector implements Connector{
     configuration: ObsConfiguration
     communicator: MixerCommunicator
-    embeddedScenes: {}
-    reconnectTimeout: NodeJS.Timeout | null
+    // tracks which scenes are embedded into other scenes
+    embeddedScenes: {} = {}
+    reconnectTimeout: NodeJS.Timeout | null = null
     obs: OBSWebSocket | null
-    connected: boolean
+    connected: boolean = false
+    private previewScenes: string[] = []
+    private programScenes: string[] = []
+    private isStreaming: boolean = false
+    private isRecording: boolean = false
     
     constructor(configuration: ObsConfiguration, communicator: MixerCommunicator) {
         this.configuration = configuration
         this.communicator = communicator
-        // tracks which scenes are embedded into other scenes
-        this.embeddedScenes = {}
-        this.reconnectTimeout = null
-        this.connected = false
     }
     connect() {
         this.obs = new OBSWebSocket()
@@ -65,8 +66,45 @@ class ObsConnector implements Connector{
                 this.updatePreviewScene()
             } else {
                 // if: switched OUT OF studio mode
-                this.communicator.notifyPreviewChanged(null)
+                this.previewScenes = []
+                this.notifyChanged()
             }
+        })
+
+        this.obs.on('StreamStarting', data => {
+            // console.debug('StreamStarted', data)
+            this.isStreaming = true
+            this.notifyChanged()
+        })
+        this.obs.on('StreamStopped', data => {
+            // console.debug('StreamStopped', data)
+            this.isStreaming = false
+            this.notifyChanged()
+        })
+        this.obs.on('RecordingStarting', data => {
+            // console.debug('RecordingStarting', data)
+            this.isRecording = true
+            this.notifyChanged()
+        })
+        this.obs.on('RecordingStopped', data => {
+            // console.debug('RecordingStopped', data)
+            this.isRecording = false
+            this.notifyChanged()
+        })
+        this.obs.on('RecordingPaused', data => {
+            // console.debug('RecordingPaused', data)
+            this.isRecording = false
+            this.notifyChanged()
+        })
+        this.obs.on('RecordingResumed', data => {
+            // console.debug('RecordingResumed', data)
+            this.isRecording = true
+            this.notifyChanged()
+        })
+        this.obs.on('StreamStatus', data => {
+            this.isStreaming = data.streaming
+            this.isRecording = data.recording
+            this.notifyChanged()
         })
 
         const connect = () => {
@@ -132,22 +170,51 @@ class ObsConnector implements Connector{
         })
     }
     private notifyProgramChanged(scenes: string[]) {
-        const programs: string[] = []
-        scenes.forEach(scene => {
+        this.programScenes = scenes
+        this.notifyChanged()
+    }
+    private notifyPreviewChanged(scenes: string[]) {
+        this.previewScenes = scenes
+        this.notifyChanged()
+    }
+
+    private shouldProgramBeShownAsPreview(): boolean {
+        const mode = this.configuration.getLiveMode()
+        if (mode === "always") {
+            return false
+        } else if (mode === "record") {
+            return !this.isRecording
+        } else if(mode === "stream") {
+            return !this.isStreaming
+        } else if(mode === "streamOrRecord") {
+            return !this.isStreaming && !this.isRecording
+        } else {
+            ((_: never) => {})(mode) // if typescript complains about this, we forgot a case
+        }
+    }
+
+    private notifyChanged() {
+        let programs: string[] = []
+        
+        this.programScenes.forEach(scene => {
             programs.push(scene)
             programs.push(...(this.embeddedScenes[scene] || []))
         })
 
-        this.communicator.notifyProgramChanged(programs)
-    }
-    private notifyPreviewChanged(scenes: string[]) {
-        const previews: string[] = []
-        scenes.forEach(scene => {
-            previews.push(scene)
-            previews.push(...(this.embeddedScenes[scene] || []))
-        })
+        let previews: string[] = []
+        if (this.shouldProgramBeShownAsPreview()) {
+            previews = programs
+            programs = []
+        } else {
+            this.previewScenes.forEach(scene => {
+                previews.push(scene)
+                previews.push(...(this.embeddedScenes[scene] || []))
+            })
+        }
+        
+        
 
-        this.communicator.notifyPreviewChanged(previews)
+        this.communicator.notifyProgramPreviewChanged(programs, previews)
     }
 
     disconnect() {
