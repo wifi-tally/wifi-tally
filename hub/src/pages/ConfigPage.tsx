@@ -8,6 +8,7 @@ import ObsSettings from '../mixer/obs/react/ObsSettings'
 import TestSettings from '../mixer/test/react/TestSettings'
 import VmixSettings from '../mixer/vmix/react/VmixSettings'
 import TallySettings from '../components/config/TallySettings'
+import WirecastSettings from '../mixer/wirecast/react/WirecastSettings'
 
 const ConfigPage = () => {
   return (
@@ -19,6 +20,7 @@ const ConfigPage = () => {
         <ObsSettings />
         <TestSettings />
         <VmixSettings />
+        <WirecastSettings />
       </MixerSelection>
       <TallySettings />
     </Layout>

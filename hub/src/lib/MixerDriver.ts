@@ -9,6 +9,7 @@ import type { AppConfiguration } from './AppConfiguration'
 import ServerEventEmitter from './ServerEventEmitter'
 import { Configuration, Connector } from '../mixer/interfaces'
 import TestConnector from '../mixer/test/TestConnector'
+import WirecastConnector from '../mixer/wirecast/WirecastConnector'
 
 const haveValuesChanged = (one: any, two: any) => {
     //@TODO: this could probably be more performant
@@ -87,6 +88,9 @@ export class MixerDriver {
             } else if(newMixerId === ObsConnector.ID) {
                 MixerClass = ObsConnector
                 this.getCurrentMixerSettings = this.configuration.getObsConfiguration.bind(this.configuration)
+            } else if(newMixerId === WirecastConnector.ID) {
+                MixerClass = WirecastConnector
+                this.getCurrentMixerSettings = this.configuration.getWirecastConfiguration.bind(this.configuration)
             } else if(newMixerId === MockConnector.ID) {
                 MixerClass = MockConnector
                 this.getCurrentMixerSettings = this.configuration.getMockConfiguration.bind(this.configuration)
@@ -131,6 +135,7 @@ export class MixerDriver {
             AtemConnector.ID,
             ObsConnector.ID,
             VmixConnector.ID,
+            WirecastConnector.ID,
         ]
 
         if (!isDev) {

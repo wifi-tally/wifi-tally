@@ -22,6 +22,7 @@ import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
 import WebTallyDriver from './tally/WebTallyDriver'
 import { DefaultTallyConfiguration, TallyConfiguration } from './tally/TallyConfiguration'
+import WirecastConfiguration from './mixer/wirecast/WirecastConfiguration'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -129,6 +130,9 @@ io.on('connection', (socket: ServerSideSocket) => {
     new SocketAwareEvent(myEmitter, 'config.changed.vmix', socket, (socket, vmixConfiguration) => {
       socket.emit('config.state.vmix', vmixConfiguration.toJson())
     }),
+    new SocketAwareEvent(myEmitter, 'config.changed.wirecast', socket, (socket, wirecastConfiguration) => {
+      socket.emit('config.state.wirecast', wirecastConfiguration.toJson())
+    }),
     new SocketAwareEvent(myEmitter, 'config.changed.tallyconfig', socket, (socket, tallyConfiguration) => {
       socket.emit('config.state.tallyconfig', tallyConfiguration.toJson())
     }),
@@ -144,6 +148,7 @@ io.on('connection', (socket: ServerSideSocket) => {
     socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
+    socket.emit('config.state.wirecast', myConfiguration.getWirecastConfiguration().toJson())
     socket.emit('config.state.tallyconfig', myConfiguration.getTallyConfiguration().toJson())
   })
   socket.on('events.program.unsubscribe', () => {
@@ -272,6 +277,15 @@ io.on('connection', (socket: ServerSideSocket) => {
     const vmix = new VmixConfiguration()
     vmix.fromJson(newVmixConfiguration)
     myConfiguration.setVmixConfiguration(vmix)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.wirecast', (newWirecastConfiguration, newMixerName) => {
+    const wirecast = new WirecastConfiguration()
+    wirecast.fromJson(newWirecastConfiguration)
+    myConfiguration.setWirecastConfiguration(wirecast)
 
     if (newMixerName) {
       myConfiguration.setMixerSelection(newMixerName)

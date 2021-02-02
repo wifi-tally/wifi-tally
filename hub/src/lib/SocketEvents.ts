@@ -9,6 +9,7 @@ import { LogObjectType } from "../domain/Log";
 import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
 import { StateCommand } from "../tally/CommandCreator";
 import { TallyConfigurationObjectType } from "../tally/TallyConfiguration";
+import { WirecastConfigurationSaveType } from "../mixer/wirecast/WirecastConfiguration";
 
 // events the server sends to the client
 export interface ServerSentEvents {
@@ -26,6 +27,7 @@ export interface ServerSentEvents {
     'config.state.mock': (mockConfiguration: MockConfigurationSaveType) => void
     'config.state.obs': (obsConfiguration: ObsConfigurationSaveType) => void
     'config.state.vmix': (vmixConfiguration: VmixConfigurationSaveType) => void
+    'config.state.wirecast': (wirecastConfiguration: WirecastConfigurationSaveType) => void
     'config.state.tallyconfig': (defaultTallyConfiguration: TallyConfigurationObjectType) => void
     'config.state.mixer': (data: {mixerName: string, allowedMixers: string[]}) => void
 }
@@ -59,6 +61,7 @@ export interface ClientSentEvents {
     'config.change.test': (testConfiguration: TestConfigurationSaveType, newMixer?: "test") => void
     'config.change.obs': (obsConfiguration: ObsConfigurationSaveType, newMixer?: "obs") => void
     'config.change.vmix': (vmixConfiguration: VmixConfigurationSaveType, newMixer?: "vmix") => void
+    'config.change.wirecast': (wirecastConfiguration: WirecastConfigurationSaveType, newMixer?: "wirecast") => void
     'config.change.tallyconfig': (configuration: TallyConfigurationObjectType) => void
 }
 

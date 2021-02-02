@@ -6,6 +6,7 @@ import ObsConfiguration from '../mixer/obs/ObsConfiguration';
 import MockConfiguration from '../mixer/mock/MockConfiguration';
 import AtemConfiguration from '../mixer/atem/AtemConfiguration';
 import { DefaultTallyConfiguration } from '../tally/TallyConfiguration';
+import WirecastConfiguration from '../mixer/wirecast/WirecastConfiguration';
 
 const configTracker = new ConfigTracker(socket)
 
@@ -118,6 +119,25 @@ export function useVmixConfiguration() {
   }, [])
 
   return vmixConfiguration
+}
+
+export function useWirecastConfiguration() {
+  const [wirecastConfiguration, setWirecastConfiguration] = useState<WirecastConfiguration|undefined>(undefined)
+
+  const onChange = newConf => {
+    setWirecastConfiguration(newConf)
+  }
+
+  useEffect(() => {
+    configTracker.on("wirecast", onChange)
+    setWirecastConfiguration(configTracker.wirecastConfiguration)
+    return () => {
+      // cleanup
+      configTracker.off("wirecast", onChange)
+    }
+  }, [])
+
+  return wirecastConfiguration
 }
 
 export function useDefaultTallyConfiguration() {

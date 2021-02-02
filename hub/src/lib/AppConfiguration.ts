@@ -5,6 +5,7 @@ import AtemConfiguration from '../mixer/atem/AtemConfiguration'
 import MockConfiguration from '../mixer/mock/MockConfiguration'
 import ObsConfiguration from '../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
+import WirecastConfiguration from '../mixer/wirecast/WirecastConfiguration'
 import NullConfiguration from '../mixer/null/NullConfiguration'
 import { Configuration } from '../mixer/interfaces'
 import Tally from '../domain/Tally'
@@ -19,6 +20,7 @@ export class AppConfiguration extends Configuration {
     obsConfiguration: ObsConfiguration
     testConfiguration: TestConfiguration
     vmixConfiguration: VmixConfiguration
+    wirecastConfiguration: WirecastConfiguration
     tallyConfiguration: DefaultTallyConfiguration
     tallies: Tally[]
     channels: Channel[]
@@ -38,6 +40,7 @@ export class AppConfiguration extends Configuration {
         this.obsConfiguration = new ObsConfiguration()
         this.testConfiguration = new TestConfiguration()
         this.vmixConfiguration = new VmixConfiguration()
+        this.wirecastConfiguration = new WirecastConfiguration()
         this.tallyConfiguration = new DefaultTallyConfiguration()
         this.tallies = []
         this.channels = MixerDriver.defaultChannels
@@ -102,6 +105,9 @@ export class AppConfiguration extends Configuration {
         if (data.vmix) {
             this.vmixConfiguration.fromJson(data.vmix)
         }
+        if (data.wirecast) {
+            this.wirecastConfiguration.fromJson(data.wirecast)
+        }
         if (data.tallyDefaults) {
             this.tallyConfiguration.fromJson(data.tallyDefaults)
         }
@@ -118,6 +124,7 @@ export class AppConfiguration extends Configuration {
             obs: this.obsConfiguration.toJson(),
             test: this.testConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
+            wirecast: this.wirecastConfiguration.toJson(),
             tallyDefaults: this.tallyConfiguration.toJson(),
             tallies: this.tallies.map(tally => tally.toJsonForSave()),
             channels: this.channels.map(channel => channel.toJson()),
@@ -187,6 +194,16 @@ export class AppConfiguration extends Configuration {
         this.vmixConfiguration = vmixConfiguration.clone()
         this.emitter.emit("config.changed", this)
         this.emitter.emit("config.changed.vmix", this.vmixConfiguration)
+    }
+
+    getWirecastConfiguration() {
+        return this.wirecastConfiguration.clone()
+    }
+
+    setWirecastConfiguration(wirecastConfiguration: WirecastConfiguration) {
+        this.wirecastConfiguration = wirecastConfiguration.clone()
+        this.emitter.emit("config.changed", this)
+        this.emitter.emit("config.changed.wirecast", this.wirecastConfiguration)
     }
 
     getTallyConfiguration() {

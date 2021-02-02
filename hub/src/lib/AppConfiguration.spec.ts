@@ -5,6 +5,7 @@ import AtemConfiguration from '../mixer/atem/AtemConfiguration'
 import MockConfiguration from '../mixer/mock/MockConfiguration'
 import ObsConfiguration from '../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
+import WirecastConfiguration from '../mixer/wirecast/WirecastConfiguration'
 import {UdpTally, WebTally} from '../domain/Tally'
 import { DefaultTallyConfiguration } from '../tally/TallyConfiguration'
 
@@ -59,7 +60,18 @@ describe("toJson/fromJson", () => {
         otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getVmixConfiguration().getIp().toString()).toEqual("10.1.1.44")
+    })
+    test('it can persist wirecast configuration', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+        const wirecastConfig = new WirecastConfiguration()
+        wirecastConfig.setIp("10.1.1.45")
+        config.setWirecastConfiguration(wirecastConfig)
 
+        const otherConfig = new AppConfiguration(emitter)
+        otherConfig.fromJson(config.toJson())
+
+        expect(otherConfig.getWirecastConfiguration().getIp().toString()).toEqual("10.1.1.45")
     })
     test('it can persist mixer selection', () => {
         const emitter = new EventEmitter()

@@ -5,6 +5,7 @@ import MockConfiguration from '../../mixer/mock/MockConfiguration'
 import NullConfiguration from '../../mixer/null/NullConfiguration'
 import ObsConfiguration from '../../mixer/obs/ObsConfiguration'
 import VmixConfiguration from '../../mixer/vmix/VmixConfiguration'
+import WirecastConfiguration from '../../mixer/wirecast/WirecastConfiguration'
 import { DefaultTallyConfiguration } from '../../tally/TallyConfiguration'
 
 class ConfigTracker extends EventEmitter{
@@ -16,6 +17,7 @@ class ConfigTracker extends EventEmitter{
     mockConfiguration?: MockConfiguration
     obsConfiguration?: ObsConfiguration
     vmixConfiguration?: VmixConfiguration
+    wirecastConfiguration?: WirecastConfiguration
     defaultTallyConfiguration?: DefaultTallyConfiguration
 
     constructor(socket: ClientSideSocket) {
@@ -45,6 +47,11 @@ class ConfigTracker extends EventEmitter{
         socket.on('config.state.vmix', (vmix) => {
             this.vmixConfiguration = new VmixConfiguration()
             this.vmixConfiguration.fromJson(vmix)
+            this.emit('vmix', this.vmixConfiguration)
+        })
+        socket.on('config.state.wirecast', (vmix) => {
+            this.wirecastConfiguration = new WirecastConfiguration()
+            this.wirecastConfiguration.fromJson(vmix)
             this.emit('vmix', this.vmixConfiguration)
         })
         socket.on('config.state.tallyconfig', (conf) => {

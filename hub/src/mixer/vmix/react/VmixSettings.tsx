@@ -34,7 +34,7 @@ function VmixSettings(props: VmixSettingsProps) {
 
     return (
         <MixerSettingsWrapper 
-            title="vMix"
+            title="vMix Configuration"
             testId="vmix"
             description="Connects to any vMix over network."
             canBeSaved={isValid}

@@ -8,6 +8,7 @@ import NullConfiguration from "../mixer/null/NullConfiguration";
 import ObsConfiguration from "../mixer/obs/ObsConfiguration";
 import TestConfiguration from "../mixer/test/TestConfiguration";
 import VmixConfiguration from "../mixer/vmix/VmixConfiguration";
+import WirecastConfiguration from "../mixer/wirecast/WirecastConfiguration";
 import { DefaultTallyConfiguration } from "../tally/TallyConfiguration";
 import { AppConfiguration } from "./AppConfiguration";
 import { ChannelList } from "./MixerCommunicator";
@@ -22,6 +23,7 @@ export interface EventHandlersDataMap {
     'config.changed.obs': (obsConfiguration: ObsConfiguration) => void
     'config.changed.test': (testConfiguration: TestConfiguration) => void
     'config.changed.vmix': (vmixConfiguration: VmixConfiguration) => void
+    'config.changed.wirecast': (wirecastConfiguration: WirecastConfiguration) => void
     'config.changed.tallyconfig': (tallyConfiguration: DefaultTallyConfiguration) => void
     'config.changed.channels': (channels: Channel[]) => void
     'config.changed.tallies': (tallies: Tally[]) => void
