@@ -1,3 +1,7 @@
+# Upcoming
+
+* [ADDED] the dim green light for the operator, that indicates the tally is working, can be turned off #50
+
 # v0.4.0
 
 **IMPORTANT**: Code on the Tally **HAS** changed. Tallies and the Hub will not be able to communicate

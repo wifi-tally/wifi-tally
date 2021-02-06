@@ -32,6 +32,7 @@ function TallySettings() {
   const [operatorColorScheme, setOperatorColorScheme] = useState<ColorSchemeId>(undefined)
   const [stageColorScheme, setStageColorScheme] = useState<ColorSchemeId>(undefined)
   const [stageShowsPreview, setStageShowsPreview] = useState<boolean>(undefined)
+  const [operatorShowsIdle, setOperatorShowsIdle] = useState<boolean>(undefined)
   useMemo(() => {
     // called when setting changed
     setOperatorBrightness(settings?.getOperatorLightBrightness())
@@ -39,7 +40,7 @@ function TallySettings() {
     setOperatorColorScheme(settings?.getOperatorColorScheme())
     setStageColorScheme(settings?.getStageColorScheme())
     setStageShowsPreview(settings?.getStageShowsPreview())
-    
+    setOperatorShowsIdle(settings?.getOperatorShowsIdle())
   }, [settings])
 
   const classes = useStyle()
@@ -52,6 +53,7 @@ function TallySettings() {
     operatorColorScheme !== undefined && settings.setOperatorColorScheme(operatorColorScheme)
     stageColorScheme !== undefined && settings.setStageColorScheme(stageColorScheme)
     stageShowsPreview !== undefined && settings.setStageShowsPreview(stageShowsPreview)
+    operatorShowsIdle !== undefined && settings.setOperatorShowsIdle(operatorShowsIdle)
 
     socket.emit('config.change.tallyconfig', settings.toJson())
   }
@@ -74,6 +76,21 @@ function TallySettings() {
           testId="tally-defaults-oc"
           value={operatorColorScheme}
           onChange={(value) => {setOperatorColorScheme(value)}}
+        />
+      </div>
+      <div className={classes.input}>
+        <Typography paragraph variant="h6">Operator Display</Typography>
+        <FormControlLabel
+          classes={{label: classes.checkboxLabel}}
+          control={<Checkbox
+            data-testid="tally-defaults-oi"
+            data-value={operatorShowsIdle}
+            checked={operatorShowsIdle}
+            color="primary"
+            onChange={(e) => {setOperatorShowsIdle(e.target.checked)}}
+            size="small"
+          />}
+          label="Shows Idle State"
         />
       </div>
       <div className={classes.input}>
