@@ -48,7 +48,7 @@ WS2812 strip for the stage light.
 The configuration for this example would be
 
 ````ini
-operator.ws2812 = 0
+operator.ws2812 = 1
 stage.ws2812    = 4
 ````
 
