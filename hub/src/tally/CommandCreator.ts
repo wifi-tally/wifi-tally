@@ -43,7 +43,8 @@ class CommandCreator {
       const showPreview = tally.configuration.getStageShowsPreview() === undefined ? defaultConfiguration.getStageShowsPreview() : tally.configuration.getStageShowsPreview()
       stColor = showPreview ? stColorScheme.preview : Black
     } else if (state === "release") {
-      opColor = opColorScheme.idle
+      const showIdle = tally.configuration.getOperatorShowsIdle() === undefined ? defaultConfiguration.getOperatorShowsIdle() : tally.configuration.getOperatorShowsIdle()
+      opColor = showIdle ? opColorScheme.idle : Black
       stColor = Black
     } else if (state === "unknown") {
       opColor = opColorScheme.unknown

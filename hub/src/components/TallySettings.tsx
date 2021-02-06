@@ -44,6 +44,9 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
   // stageShowPreview
   const [sp, setSp] = useState<boolean>(settings ? settings.getStageShowsPreview() : undefined)
   const [isSpDefault, setSpDefault] = useState(settings && settings.getStageShowsPreview() === undefined)
+  // operatorShowIdle
+  const [oi, setOi] = useState<boolean>(settings ? settings.getOperatorShowsIdle() : undefined)
+  const [isOiDefault, setOiDefault] = useState(settings && settings.getOperatorShowsIdle() === undefined)
   useMemo(() => {
     // when default settings change
     if (defaultSettings) {
@@ -52,6 +55,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
       if (isOcDefault) { setOc(defaultSettings.getOperatorColorScheme()) }
       if (isScDefault) { setSc(defaultSettings.getStageColorScheme()) }
       if (isSpDefault) { setSp(defaultSettings.getStageShowsPreview()) }
+      if (isOiDefault) { setOi(defaultSettings.getOperatorShowsIdle()) }
     }
   }, [defaultSettings])
   useMemo(() => {
@@ -62,17 +66,20 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
       const newIsOcDefault = settings.getOperatorColorScheme() === undefined
       const newIsScDefault = settings.getStageColorScheme() === undefined
       const newIsSpDefault = settings.getStageShowsPreview() === undefined
+      const newIsOiDefault = settings.getOperatorShowsIdle() === undefined
       setObDefault(newIsObDefault)
       setSbDefault(newIsSbDefault)
       setOcDefault(newIsOcDefault)
       setScDefault(newIsScDefault)
       setSpDefault(newIsSpDefault)
+      setOiDefault(newIsOiDefault)
 
       if (!newIsObDefault) { setOb(settings.getOperatorLightBrightness()) }
       if (!newIsSbDefault) { setSb(settings.getStageLightBrightness()) }
       if (!newIsOcDefault) { setOc(settings.getOperatorColorScheme()) }
       if (!newIsScDefault) { setSc(settings.getStageColorScheme()) }
       if (!newIsSpDefault) { setSp(settings.getStageShowsPreview()) }
+      if (!newIsOiDefault) { setOi(settings.getOperatorShowsIdle()) }
     }
   }, [settings])
 
@@ -87,6 +94,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
     settings.setStageLightBrightness((!tally.hasStageLight || isSbDefault) ? undefined : sb)
     settings.setStageColorScheme((!tally.hasStageLight || isScDefault) ? undefined : sc)
     settings.setStageShowsPreview((!tally.hasStageLight || isSpDefault) ? undefined : sp)
+    settings.setOperatorShowsIdle((isOiDefault) ? undefined : oi)
     socket.emit('tally.settings', tally.name, tally.type, settings.toJson())
     onClose && onClose()
   }
@@ -128,6 +136,27 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
             value={oc}
             onChange={(value) => { setOc(value) }}
             disabled={isOcDefault}
+          />
+        </TallySettingsField>
+        <TallySettingsField
+          label="Operator Display"
+          isDefault={isOiDefault}
+          onChange={setOiDefault}
+          testId="tally-settings-oi"
+          className={classes.input}
+        >
+          <FormControlLabel
+            classes={{label: classes.checkboxLabel}}
+            control={<Checkbox
+              data-testid="tally-settings-oi"
+              data-value={isOiDefault ? defaultSettings.getOperatorShowsIdle() : oi}
+              checked={isOiDefault ? defaultSettings.getOperatorShowsIdle() : oi}
+              disabled={isOiDefault}
+              color="primary"
+              onChange={(e) => {setOi(e.target.checked)}}
+              size="small"
+            />}
+            label="Shows Idle State"
           />
         </TallySettingsField>
         { tally.hasStageLight && (<>
