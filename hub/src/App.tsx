@@ -6,6 +6,7 @@ import IndexPage from './pages/IndexPage'
 import ConfigPage from './pages/ConfigPage'
 import TallyLogPage from './pages/TallyLogPage'
 import WebTallyPage from './pages/WebTallyPage'
+import FlasherIniPage from './pages/FlasherIniPage'
 
 function App() {
   return (
@@ -21,6 +22,9 @@ function App() {
           </Route>
           <Route exact path="/config">
             <ConfigPage />
+          </Route>
+          <Route exact path="/flasher">
+            <FlasherIniPage />
           </Route>
           <Route path="/">
             <IndexPage />
