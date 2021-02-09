@@ -11,6 +11,7 @@ import { LogObjectType } from "../domain/Log";
 import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
 import { StateCommand } from "../tally/CommandCreator";
 import { TallyConfigurationObjectType } from "../tally/TallyConfiguration";
+import { TallyDeviceObjectType } from "../flasher/TallyDevice";
 
 // events the server sends to the client
 export interface ServerSentEvents {
@@ -32,6 +33,8 @@ export interface ServerSentEvents {
     'config.state.vmix': (vmixConfiguration: VmixConfigurationSaveType) => void
     'config.state.tallyconfig': (defaultTallyConfiguration: TallyConfigurationObjectType) => void
     'config.state.mixer': (data: {mixerName: string, allowedMixers: string[]}) => void
+
+    'flasher.device': (tallyDevice: TallyDeviceObjectType) => void
 }
 
 // events the client sends to the server
@@ -66,6 +69,8 @@ export interface ClientSentEvents {
     'config.change.rolandV60HD': (rolandV60HDConfiguration: RolandV60HDConfigurationSaveType, newMixer?: "rolandV60HD") => void
     'config.change.vmix': (vmixConfiguration: VmixConfigurationSaveType, newMixer?: "vmix") => void
     'config.change.tallyconfig': (configuration: TallyConfigurationObjectType) => void
+
+    'flasher.device.get': () => void
 }
 
 export interface ServerSideSocket {
