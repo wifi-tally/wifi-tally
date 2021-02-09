@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "atem-connection": "^2.0.0",
+    "escape-string-regexp": "^4.0.0",
     "express": "^4.15.2",
     "http-proxy-middleware": "^1.0.6",
+    "nodemcu-tool": "^3.2.1",
     "obs-websocket-js": "^4.0.2",
     "socket.io": "^2.4.1",
     "socket.io-client": "^2.4.0",

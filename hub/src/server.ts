@@ -22,6 +22,7 @@ import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
 import WebTallyDriver from './tally/WebTallyDriver'
 import { DefaultTallyConfiguration, TallyConfiguration } from './tally/TallyConfiguration'
+import NodeMcuConnector from './flasher/NodeMcuConnector'
 
 const argv = yargs.argv
 if (argv.env !== undefined) {
@@ -53,6 +54,8 @@ new UdpTallyDriver(myConfiguration, myTallyContainer)
 const myWebTallyDriver = new WebTallyDriver(myConfiguration, myTallyContainer)
 
 const myMixerDriver = new MixerDriver(myConfiguration, myEmitter)
+
+const myNodeMcuConnector = new NodeMcuConnector()
 
 // log stuff
 myEmitter.on('tally.logged', ({tally, log}) => {
@@ -281,6 +284,12 @@ io.on('connection', (socket: ServerSideSocket) => {
     const configuration = new DefaultTallyConfiguration()
     configuration.fromJson(conf)
     myConfiguration.setTallyConfiguration(configuration)
+  })
+
+  socket.on('flasher.device.get', () => {
+    myNodeMcuConnector.getDevice().then(device => {
+      socket.emit('flasher.device', device.toJson())
+    })
   })
 })
 
