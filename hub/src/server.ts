@@ -313,6 +313,13 @@ io.on('connection', (socket: ServerSideSocket) => {
       socket.emit('flasher.device', device.toJson())
     })
   })
+
+  socket.on('flasher.settingsIni', (path, settingsIniString) => {
+    myNodeMcuConnector.writeTallySettingsIni(path, settingsIniString, (state) => {
+      console.log(state)
+      socket.emit('flasher.settingsIni.progress', state)
+    })
+  })
 })
 
 if (myConfiguration.isDev()) {

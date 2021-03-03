@@ -8,6 +8,8 @@ const useStyles = makeStyles(theme => {
       marginBottom: theme.spacing(2),
     },
     header: {
+      display: "flex",
+      justifyContent: "space-between",
       padding: theme.spacing(1, 2),
       borderBottom: "1px solid " + theme.palette.background.default,
     },
@@ -19,11 +21,12 @@ const useStyles = makeStyles(theme => {
 
 type MiniPageProps = {
   title?: string,
+  addHeaderContent?: React.ReactNode
   contentPadding?: string
   children: React.ReactNode
 }
 
-function MiniPage({ title, contentPadding, children }: MiniPageProps) {
+function MiniPage({ title, addHeaderContent, contentPadding, children }: MiniPageProps) {
   const classes = useStyles({
     contentPadding
   })
@@ -31,7 +34,10 @@ function MiniPage({ title, contentPadding, children }: MiniPageProps) {
   return(
     <Container className={classes.root} maxWidth="sm">
       <Paper>
-        <Typography variant="h1" className={classes.header}>{title}</Typography>
+        <div className={classes.header}>
+          <Typography variant="h1">{title}</Typography>
+          {addHeaderContent}
+        </div>
         <div className={classes.content}>{children}</div>
       </Paper>
     </Container>
