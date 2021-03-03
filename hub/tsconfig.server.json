@@ -5,6 +5,7 @@
     "module": "commonjs",
     "outDir": "dist",
     "noEmit": false,
+    "moduleResolution": "node",
     "isolatedModules": false,
   }
 }
