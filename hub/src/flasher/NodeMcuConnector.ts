@@ -28,6 +28,16 @@ export interface TallySettingsIniProgressType {
   error: boolean
 }
 
+export interface TallyProgramProgressType {
+  inititalizeDone: boolean
+  connectionDone: boolean
+  filesUploaded: number
+  filesTotal: number
+  rebootDone: boolean
+  allDone: boolean
+  error: boolean
+}
+
 class NodeMcuConnector {
   nodemcu: any
 
@@ -58,6 +68,27 @@ class NodeMcuConnector {
     this.nodemcu = nodemcu
     this.nodemcu.onError((error:any) => {
       console.error(error)
+    })
+  }
+
+  private static async getLocalFiles() {
+    const dirName = __dirname + "/../../../tally/out" // @TODO: location is different on prod
+    const files = await fs.readdir(dirName)
+    const filteredFiles = files.filter(file => file.endsWith(".lc") || file.endsWith(".lua"))
+    return Promise.all(filteredFiles.map(async file => {
+      const stats = await fs.stat(dirName + "/" + file)
+      return {
+        fileName: file,
+        filePath: `${dirName}/${file}`,
+        fileSize: stats.size,
+      }
+    }))
+  }
+
+  private static async doFilesNeedUpdate(filesOnNodemcu: {name: string, size: number}[]) : Promise<boolean> {
+    const localFiles = await NodeMcuConnector.getLocalFiles()
+    return localFiles.some(localFile => {  
+      return filesOnNodemcu.every(nodeMcuFile => nodeMcuFile.name !== localFile.fileName || nodeMcuFile.size !== localFile.fileSize)
     })
   }
 
@@ -114,6 +145,11 @@ class NodeMcuConnector {
 
   async getDevice(): Promise<TallyDevice> {
     const tallyDevice = new TallyDevice()
+    const localFiles = await NodeMcuConnector.getLocalFiles()
+    const updatePossible = localFiles.length > 0
+    if (!updatePossible) {
+      tallyDevice.update = "not-available"
+    }
 
     try {
       return await this.withMutex(async () => {
@@ -134,6 +170,12 @@ class NodeMcuConnector {
           tallyDevice.nodeMcuModules = deviceInfo.modules
 
           const fsinfo = await this.nodemcu.fsinfo()
+          if (updatePossible) {
+            tallyDevice.update = await NodeMcuConnector.doFilesNeedUpdate(fsinfo.files) ? "updateable" : "up-to-date"
+          }
+
+          console.log(tallyDevice)
+
           const settingsFileExists = fsinfo.files.some(file => file.name === fileName)
 
           if (settingsFileExists) {
@@ -150,6 +192,43 @@ class NodeMcuConnector {
     }
     finally {
       if(this.nodemcu && this.nodemcu.isConnected()) { await this.nodemcu.disconnect() }
+    }
+  }
+
+  async program(path: string, onProgress: (state: TallyProgramProgressType) => void) {
+    const progress: TallyProgramProgressType = {
+      inititalizeDone: false,
+      connectionDone: false,
+      filesUploaded: 0,
+      filesTotal: null,
+      rebootDone: false,
+      allDone: false,
+      error: false,
+    }
+    onProgress(progress)
+
+    try {
+
+
+      // await this.withMutex(async () => {
+      //   progress.inititalizeDone = true
+      //   onProgress(progress)
+
+      //   await this.connect(path)
+
+      //   progress.connectionDone = true
+      //   onProgress(progress)
+      // })
+    }
+    catch (e) {
+      console.error(`programming failed because of: ${e}`)
+
+      progress.error = true
+      onProgress(progress)
+      return false
+    }
+    finally {
+      if(this.nodemcu && this.nodemcu.isConnected()) { this.nodemcu.disconnect() }
     }
   }
 

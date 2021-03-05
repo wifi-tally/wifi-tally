@@ -1,5 +1,7 @@
 import TallySettingsIni from "./TallySettingsIni"
 
+export type UpdateType = "not-available" | "up-to-date" | "updateable"
+
 export interface TallyDeviceObjectType {
   vendorId: string
   productId: string
@@ -10,6 +12,7 @@ export interface TallyDeviceObjectType {
   path: string
   tallySettings?: string
   errorMessage?: string
+  update?: UpdateType
 }
 
 class TallyDevice{
@@ -20,6 +23,7 @@ class TallyDevice{
   nodeMcuModules: string
   nodeMcuVersion: string
   path: string
+  update?: UpdateType
   tallySettings?: TallySettingsIni
   errorMessage?: string
 
@@ -34,6 +38,7 @@ class TallyDevice{
       path: this.path,
       tallySettings: this.tallySettings ? this.tallySettings.toString() : undefined,
       errorMessage: this.errorMessage,
+      update: this.update,
     }
   }
 
@@ -48,6 +53,7 @@ class TallyDevice{
     device.path = data.path
     device.tallySettings = data.tallySettings ? new TallySettingsIni(data.tallySettings) : undefined
     device.errorMessage = data.errorMessage
+    device.update = data.update
 
     return device
   }
