@@ -316,8 +316,13 @@ io.on('connection', (socket: ServerSideSocket) => {
 
   socket.on('flasher.settingsIni', (path, settingsIniString) => {
     myNodeMcuConnector.writeTallySettingsIni(path, settingsIniString, (state) => {
-      console.log(state)
       socket.emit('flasher.settingsIni.progress', state)
+    })
+  })
+
+  socket.on('flasher.program', (path) => {
+    myNodeMcuConnector.program(path, (state) => {
+      socket.emit('flasher.program.progress', state)
     })
   })
 })

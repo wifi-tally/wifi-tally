@@ -174,8 +174,6 @@ class NodeMcuConnector {
             tallyDevice.update = await NodeMcuConnector.doFilesNeedUpdate(fsinfo.files) ? "updateable" : "up-to-date"
           }
 
-          console.log(tallyDevice)
-
           const settingsFileExists = fsinfo.files.some(file => file.name === fileName)
 
           if (settingsFileExists) {
@@ -196,11 +194,12 @@ class NodeMcuConnector {
   }
 
   async program(path: string, onProgress: (state: TallyProgramProgressType) => void) {
+    const files = await NodeMcuConnector.getLocalFiles()
     const progress: TallyProgramProgressType = {
       inititalizeDone: false,
       connectionDone: false,
       filesUploaded: 0,
-      filesTotal: null,
+      filesTotal: files.length,
       rebootDone: false,
       allDone: false,
       error: false,
@@ -208,17 +207,29 @@ class NodeMcuConnector {
     onProgress(progress)
 
     try {
+      await this.withMutex(async () => {
+        progress.inititalizeDone = true
+        onProgress(progress)
 
+        await this.connect(path)
 
-      // await this.withMutex(async () => {
-      //   progress.inititalizeDone = true
-      //   onProgress(progress)
+        progress.connectionDone = true
+        onProgress(progress)
 
-      //   await this.connect(path)
+        for(const file of files) {
+          await this.saveFileUpload(file.fileName, file.filePath)
+          progress.filesUploaded = progress.filesUploaded + 1
+          onProgress(progress)
+        }
 
-      //   progress.connectionDone = true
-      //   onProgress(progress)
-      // })
+        await this.hardReset(path)
+
+        progress.rebootDone = true
+        onProgress(progress)
+
+        progress.allDone = true
+        onProgress(progress)
+      })
     }
     catch (e) {
       console.error(`programming failed because of: ${e}`)
@@ -266,7 +277,7 @@ class NodeMcuConnector {
         onProgress(progress)
 
         try {
-          await this.saveFileUpload(fileName, settingsIniString)
+          await this.saveContentUpload(fileName, settingsIniString)
         } catch (e) {
           console.error(e)
         }
@@ -274,26 +285,7 @@ class NodeMcuConnector {
         progress.uploadDone = true
         onProgress(progress)
         
-        await this.nodemcu.hardreset()
-        await this.nodemcu.disconnect()
-        await this.connect(path)
-
-        await new Promise(resolve => { setTimeout(resolve, 3000) }) // sleep
-
-        const failTimeout = setTimeout(() => {
-          throw new Error("TODO: Timeout")
-        }, 10000)
-
-        let rebootSuccess = false
-        while(!rebootSuccess) {
-          try {
-            await this.nodemcu.checkConnection()
-            rebootSuccess = true
-          } catch (e) {
-            rebootSuccess = false
-          }
-        }
-        clearTimeout(failTimeout)
+        await this.hardReset(path)
 
         progress.rebootDone = true
         onProgress(progress)
@@ -315,43 +307,75 @@ class NodeMcuConnector {
     }
   }
 
+  private async hardReset(path: string) {
+    await this.nodemcu.hardreset()
+    await this.nodemcu.disconnect()
+    await this.connect(path)
+
+    await new Promise(resolve => { setTimeout(resolve, 3000) }) // sleep
+
+    const failTimeout = setTimeout(() => {
+      throw new Error("Could not connect to NodeMCU after hardreset.")
+    }, 10000)
+
+    let rebootSuccess = false
+    while(!rebootSuccess) {
+      try {
+        await this.nodemcu.checkConnection()
+        rebootSuccess = true
+      } catch (e) {
+        rebootSuccess = false
+      }
+    }
+    clearTimeout(failTimeout)
+  }
+
   /**
-   * uploads a file via nodemcu-tool and does some verification
+   * uploads content via nodemcu-tool
    * 
    * @param filePath the file path on nodemcu
    * @param content the file content
    */
-  private async saveFileUpload(filePath: string, content: string) {
+  private async saveContentUpload(filePath: string, content: string) {
+    const { path: tmpPath, cleanup: tmpCleanup } = await tmp.file({})
+    try {
+      await fs.writeFile(tmpPath, content)
+      this.saveFileUpload(filePath, tmpPath)
+    }
+    finally {
+      tmpCleanup()
+    }
+  }
+
+  /**
+   * uploads a file via nodemcu-tool and does some verification
+   * 
+   * @param remoteFilePath the file path on nodemcu
+   * @param localFilePath the local file path
+   */
+  private async saveFileUpload(remoteFilePath: string, localFilePath: string) {
     if (!this.nodemcu.isConnected())  {
       throw new Error("Expected to have an already established connection to NodeMCU, but did not.")
     }
 
-    const { path: tmpPath, cleanup: tmpCleanup } = await tmp.file({})
+    const copyFileName = remoteFilePath + ".swp"
+
     try {
-      const copyFileName = filePath + ".swp"
-
-      await fs.writeFile(tmpPath, content)
-
-      await this.nodemcu.upload(tmpPath, copyFileName, {}, () => {})
+      await this.nodemcu.upload(localFilePath, copyFileName, {}, () => {})
       await this.sleep(1000)
+      const gotContent = await this.nodemcu.download(copyFileName)
+      const localContent = await fs.readFile(localFilePath).then(buffer => buffer.toString())
 
-      try {
-        const gotContent = await this.nodemcu.download(copyFileName)
-
-        if (gotContent.toString() !== content) {
-          throw new Error(`Uploaded file does not match downloaded file. Expected file size of ${content.length}, but got ${gotContent.length}`)
-        }
-
-        // rename file
-        await this.removeFileIfExists(filePath)
-        await this.execute(`file.rename("${copyFileName}", "${filePath}")`)
+      if (gotContent.toString() !== localContent) {
+        throw new Error(`Uploaded file does not match downloaded file. Expected file size of ${localContent.length}, but got ${gotContent.length}`)
       }
-      finally {
-        await this.removeFileIfExists(copyFileName)
-      }
+
+      // rename file
+      await this.removeFileIfExists(remoteFilePath)
+      await this.execute(`file.rename("${copyFileName}", "${remoteFilePath}")`)
     }
     finally {
-      tmpCleanup()
+      await this.removeFileIfExists(copyFileName)
     }
   }
   private async removeFileIfExists(filePath: string) {
