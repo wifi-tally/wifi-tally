@@ -14,6 +14,7 @@ test('toJson/fromJson', () => {
   device.productId = "123abc"
   device.tallySettings = tallySettings
   device.vendorId = "abc123"
+  device.update = "up-to-date"
 
   const json = device.toJson()
   const object = TallyDevice.fromJson(json)
@@ -27,4 +28,5 @@ test('toJson/fromJson', () => {
   expect(object.productId).toEqual("123abc")
   expect(object.tallySettings.toString()).toEqual("example=foo\n")
   expect(object.vendorId).toEqual("abc123")
+  expect(object.update).toEqual("up-to-date")
 })
