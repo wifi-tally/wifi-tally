@@ -1,10 +1,8 @@
 import { CircularProgress, fade, makeStyles, Step, StepLabel, Stepper } from '@material-ui/core'
 import React from 'react'
-import { TallySettingsIniProgressType } from '../flasher/NodeMcuConnector'
 import CancelIcon from '@material-ui/icons/Cancel'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import PauseCircleFilledRoundedIcon from '@material-ui/icons/PauseCircleFilledRounded'
-import useTallies from '../hooks/useTallies'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -31,62 +29,15 @@ const useStyles = makeStyles((theme) => {
   }
 })
 
-type StepType = {
+export type StepType = {
   id: string
   label: string
   done: boolean
   active: boolean
+  current?: number
+  max?: number
   error: boolean
   skipped: boolean
-}
-
-function getSteps(progress: TallySettingsIniProgressType, isTallyConnected: boolean): StepType[] {
-  const steps: any = [
-    {
-      id: "initialize",
-      label: "Initializing",
-      done: progress?.inititalizeDone,
-    },
-    {
-      id: "connection",
-      label: "Establishing connection",
-      done: progress?.connectionDone,
-    },
-    {
-      id: "upload",
-      label: "Uploading tally-settings.ini",
-      done: progress?.uploadDone,
-    },
-    {
-      id: "reboot",
-      label: "Rebooting Tally to apply settings",
-      done: progress?.rebootDone,
-    },
-    {
-      id: "done",
-      label: "Upload Done",
-      done: progress?.allDone,
-    },
-    {
-      id: "connected",
-      label: "Tally is connected to Hub",
-      done: progress?.allDone && isTallyConnected,
-    },
-  ]
-
-  let lastDone = true
-  let hadError = false
-  for (const step of steps) {
-    step.active = lastDone && step.done === false
-    step.error = step.active && progress?.error
-    step.skipped = hadError
-    if (!hadError) {
-      // first step that errored
-      hadError = true
-    }
-    lastDone = step.done
-  }
-  return steps
 }
 
 type TheStepIconProps = {
@@ -109,15 +60,12 @@ function TheStepIcon({step, classCurrent, classDone, classError}: TheStepIconPro
 }
 
 type Props = {
-  progress?: TallySettingsIniProgressType
+  steps: StepType[]
 }
-function TallySettingsIniProgress({progress} : Props) {
-  const tallies = useTallies()
+
+function StepDisplay({steps} : Props) {
   const classes = useStyles()
 
-  const isTallyConnected = !!tallies.find(tally => tally.name === progress?.tallyName && tally.isConnected())
-
-  const steps = getSteps(progress, isTallyConnected)
   const currentStep = Math.max(steps.findIndex(step => step.done === false), 0)
 
   return <Stepper activeStep={currentStep} orientation="vertical" classes={{vertical: classes.vertical}}>
@@ -129,11 +77,11 @@ function TallySettingsIniProgress({progress} : Props) {
             completed: classes.iconCompleted
           }
         }}
-        error={step.error}>{step.label}</StepLabel>
+        error={step.error}>{step.label}{step.max && (step.active || step.done) && ` (${step.current}/${step.max})`}</StepLabel>
     </Step>)}
   </Stepper>
 }
 
-export default TallySettingsIniProgress
+export default StepDisplay
 
 
