@@ -26,7 +26,7 @@ out/init.lua: src/init.lua out
 out/%.lc: src/%.lua out
 	$(LUAC) -o $@ $<
 
-build: $(TARGETS) out/tally-settings.ini.example
+build: $(TARGETS) out/init.lua out/tally-settings.ini.example
 
 flash: flash-dev
 
