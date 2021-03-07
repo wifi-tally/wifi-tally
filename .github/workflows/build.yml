@@ -447,10 +447,8 @@ jobs:
       - setup
     runs-on: ubuntu-latest
     outputs:
-      artifact_netinstall: ${{ steps.aws-netinstall.outputs.artifact }}
-      artifact_netinstall_name: ${{ steps.aws-netinstall.outputs.artifact_name }}
-      artifact_linux: ${{ steps.aws-linux.outputs.artifact }}
-      artifact_linux_name: ${{ steps.aws-linux.outputs.artifact_name }}
+      artifact: ${{ steps.aws-netinstall.outputs.artifact }}
+      artifact_name: ${{ steps.aws-netinstall.outputs.artifact_name }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
@@ -508,18 +506,6 @@ jobs:
         run: |
           tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}-netinstall.tar.gz" *
         working-directory: ${{ github.workspace }}/dist
-      - name: Use node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - name: Linux build
-        run: |
-          npm ci --only=production --no-fund
-        working-directory: ${{ github.workspace }}/dist/hub
-      - name: Zip netinstall
-        run: |
-          tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}-linux.tar.gz" *
-        working-directory: ${{ github.workspace }}/dist
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -534,14 +520,106 @@ jobs:
           echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
           echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
           echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
-      - name: Push linux artifact to AWS S3
-        id: aws-linux
+
+  # ###
+  #
+  # pre-packaged bundles of operating systems
+  #
+  # ###
+
+  bundle-os:
+    needs:
+      - bundle
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            prefix: linux
+          - os: macos-latest
+            prefix: mac
+          - os: windows-latest
+            prefix: win
+    runs-on: "${{ matrix.os }}"
+    outputs:
+      artifact_linux: ${{ steps.pack.outputs.artifact_linux }}
+      artifact_linux_name: ${{ steps.pack.outputs.artifact_linux_name }}
+      artifact_win: ${{ steps.pack.outputs.artifact_win }}
+      artifact_win_name: ${{ steps.pack.outputs.artifact_win_name }}
+      artifact_mac: ${{ steps.pack.outputs.artifact_mac }}
+      artifact_mac_name: ${{ steps.pack.outputs.artifact_mac_name }}
+    steps:
+      - name: Use node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - name: Install dependencies
         run: |
-          ARTIFACT_FILENAME="wifi-tally-${{ needs.setup.outputs.build_name }}-linux.tar.gz"
-          aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
-          echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
-          echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
-          echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
+          python -m pip install requests boto3
+      - name: Download the artifact (cross-env)
+        id: hub
+        run: |
+          import requests
+          import tarfile
+          import os
+          url = r"${{ needs.bundle.outputs.artifact }}"
+          tmp_dir = r"${{ runner.temp }}"
+          file_name = os.path.basename(url)
+          dir_name = file_name[:-7]
+          file_path = os.path.join(tmp_dir, file_name)
+          dir_path = os.path.join(tmp_dir, dir_name)
+          print('downloading {}'.format(url))
+          response = requests.get(url)
+          with open(file_path, 'wb') as f:
+              f.write(response.content)
+          print('created {}'.format(file_path))
+          tar = tarfile.open(file_path, "r:gz")
+          tar.extractall(path=dir_path)
+          tar.close()
+          hub_dir = os.path.join(dir_path, "hub")
+          print(hub_dir)
+          print('::set-output name=hubDir::{}'.format(hub_dir))
+          print('::set-output name=rootDir::{}'.format(dir_path))
+        shell: python
+      - name: npm ci
+        run: npm ci --only=production --no-fund
+        working-directory: ${{ steps.hub.outputs.hubDir }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
+          aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
+      - name: Package the artifact (cross-env)
+        id: pack
+        run: |
+          import shutil
+          import os
+          import boto3
+          from botocore.exceptions import ClientError
+
+          bucket = os.getenv("AWS_S3_NIGHTLY_BUCKET")
+          s3_uri = os.getenv("AWS_S3_NIGHTLY_BASEURI")
+
+          url = r"${{ needs.bundle.outputs.artifact }}"
+          basename = os.path.basename(url)[:-7]
+
+          output_filename = basename.replace("netinstall", r"${{ matrix.prefix }}")
+
+          shutil.make_archive(output_filename, 'zip', r"${{ steps.hub.outputs.rootDir }}")
+
+          # Upload the file
+          s3 = boto3.client('s3')
+          try:
+              response = s3.upload_file(output_filename+".zip", bucket, output_filename+".zip", ExtraArgs={'ACL': 'public-read'})
+          except ClientError as e:
+              logging.error(e)
+              os.exit(1)
+
+          print('::set-output name=artifact_{}::{}/{}.zip'.format(r"${{ matrix.prefix }}", s3_uri, output_filename))
+          print('::set-output name=artifact_{}_name::{}.zip'.format(r"${{ matrix.prefix }}", output_filename))
+          print("::warning ::Artifact is available at {}/{}.zip for the next days.".format(s3_uri, output_filename))
+        shell: python
 
   # ###
   #
@@ -554,10 +632,13 @@ jobs:
     needs: 
       - setup
       - bundle
+      - bundle-os
     steps:
       - run: |
-          wget "${{ needs.bundle.outputs.artifact_netinstall }}"
-          wget "${{ needs.bundle.outputs.artifact_linux }}"
+          wget "${{ needs.bundle.outputs.artifact }}"
+          wget "${{ needs.bundle-os.outputs.artifact_linux }}"
+          wget "${{ needs.bundle-os.outputs.artifact_win }}"
+          wget "${{ needs.bundle-os.outputs.artifact_mac }}"
       - uses: meeDamian/ease@github-rel2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -567,8 +648,9 @@ jobs:
           prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
           draft: true
           files: |
-            ${{ needs.bundle.outputs.artifact_netinstall_name }}
-            ${{ needs.bundle.outputs.artifact_linux_name }}
+            ${{ needs.bundle.outputs.artifact_name }}
+            ${{ needs.bundle-os.outputs.artifact_linux_name }}
+            ${{ needs.bundle-os.outputs.artifact_win_name }}
+            ${{ needs.bundle-os.outputs.artifact_mac_name }}
           gzip: false
           allow_override: true
-

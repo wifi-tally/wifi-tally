@@ -9,7 +9,7 @@ on:
         required: true
         default: 'master'
       source:
-        description: 'Source tar.gz (from S3 or releases)'
+        description: 'Source *-netinstall.tar.gz (from S3 or releases)'
         required: true
 env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
@@ -23,12 +23,15 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            prefix: linux
             node: 12
             browser: chrome
           - os: ubuntu-latest
+            prefix: linux
             node: 14
             browser: chrome
           - os: macos-latest
+            prefix: mac
             node: 14
             browser: chrome
           - os: windows-latest
@@ -54,7 +57,7 @@ jobs:
           import tarfile
           import os
 
-          url = r"${{ github.event.inputs.source }}"
+          url = r"${{ github.event.inputs.source }}".replace("netinstall", r"${{ matrix.prefix }}")
           tmp_dir = r"${{ runner.temp }}"
           file_name = os.path.basename(url)
           dir_name = file_name[:-7]
