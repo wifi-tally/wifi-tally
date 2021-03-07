@@ -41,6 +41,6 @@ JQ_FILTER="{name: .name, private: .private, version: \"${BUILD_NAME}\", dependen
 jq "$JQ_FILTER" package.json > "$RELEASE_DIR/package.json"
 cp package-lock.json "$RELEASE_DIR/package-lock.json"
 
-cd "$RELEASE_DIR"
-npm ci --only=production --no-fund
+#cd "$RELEASE_DIR"
+#npm ci --only=production --no-fund
 
