@@ -445,7 +445,12 @@ jobs:
       - tally-build
       - tally-firmware
       - setup
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_netinstall: ${{ steps.aws-netinstall.outputs.artifact }}
+      artifact_netinstall_name: ${{ steps.aws-netinstall.outputs.artifact_name }}
+      artifact_linux: ${{ steps.aws-linux.outputs.artifact }}
+      artifact_linux_name: ${{ steps.aws-linux.outputs.artifact_name }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
@@ -499,47 +504,44 @@ jobs:
           tree -I "node_modules"
           du -h -d1
         working-directory: ${{ github.workspace }}/dist
-      - name: Zip it
+      - name: Zip netinstall
         run: |
-          # zip -Jrq "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}.zip" *
-          tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz" *
-          # tar -cjf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz" *
+          tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}-netinstall.tar.gz" *
         working-directory: ${{ github.workspace }}/dist
-      - name: Archive
-        uses: actions/upload-artifact@v2
+      - name: Use node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v1
         with:
-          name: bundle
-          path: ${{ github.workspace }}/wifi-tally-*.tar.gz
-          if-no-files-found: error
-          retention-days: 1
-      
-
-  # ###
-  # 
-  # Publish the build on AWS S3 for a few days
-  # 
-  # ###
-  nightly:
-    runs-on: ubuntu-latest
-    needs: 
-      - setup
-      - bundle
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: bundle
-          path: .
+          node-version: ${{ env.NODEJS_VERSION }}
+      - name: Linux build
+        run: |
+          npm ci --only=production --no-fund
+        working-directory: ${{ github.workspace }}/dist/hub
+      - name: Zip netinstall
+        run: |
+          tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}-linux.tar.gz" *
+        working-directory: ${{ github.workspace }}/dist
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
           aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
-      - name: Push artifact to AWS S3
+      - name: Push netinstall artifact to AWS S3
+        id: aws-netinstall
         run: |
-          ARTIFACT_FILENAME="wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz"
+          ARTIFACT_FILENAME="wifi-tally-${{ needs.setup.outputs.build_name }}-netinstall.tar.gz"
           aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
-          echo "::warning ::Your artifacts are available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
+          echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
+          echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
+          echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
+      - name: Push linux artifact to AWS S3
+        id: aws-linux
+        run: |
+          ARTIFACT_FILENAME="wifi-tally-${{ needs.setup.outputs.build_name }}-linux.tar.gz"
+          aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
+          echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
+          echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
+          echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
 
   # ###
   #
@@ -553,17 +555,10 @@ jobs:
       - setup
       - bundle
     steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: bundle
-          path: .
       - run: |
-          gunzip -dc wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz | xz -z - > wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz
-          mkdir temp
-          cd temp
-          tar -xzf ../wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz
-          zip -Jrq "../wifi-tally-${{ needs.setup.outputs.build_name }}.zip" *
-      - uses: meeDamian/github-release@2.0
+          wget "${{ needs.bundle.outputs.artifact_netinstall }}"
+          wget "${{ needs.bundle.outputs.artifact_linux }}"
+      - uses: meeDamian/ease@github-rel2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ needs.setup.outputs.tag }}
@@ -572,9 +567,8 @@ jobs:
           prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
           draft: true
           files: |
-            wifi-tally-${{ needs.setup.outputs.build_name }}.tar.gz
-            wifi-tally-${{ needs.setup.outputs.build_name }}.tar.xz
-            wifi-tally-${{ needs.setup.outputs.build_name }}.zip
+            ${{ needs.bundle.outputs.artifact_netinstall_name }}
+            ${{ needs.bundle.outputs.artifact_linux_name }}
           gzip: false
           allow_override: true
 
