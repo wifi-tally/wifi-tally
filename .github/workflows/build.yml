@@ -443,64 +443,55 @@ jobs:
       - setup
     runs-on: ubuntu-latest
     outputs:
-      artifact: ${{ steps.aws-netinstall.outputs.artifact }}
-      artifact_name: ${{ steps.aws-netinstall.outputs.artifact_name }}
+      artifact: ${{ steps.aws.outputs.artifact }}
+      artifact_name: ${{ steps.aws.outputs.artifact_name }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
-      - name: Install dependencies
-        run: |
-          sudo apt-get install tree
       - run: |
           mkdir ${GITHUB_WORKSPACE}/dist
-          mkdir ${GITHUB_WORKSPACE}/dist/documentation
-          mkdir ${GITHUB_WORKSPACE}/dist/firmware
-          mkdir ${GITHUB_WORKSPACE}/dist/tally
-          mkdir ${GITHUB_WORKSPACE}/dist/hub
-      - name: Get HTML documentation
-        uses: actions/download-artifact@v2
-        with:
-          name: documentation-html
-          path: ${{ github.workspace }}/dist/documentation/html
-      - name: Get Markdown documentation
-        uses: actions/download-artifact@v2
-        with:
-          name: documentation-markdown
-          path: ${{ github.workspace }}/dist/documentation/markdown
-      - name: Get Firmware
-        uses: actions/download-artifact@v2
-        with:
-          name: nodemcu-firmware
-          path: ${{ github.workspace }}/dist/firmware/
-      - name: Get Tally
-        uses: actions/download-artifact@v2
-        with:
-          name: tally-dist
-          path: ${{ github.workspace }}/dist/tally
+          mkdir ${GITHUB_WORKSPACE}/dist/docs
+          mkdir ${GITHUB_WORKSPACE}/dist/esp8266
       - name: Get Hub
         uses: actions/download-artifact@v2
         with:
           name: hub-dist
-          path: ${{ github.workspace }}/dist/hub
+          path: ${{ github.workspace }}/dist
       - name: extract hub
         run: |
           tar -xzf hub-dist.tar.gz .
           rm hub-dist.tar.gz
-        working-directory: ${{ github.workspace }}/dist/hub
+        working-directory: ${{ github.workspace }}/dist
+      - name: Get HTML documentation
+        uses: actions/download-artifact@v2
+        with:
+          name: documentation-html
+          path: ${{ github.workspace }}/dist/docs/html
+      - name: Get Markdown documentation
+        uses: actions/download-artifact@v2
+        with:
+          name: documentation-markdown
+          path: ${{ github.workspace }}/dist/docs/markdown
+      - name: Get Firmware
+        uses: actions/download-artifact@v2
+        with:
+          name: nodemcu-firmware
+          path: ${{ github.workspace }}/dist/esp8266
+      - name: Get Tally
+        uses: actions/download-artifact@v2
+        with:
+          name: tally-dist
+          path: ${{ github.workspace }}/dist/esp8266
+
       - name: Copy static files
         run: |
-          echo "${{ needs.setup.outputs.build_name }}" > "${GITHUB_WORKSPACE}/dist/version.txt"
           cp "${GITHUB_WORKSPACE}/Readme.md" "${GITHUB_WORKSPACE}/dist"
           cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/dist"
           cp "${GITHUB_WORKSPACE}/Changelog.md" "${GITHUB_WORKSPACE}/dist"
-      - name: Log content and size
+      - name: npm pack
         run: |
-          tree -I "node_modules"
-          du -h -d1
-        working-directory: ${{ github.workspace }}/dist
-      - name: Zip netinstall
-        run: |
-          tar -czf "${GITHUB_WORKSPACE}/wifi-tally-${{ needs.setup.outputs.build_name }}-netinstall.tar.gz" *
+          npm shrinkwrap
+          npm pack
         working-directory: ${{ github.workspace }}/dist
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -508,145 +499,42 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
           aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
-      - name: Push netinstall artifact to AWS S3
-        id: aws-netinstall
+      - name: Push artifact to AWS S3
+        id: aws
         run: |
-          ARTIFACT_FILENAME="wifi-tally-${{ needs.setup.outputs.build_name }}-netinstall.tar.gz"
+          # strip the "v" in front of the version
+          BUILD_NAME="${{ needs.setup.outputs.build_name }}"
+          BUILD_NAME=${BUILD_NAME/#v/}
+          ARTIFACT_FILENAME="wifi-tally-${BUILD_NAME}.tgz"
           aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
           echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
           echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
           echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
-
-  # ###
-  #
-  # pre-packaged bundles of operating systems
-  #
-  # ###
-
-  bundle-os:
-    needs:
-      - bundle
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            prefix: linux
-          - os: macos-latest
-            prefix: mac
-          - os: windows-latest
-            prefix: win
-    runs-on: "${{ matrix.os }}"
-    outputs:
-      artifact_linux: ${{ steps.pack.outputs.artifact_linux }}
-      artifact_linux_name: ${{ steps.pack.outputs.artifact_linux_name }}
-      artifact_win: ${{ steps.pack.outputs.artifact_win }}
-      artifact_win_name: ${{ steps.pack.outputs.artifact_win_name }}
-      artifact_mac: ${{ steps.pack.outputs.artifact_mac }}
-      artifact_mac_name: ${{ steps.pack.outputs.artifact_mac_name }}
-    steps:
-      - name: Use node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - name: Install dependencies
-        run: |
-          python -m pip install requests boto3
-      - name: Download the artifact (cross-env)
-        id: hub
-        run: |
-          import requests
-          import tarfile
-          import os
-          url = r"${{ needs.bundle.outputs.artifact }}"
-          tmp_dir = r"${{ runner.temp }}"
-          file_name = os.path.basename(url)
-          dir_name = file_name[:-7]
-          file_path = os.path.join(tmp_dir, file_name)
-          dir_path = os.path.join(tmp_dir, dir_name)
-          print('downloading {}'.format(url))
-          response = requests.get(url)
-          with open(file_path, 'wb') as f:
-              f.write(response.content)
-          print('created {}'.format(file_path))
-          tar = tarfile.open(file_path, "r:gz")
-          tar.extractall(path=dir_path)
-          tar.close()
-          hub_dir = os.path.join(dir_path, "hub")
-          print(hub_dir)
-          print('::set-output name=hubDir::{}'.format(hub_dir))
-          print('::set-output name=rootDir::{}'.format(dir_path))
-        shell: python
-      - name: npm ci
-        run: npm ci --only=production --no-fund
-        working-directory: ${{ steps.hub.outputs.hubDir }}
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
-          aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
-      - name: Package the artifact (cross-env)
-        id: pack
-        run: |
-          import shutil
-          import os
-          import boto3
-          from botocore.exceptions import ClientError
-
-          bucket = os.getenv("AWS_S3_NIGHTLY_BUCKET")
-          s3_uri = os.getenv("AWS_S3_NIGHTLY_BASEURI")
-
-          url = r"${{ needs.bundle.outputs.artifact }}"
-          basename = os.path.basename(url)[:-7]
-
-          output_filename = basename.replace("netinstall", r"${{ matrix.prefix }}")
-
-          shutil.make_archive(output_filename, 'zip', r"${{ steps.hub.outputs.rootDir }}")
-
-          # Upload the file
-          s3 = boto3.client('s3')
-          try:
-              response = s3.upload_file(output_filename+".zip", bucket, output_filename+".zip", ExtraArgs={'ACL': 'public-read'})
-          except ClientError as e:
-              logging.error(e)
-              os.exit(1)
-
-          print('::set-output name=artifact_{}::{}/{}.zip'.format(r"${{ matrix.prefix }}", s3_uri, output_filename))
-          print('::set-output name=artifact_{}_name::{}.zip'.format(r"${{ matrix.prefix }}", output_filename))
-          print("::warning ::Artifact is available at {}/{}.zip for the next days.".format(s3_uri, output_filename))
-        shell: python
+        working-directory: ${{ github.workspace }}/dist
 
   # ###
   #
   # Create a Github Release and upload artifacts
   #
   # ###
-  release:
-    runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.tag != '' }}
-    needs: 
-      - setup
-      - bundle
-      - bundle-os
-    steps:
-      - run: |
-          wget "${{ needs.bundle.outputs.artifact }}"
-          wget "${{ needs.bundle-os.outputs.artifact_linux }}"
-          wget "${{ needs.bundle-os.outputs.artifact_win }}"
-          wget "${{ needs.bundle-os.outputs.artifact_mac }}"
-      - uses: meeDamian/ease@github-rel2.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ needs.setup.outputs.tag }}
-          name: ${{ needs.setup.outputs.tag }}
-          # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
-          prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
-          draft: true
-          files: |
-            ${{ needs.bundle.outputs.artifact_name }}
-            ${{ needs.bundle-os.outputs.artifact_linux_name }}
-            ${{ needs.bundle-os.outputs.artifact_win_name }}
-            ${{ needs.bundle-os.outputs.artifact_mac_name }}
-          gzip: false
-          allow_override: true
+#  release:
+#    runs-on: ubuntu-latest
+#    if: ${{ needs.setup.outputs.tag != '' }}
+#    needs:
+#      - setup
+#      - bundle
+#    steps:
+#      - run: |
+#          wget "${{ needs.bundle.outputs.artifact }}"
+#      - uses: meeDamian/ease@github-rel2.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          tag: ${{ needs.setup.outputs.tag }}
+#          name: ${{ needs.setup.outputs.tag }}
+#          # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
+#          prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
+#          draft: true
+#          files: |
+#            ${{ needs.bundle.outputs.artifact_name }}
+#          gzip: false
+#          allow_override: true
