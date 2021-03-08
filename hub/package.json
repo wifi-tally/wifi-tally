@@ -60,6 +60,18 @@
     "typescript": "^4.2.4",
     "web-vitals": "^0.2.4"
   },
+  "engines": {
+    "node": ">=12",
+    "npm": ">=6.9"
+  },
+  "os": [
+    "linux",
+    "win32",
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
   "browserslist": {
     "production": [
       ">0.2%",
