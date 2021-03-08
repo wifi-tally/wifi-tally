@@ -37,7 +37,7 @@ npm run build:backend
 
 NPM_START="node server.js --env=production"
 # copy a cleaned up package.json
-JQ_FILTER="{name: .name, private: .private, version: \"${BUILD_NAME}\", dependencies: .dependencies, scripts: {start: \"${NPM_START}\"}}"
+JQ_FILTER="{name: .name, private: false, bin: {vtally: \"${NPM_START}\"}, version: \"${BUILD_NAME}\", dependencies: .dependencies}"
 jq "$JQ_FILTER" package.json > "$RELEASE_DIR/package.json"
 cp package-lock.json "$RELEASE_DIR/package-lock.json"
 
