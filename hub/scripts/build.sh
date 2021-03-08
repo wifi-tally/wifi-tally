@@ -23,13 +23,13 @@ if [ -z "${GITHUB_TOKEN:=""}" ]; then
   PACKAGE_REPO=""
 else
   # when running in CI: try to determine the correct values
-  PACKAGE_LICENSE=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".license.spdx_id")
-  PACKAGE_DESCRIPTION=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".description")
+  PACKAGE_LICENSE=$(gh api "repos/${GITHUB_REPOSITORY}" | jq -c -r ".license.spdx_id")
+  PACKAGE_DESCRIPTION=$(gh api "repos/${GITHUB_REPOSITORY}" | jq -c -r ".description")
   # @see https://github.community/t/how-to-get-the-keywords-of-a-repository-by-the-api/156445
-  PACKAGE_TOPICS=$(gh api -H "Accept: application/vnd.github.mercy-preview+json" "repos/${GITHUB_REPOSITORY}" --jq ".topics")
-  PACKAGE_HOMEPAGE=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".homepage")
-  PACKAGE_ISSUES=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".html_url")/issues
-  PACKAGE_REPO=github:$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".full_name")
+  PACKAGE_TOPICS=$(gh api -H "Accept: application/vnd.github.mercy-preview+json" "repos/${GITHUB_REPOSITORY}" | jq -c -r ".topics")
+  PACKAGE_HOMEPAGE=$(gh api "repos/${GITHUB_REPOSITORY}" | jq -c -r ".homepage")
+  PACKAGE_ISSUES=$(gh api "repos/${GITHUB_REPOSITORY}" | jq -c -r ".html_url")/issues
+  PACKAGE_REPO=github:$(gh api "repos/${GITHUB_REPOSITORY}" | jq -c -r ".full_name")
 fi
 
 # ###
