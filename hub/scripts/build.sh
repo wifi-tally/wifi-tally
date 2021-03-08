@@ -5,6 +5,33 @@ REACT_DIR="./build"
 BUILD_NAME=${BUILD_NAME:=$(git describe --tags --always)}
 BUILD_NAME=${BUILD_NAME/#v/} # remove the leading "v" in the version
 
+if [ -z "${CI:=""}" ]; then
+  # not on CI
+  PACKAGE_PRIVATE="true"
+else
+  PACKAGE_PRIVATE="false"
+fi
+
+# try to keep npm metadata in sync with Github Repo
+if [ -z "${GITHUB_TOKEN:=""}" ]; then
+  # use default values
+  PACKAGE_LICENSE=""
+  PACKAGE_DESCRIPTION=""
+  PACKAGE_TOPICS="[]"
+  PACKAGE_HOMEPAGE=""
+  PACKAGE_ISSUES=""
+  PACKAGE_REPO=""
+else
+  # when running in CI: try to determine the correct values
+  PACKAGE_LICENSE=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".license.spdx_id")
+  PACKAGE_DESCRIPTION=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".description")
+  # @see https://github.community/t/how-to-get-the-keywords-of-a-repository-by-the-api/156445
+  PACKAGE_TOPICS=$(gh api -H "Accept: application/vnd.github.mercy-preview+json" "repos/${GITHUB_REPOSITORY}" --jq ".topics")
+  PACKAGE_HOMEPAGE=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".homepage")
+  PACKAGE_ISSUES=$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".html_url")/issues
+  PACKAGE_REPO=github:$(gh api "repos/${GITHUB_REPOSITORY}" --jq ".full_name")
+fi
+
 # ###
 #
 # PREPARE
@@ -35,9 +62,9 @@ cp -r "$REACT_DIR" "$RELEASE_DIR/frontend-static"
 
 npm run build:backend
 
-NPM_START="node server.js --env=production"
+NPM_START="server.js --env=production"
 # copy a cleaned up package.json
-JQ_FILTER="{name: .name, private: false, bin: {vtally: \"${NPM_START}\"}, version: \"${BUILD_NAME}\", dependencies: .dependencies}"
+JQ_FILTER="{name: .name, version: \"${BUILD_NAME}\", description: \"${PACKAGE_DESCRIPTION}\", keywords: ${PACKAGE_TOPICS}, homepage: \"${PACKAGE_HOMEPAGE}\", bugs: \"${PACKAGE_ISSUES}\", license: \"${PACKAGE_LICENSE}\", private: ${PACKAGE_PRIVATE}, repository: \"${PACKAGE_REPO}\", engines: .engines, bin: {vtally: \"${NPM_START}\"}, dependencies: .dependencies, os: .os, cpu: .cpu}"
 jq "$JQ_FILTER" package.json > "$RELEASE_DIR/package.json"
 cp package-lock.json "$RELEASE_DIR/package-lock.json"
 
