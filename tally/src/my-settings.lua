@@ -8,6 +8,11 @@ _G.LightTypes = {
     COMMON_CATHODE = "grb-",
 }
 
+_G.Ws2812Types = {
+    RGB = "rgb",
+    GRB = "grb",
+}
+
 -- defaults
 local staSsid = nil
 local staPw = nil
@@ -15,8 +20,10 @@ local hubIp = nil
 local hubPort = 7411
 local name = string.format("%x", node.chipid())
 local operatorType = LightTypes.COMMON_ANODE
+local operatorWs2812Type = Ws2812Types.GRB
 local operatorWs2812Lights = 5
 local stageType = LightTypes.COMMON_ANODE
+local stageWs2812Type = Ws2812Types.GRB
 local stageWs2812Lights = 0
 
 local trim = function(s)
@@ -59,11 +66,17 @@ _G.MySettings = {
     operatorNumberOfWs2812Lights = function()
         return operatorWs2812Lights
     end,
+    operatorWs2812Type = function()
+        return operatorWs2812Type
+    end,
     stageType = function()
         return stageType
     end,
     stageNumberOfWs2812Lights = function()
         return stageWs2812Lights
+    end,
+    stageWs2812Type = function()
+        return stageWs2812Type
     end,
     isValid = function()
         return staSsid ~= nil and hubIp ~= nil
@@ -104,11 +117,27 @@ if file.exists(fileName) then
                             MyLog.warning("Invalid operator.type \"" .. v .. "\"")
                         end
                     elseif k == "operator.ws2812" then
-                        local value = tonumber(v)
+                        local value, type
+                        local idx = v:find(" ", 1, true)
+                        if idx ~= nil then
+                            value = v:sub(1, idx-1)
+                            type = v:sub(idx+1)
+                        else
+                            value = v
+                            type = nil
+                        end
+                        value = tonumber(value)
                         if value ~= nil and value >= 0 and value <= 10 then
                             operatorWs2812Lights = value
                         else
                             MyLog.warning("operator.ws2812 needs to be number between 0 and 10, but got \"" .. v .. "\"")
+                        end
+                        if type ~= nil then
+                            if isValueInTable(type, Ws2812Types) then
+                                operatorWs2812Type = type
+                            else
+                                MyLog.warning("operator.ws2812 should have a supported light type, but got \"" .. type .. "\"")
+                            end
                         end
                     elseif k == "stage.type" then
                         local value = v:lower()
@@ -118,11 +147,27 @@ if file.exists(fileName) then
                             MyLog.warning("Invalid stage.type \"" .. v .. "\"")
                         end
                     elseif k == "stage.ws2812" then
-                        local value = tonumber(v)
+                        local value, type
+                        local idx = v:find(" ", 1, true)
+                        if idx ~= nil then
+                            value = v:sub(1, idx-1)
+                            type = v:sub(idx+1)
+                        else
+                            value = v
+                            type = nil
+                        end
+                        value = tonumber(value)
                         if value ~= nil and value >= 0 and value <= 10 then
                             stageWs2812Lights = value
                         else
                             MyLog.warning("stage.ws2812 needs to be number between 0 and 10, but got \"" .. v .. "\"")
+                        end
+                        if type ~= nil then
+                            if isValueInTable(type, Ws2812Types) then
+                                stageWs2812Type = type
+                            else
+                                MyLog.warning("stage.ws2812 should have a supported light type, but got \"" .. type .. "\"")
+                            end
                         end
                     else
                         MyLog.warning("Unknown key " .. k .. " in configuration file. Did you mistype it?")

@@ -62,17 +62,35 @@ local showColor = function(operatorR, operatorG, operatorB, stageR, stageG, stag
     if MySettings.operatorNumberOfWs2812Lights() + MySettings.stageNumberOfWs2812Lights() > 0 then
         -- the API uses chars to represent brightness
         local data = ""
-        for _=1,MySettings.operatorNumberOfWs2812Lights() do
-            data = data ..
-                string.char(operatorG) ..
-                string.char(operatorR) ..
-                string.char(operatorB)
+        if MySettings.operatorWs2812Type() == Ws2812Types.GRB then
+            for _=1,MySettings.operatorNumberOfWs2812Lights() do
+                data = data ..
+                    string.char(operatorG) ..
+                    string.char(operatorR) ..
+                    string.char(operatorB)
+            end
+        elseif MySettings.operatorWs2812Type() == Ws2812Types.RGB then
+            for _=1,MySettings.operatorNumberOfWs2812Lights() do
+                data = data ..
+                    string.char(operatorR) ..
+                    string.char(operatorG) ..
+                    string.char(operatorB)
+            end
         end
-        for _=1,MySettings.stageNumberOfWs2812Lights() do
-            data = data ..
-                string.char(stageG) ..
-                string.char(stageR) ..
-                string.char(stageB)
+        if MySettings.stageWs2812Type() == Ws2812Types.GRB then
+            for _=1,MySettings.stageNumberOfWs2812Lights() do
+                data = data ..
+                    string.char(stageG) ..
+                    string.char(stageR) ..
+                    string.char(stageB)
+            end
+        elseif MySettings.stageWs2812Type() == Ws2812Types.RGB then
+            for _=1,MySettings.stageNumberOfWs2812Lights() do
+                data = data ..
+                    string.char(stageR) ..
+                    string.char(stageG) ..
+                    string.char(stageB)
+            end
         end
         ws2812.write(data)
     end

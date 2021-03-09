@@ -584,4 +584,73 @@ describe("Led", function()
             end)
         end)
     end)
+    describe("supports operatorWs2812Type() and stageWs2812Type()", function()
+        require "spec.nodemcu-mock"
+        require "src.my-settings"
+        MySettings.operatorNumberOfWs2812Lights = function() return 1 end -- mock
+        MySettings.stageNumberOfWs2812Lights = function() return 1 end -- mock
+        insulate(function()
+            MySettings.operatorWs2812Type = function() return "grb" end -- mock
+            MySettings.stageWs2812Type = function() return "grb" end -- mock
+
+            require "src.my-led"
+            _G.MyLed.static(255, 127, 63, 31, 15, 0)
+
+            it("shows GRB on stage and operator", function()
+                assert.is_same({
+                    --g    r    b
+                    127, 255,  63,
+                     15,  31,   0,
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            MySettings.operatorWs2812Type = function() return "rgb" end -- mock
+            MySettings.stageWs2812Type = function() return "grb" end -- mock
+
+            require "src.my-led"
+            _G.MyLed.static(255, 127, 63, 31, 15, 0)
+
+            it("shows GRB on stage and RGB on operator", function()
+                assert.is_same({
+                    --r    g    b
+                    255, 127,  63,
+                    --g    r    b
+                     15,  31,   0,
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            MySettings.operatorWs2812Type = function() return "grb" end -- mock
+            MySettings.stageWs2812Type = function() return "rgb" end -- mock
+
+            require "src.my-led"
+            _G.MyLed.static(255, 127, 63, 31, 15, 0)
+
+            it("shows RGB on stage and GRB on operator", function()
+                assert.is_same({
+                    --g    r    b
+                    127, 255,  63,
+                    --r    g    b
+                     31,  15,   0,
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+        insulate(function()
+            MySettings.operatorWs2812Type = function() return "rgb" end -- mock
+            MySettings.stageWs2812Type = function() return "rgb" end -- mock
+
+            require "src.my-led"
+            _G.MyLed.static(255, 127, 63, 31, 15, 0)
+
+            it("shows RGB on stage and operator", function()
+                assert.is_same({
+                    --r    g    b
+                    255, 127,  63,
+                    --r    g    b
+                     31,  15,   0,
+                }, _G.ws2812:getDataAt(0))
+            end)
+        end)
+    end)
 end)
