@@ -1,6 +1,14 @@
-# Upcoming
+# v0.4.1
+
+A minor feature and bugfix release.
+
+You only need to update the code on the Tally if you plan on using the new feature
+that supports red-green-blue WS2812 light.
 
 * [ADDED] the dim green light for the operator, that indicates the tally is working, can be turned off #50
+* [ADDED] support WS2812 leds with red-green-blue order #52
+* [CHANGED] npm dependencies of the hub updated
+* [BUGFIX] add `init.lua` to the release package. For some reason it got lost along the way
 
 # v0.4.0
 
