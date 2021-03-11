@@ -27,6 +27,7 @@ const Layout = ({testId: cypressId, children}: LayoutProps) => {
         <Typography className={classes.logo} variant="h2">Tally Hub</Typography>
         <Button component={RouterLink} to="/">Tallies</Button>
         <Button component={RouterLink} to="/config">Configuration</Button>
+        <Button component={RouterLink} to="/flasher">Flash</Button>
       </Toolbar>
     </AppBar>
     { children && (<Container maxWidth={false} className={classes.contentContainer} children={children} />) }
