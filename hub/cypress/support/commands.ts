@@ -24,8 +24,10 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("getTestId", { prevSubject: "optional"}, (subject, testId: string) => {
-  (subject || cy).get(`*[data-testid=${testId}]`)
+type CypressOptions = Partial<Cypress.Loggable & Cypress.Timeoutable & Cypress.Withinable & Cypress.Shadow>
+
+Cypress.Commands.add("getTestId", { prevSubject: "optional"}, (subject, testId: string, options?: CypressOptions) => {
+  (subject || cy).get(`*[data-testid=${testId}]`, options)
 })
 
 export {}
