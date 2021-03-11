@@ -22,6 +22,12 @@ const useStyles = makeStyles(theme => {
     success: {
       marginBottom: theme.spacing(2),
     },
+    footer: {
+      borderTop: "solid 1px " + theme.palette.background.default,
+      margin: theme.spacing(0, -2),
+      padding: theme.spacing(2, 2, 0, 2),
+      textAlign: "right",
+    },
   }
 })
 
@@ -128,14 +134,23 @@ const FlasherIniPage = () => {
             The software on this Tally is up to date.
         </Alert>}
         { tallyDevice?.update === "updateable" && <>
-          <Typography paragraph>The Software on this Tally can be updated.</Typography>
-          <Button color="primary" variant="contained" onClick={handleProgram}>Update now</Button>
+          <Alert 
+            className={classes.warning} 
+            severity="warning"
+            variant="outlined"
+          >
+            The Software on this Tally can be updated.
+          </Alert>
+          <div className={classes.footer}>
+            <Button color="primary" variant="contained" onClick={handleProgram}>Update now</Button>
+          </div>
         </>}
       </MiniPage>}
       { tallyDevice?.nodeMcuVersion !== undefined && <MiniPage title="Edit tally-settings.ini">
         { !tallyDevice.tallySettings && <Alert 
           className={classes.warning} 
           severity="warning"
+          variant="outlined"
         >
           tally-settings.ini does not exist yet and will be created.
         </Alert> }

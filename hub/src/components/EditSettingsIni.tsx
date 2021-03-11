@@ -16,7 +16,13 @@ const useStyles = makeStyles((theme) => {
     expertMode: {
       display: "block",
       textAlign: "right",
-    }
+    },
+    footer: {
+      borderTop: "solid 1px " + theme.palette.background.default,
+      margin: theme.spacing(0, -2),
+      padding: theme.spacing(2, 2, 0, 2),
+      textAlign: "right",
+    },
   }
 })
 
@@ -101,7 +107,9 @@ const EditSettingsIni = ({settingsIni, onSave, disabled}: EditTallySettingsProps
       }} />
       </>
     }
-    <Button color="primary" disabled={disabled} variant="contained" onClick={ () => {onSave(ini)} }>Save</Button>
+    <div className={classes.footer}>
+      <Button color="primary" disabled={disabled} variant="contained" onClick={ () => {onSave(ini)} }>Save</Button>
+    </div>
   </div>)
 }
 
