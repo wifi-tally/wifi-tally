@@ -69,8 +69,12 @@ function StepDisplay({steps} : Props) {
   const currentStep = Math.max(steps.findIndex(step => step.done === false), 0)
 
   return <Stepper activeStep={currentStep} orientation="vertical" classes={{vertical: classes.vertical}}>
-    {steps.map(step => <Step key={step.id} completed={step.done}>
-      <StepLabel 
+    {steps.map(step => <Step 
+      key={step.id} 
+      completed={step.done}
+      data-testid={`progress-step-${step.id}`}
+      data-done={step.done ? "true" : "false"}
+      ><StepLabel 
         StepIconProps={{
           icon: <TheStepIcon step={step} classDone={classes.iconCompleted} classError={classes.iconError} classCurrent={classes.iconCurrent} />,
           classes: {

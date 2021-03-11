@@ -50,7 +50,7 @@ function useTallyDevice(i: number) {
   return tallyDevice
 }
 
-const FlasherIniPage = () => {
+const FlasherPage = () => {
   // every increment will refresh tallyDevice
   const [increment, setIncrement] = useState<number>(1)
   const [isUploading, setIsUploading] = useState(false)
@@ -101,8 +101,9 @@ const FlasherIniPage = () => {
   }
 
   return (
-    <Layout testId="flasher-ini">
+    <Layout testId="flasher">
       <Dialog
+        data-testid="progress"
         disableBackdropClick={isUploading}
         disableEscapeKeyDown={isUploading}
         open={uploadingOpen}
@@ -113,7 +114,7 @@ const FlasherIniPage = () => {
           { programProgress && <ProgramProgress progress={programProgress} /> }
         </DialogContent>
         <DialogActions>
-          <Button disabled={isUploading} onClick={() => setUploadingOpen(false)}>Close</Button>
+          <Button data-testid="progress-close" disabled={isUploading} onClick={() => setUploadingOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
       <MiniPage title="Tally Flasher" addHeaderContent={<IconButton aria-label="reload" disabled={isLoading || isUploading} onClick={handleReload}><RefreshIcon /></IconButton>}>
@@ -126,7 +127,7 @@ const FlasherIniPage = () => {
           <Help tallyDevice={tallyDevice} onReload={handleReload} />
         )}
       </MiniPage>
-      { (tallyDevice?.update === "updateable" || tallyDevice?.update === "up-to-date") && <MiniPage title="Software Update">
+      { (tallyDevice?.update === "updateable" || tallyDevice?.update === "up-to-date") && <MiniPage testId="update-software" title="Software Update">
         { tallyDevice?.update === "up-to-date" && <Alert
           className={classes.success}
           variant="outlined"
@@ -142,11 +143,11 @@ const FlasherIniPage = () => {
             The Software on this Tally can be updated.
           </Alert>
           <div className={classes.footer}>
-            <Button color="primary" variant="contained" onClick={handleProgram}>Update now</Button>
+            <Button color="primary" variant="contained" onClick={handleProgram} data-testid="update-software-now">Update now</Button>
           </div>
         </>}
       </MiniPage>}
-      { tallyDevice?.nodeMcuVersion !== undefined && <MiniPage title="Edit tally-settings.ini">
+      { tallyDevice?.nodeMcuVersion !== undefined && <MiniPage title="Edit tally-settings.ini" testId="tally-settings">
         { !tallyDevice.tallySettings && <Alert 
           className={classes.warning} 
           severity="warning"
@@ -159,4 +160,4 @@ const FlasherIniPage = () => {
     </Layout>
   )
 }
-export default FlasherIniPage;
+export default FlasherPage;
