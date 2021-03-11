@@ -276,11 +276,7 @@ class NodeMcuConnector {
         progress.connectionDone = true
         onProgress(progress)
 
-        try {
-          await this.saveContentUpload(fileName, settingsIniString)
-        } catch (e) {
-          console.error(e)
-        }
+        await this.saveContentUpload(fileName, settingsIniString)
 
         progress.uploadDone = true
         onProgress(progress)
@@ -296,7 +292,7 @@ class NodeMcuConnector {
       return true
     }
     catch (e) {
-      console.error(`${fileName} upload failed because of: ${e}`)
+      console.error(`${fileName} upload failed because of:`, e)
 
       progress.error = true
       onProgress(progress)
@@ -340,7 +336,7 @@ class NodeMcuConnector {
     const { path: tmpPath, cleanup: tmpCleanup } = await tmp.file({})
     try {
       await fs.writeFile(tmpPath, content)
-      this.saveFileUpload(filePath, tmpPath)
+      await this.saveFileUpload(filePath, tmpPath)
     }
     finally {
       tmpCleanup()
