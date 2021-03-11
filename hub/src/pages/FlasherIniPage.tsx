@@ -1,8 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, makeStyles, Typography } from '@material-ui/core';
-import { Alert, AlertTitle } from '@material-ui/lab';
+import { Alert } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react'
 import EditSettingsIni from '../components/EditSettingsIni';
-import ExternalLink from '../components/ExternalLink';
 import Layout from '../components/layout/Layout'
 import MiniPage from '../components/layout/MiniPage';
 import Spinner from '../components/layout/Spinner';
@@ -111,9 +110,9 @@ const FlasherIniPage = () => {
           <Button disabled={isUploading} onClick={() => setUploadingOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
-      <MiniPage title="Flasher" addHeaderContent={<IconButton aria-label="reload" disabled={isLoading || isUploading} onClick={handleReload}><RefreshIcon /></IconButton>}>
+      <MiniPage title="Tally Flasher" addHeaderContent={<IconButton aria-label="reload" disabled={isLoading || isUploading} onClick={handleReload}><RefreshIcon /></IconButton>}>
         <Typography paragraph>
-          This tool allows to update the configuration or software of a Hardware Tally light.
+          This tool allows to update the configuration or software of a Hardware Tally Light.
         </Typography>
         { tallyDevice === undefined ? (
           <Spinner />
@@ -128,7 +127,10 @@ const FlasherIniPage = () => {
           severity="success">
             The software on this Tally is up to date.
         </Alert>}
-        { tallyDevice?.update === "updateable" && <Button onClick={handleProgram}>Update NOW</Button>}
+        { tallyDevice?.update === "updateable" && <>
+          <Typography paragraph>The Software on this Tally can be updated.</Typography>
+          <Button color="primary" variant="contained" onClick={handleProgram}>Update now</Button>
+        </>}
       </MiniPage>}
       { tallyDevice?.nodeMcuVersion !== undefined && <MiniPage title="Edit tally-settings.ini">
         { !tallyDevice.tallySettings && <Alert 
