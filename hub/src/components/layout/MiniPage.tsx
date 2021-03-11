@@ -23,16 +23,17 @@ type MiniPageProps = {
   title?: string,
   addHeaderContent?: React.ReactNode
   contentPadding?: string
+  testId?: string
   children: React.ReactNode
 }
 
-function MiniPage({ title, addHeaderContent, contentPadding, children }: MiniPageProps) {
+function MiniPage({ title, addHeaderContent, contentPadding, testId, children }: MiniPageProps) {
   const classes = useStyles({
     contentPadding
   })
 
   return(
-    <Container className={classes.root} maxWidth="sm">
+    <Container className={classes.root} maxWidth="sm" data-testid={testId}>
       <Paper>
         <div className={classes.header}>
           <Typography variant="h1">{title}</Typography>
