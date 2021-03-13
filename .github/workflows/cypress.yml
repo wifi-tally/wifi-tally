@@ -9,7 +9,7 @@ on:
         required: true
         default: 'master'
       source:
-        description: 'Source *-netinstall.tar.gz (from S3 or releases)'
+        description: 'Source *.tgz (from S3 or releases)'
         required: true
 env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
@@ -50,47 +50,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install requests
-      - name: Download the artifact (cross-env)
-        id: hub
-        run: |
-          import requests
-          import tarfile
-          import os
-
-          url = r"${{ github.event.inputs.source }}".replace("netinstall", r"${{ matrix.prefix }}")
-          tmp_dir = r"${{ runner.temp }}"
-          file_name = os.path.basename(url)
-          dir_name = file_name[:-7]
-          file_path = os.path.join(tmp_dir, file_name)
-          dir_path = os.path.join(tmp_dir, dir_name)
-
-          print('downloading {}'.format(url))
-          response = requests.get(url)
-
-          with open(file_path, 'wb') as f:
-              f.write(response.content)
-
-          print('created {}'.format(file_path))
-
-          tar = tarfile.open(file_path, "r:gz")
-          tar.extractall(path=dir_path)
-          tar.close()
-
-          hub_dir = os.path.join(dir_path, "hub")
-          print(hub_dir)
-          print('::set-output name=hubDir::{}'.format(hub_dir))
-        shell: python
       - name: Use node.js ${{ matrix.node }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
+      - name: Download the artifact
+        id: hub
+        run: |
+          npm install ${{ github.event.inputs.source }}
       - # this step also runs "npm ci" and takes care of caching
         name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          start: "npm run start --prefix ${{ steps.hub.outputs.hubDir }} -- --with-test"
+          start: "./node_modules/.bin/vtally --with-test"
           wait-on: 'http://localhost:3000'
-          working-directory: ./hub
           record: true
           spec: "cypress/**/!(manual_)*.spec.ts"
           browser: ${{ matrix.browser }}
