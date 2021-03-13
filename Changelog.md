@@ -1,3 +1,9 @@
+# Upcoming
+
+* [BREAKING] way of installation has changed
+* [FEATURE] The hub automatically tries to restart in case it crashes. Consider this a safety net: It should never be necessary
+  – if it is, please file an issue – but there might be cases where it saves you.
+
 # v0.4.1
 
 A minor feature and bugfix release.

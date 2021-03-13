@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+var forever = require('forever-monitor');
+
+var child = new (forever.Monitor)(module.path + '/../server.js', {
+  args: [...process.argv, '--env=production'],  // pass-through args
+
+  watch: false,
+  minUptime: 2000,     // Minimum time a child process has to be up. Forever will 'exit' otherwise.
+  spinSleepTime: 1000, // Interval between restarts if a child is spinning (i.e. alive < minUptime).
+});
+
+child.on('restart', function() {
+  console.error("####################################")
+  console.error("")
+  console.error("AN UNEXPECTED EXCEPTION OCCURRED.")
+  console.error("")
+  console.error("This should never happen, so please consider filing a bug report including steps to reproduce and the error messages above.")
+  console.error("")
+  console.error("vTally will try to restart automatically.")
+  console.error("")
+  console.error("####################################")
+})
+
+child.start();
