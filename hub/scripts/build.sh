@@ -62,7 +62,22 @@ cp -r "$REACT_DIR" "$RELEASE_DIR/frontend-static"
 
 npm run build:backend
 
-NPM_START="server.js --env=production"
+# ###
+#
+# copy files
+#
+# ###
+
+mkdir "$RELEASE_DIR/bin"
+cp "./scripts/bin-vtally" "$RELEASE_DIR/bin/vtally"
+
+# ###
+# 
+# write package.json
+#
+# ###
+
+NPM_START="./bin/vtally"
 # copy a cleaned up package.json
 JQ_FILTER="{name: .name, version: \"${BUILD_NAME}\", description: \"${PACKAGE_DESCRIPTION}\", keywords: ${PACKAGE_TOPICS}, homepage: \"${PACKAGE_HOMEPAGE}\", bugs: \"${PACKAGE_ISSUES}\", license: \"${PACKAGE_LICENSE}\", private: ${PACKAGE_PRIVATE}, repository: \"${PACKAGE_REPO}\", engines: .engines, bin: {vtally: \"${NPM_START}\"}, dependencies: .dependencies, os: .os, cpu: .cpu}"
 jq "$JQ_FILTER" package.json > "$RELEASE_DIR/package.json"
