@@ -2,7 +2,10 @@
 
 Code on the Tally did not change.
 
+* [BREAKING] way of installation has changed
 * [ADDED] support for Roland V-8HD and V-60HD. Thanks @JWandscheer #58
+* [FEATURE] The hub automatically tries to restart in case it crashes. Consider this a safety net: It should never be necessary
+  – if it is, please file an issue – but there might be cases where it helps.
 
 # v0.4.2
 
