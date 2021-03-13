@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "name": "wifi-tally",
   "version": "0.4.2",
+=======
+  "name": "vtally",
+  "version": "0.4.1",
+>>>>>>> a92bdca (enable Github Actions to do releases again)
   "private": true,
   "dependencies": {
     "atem-connection": "^2.2.2",

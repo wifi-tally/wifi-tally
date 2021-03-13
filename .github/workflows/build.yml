@@ -509,7 +509,7 @@ jobs:
           # strip the "v" in front of the version
           BUILD_NAME="${{ needs.setup.outputs.build_name }}"
           BUILD_NAME=${BUILD_NAME/#v/}
-          ARTIFACT_FILENAME="wifi-tally-${BUILD_NAME}.tgz"
+          ARTIFACT_FILENAME="vtally-${BUILD_NAME}.tgz"
           aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
           echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
           echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
@@ -521,24 +521,24 @@ jobs:
   # Create a Github Release and upload artifacts
   #
   # ###
-#  release:
-#    runs-on: ubuntu-latest
-#    if: ${{ needs.setup.outputs.tag != '' }}
-#    needs:
-#      - setup
-#      - bundle
-#    steps:
-#      - run: |
-#          wget "${{ needs.bundle.outputs.artifact }}"
-#      - uses: meeDamian/ease@github-rel2.0
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          tag: ${{ needs.setup.outputs.tag }}
-#          name: ${{ needs.setup.outputs.tag }}
-#          # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
-#          prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
-#          draft: true
-#          files: |
-#            ${{ needs.bundle.outputs.artifact_name }}
-#          gzip: false
-#          allow_override: true
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ needs.setup.outputs.tag != '' }}
+    needs:
+      - setup
+      - bundle
+    steps:
+      - run: |
+          wget "${{ needs.bundle.outputs.artifact }}"
+      - uses: meeDamian/ease@github-rel2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ needs.setup.outputs.tag }}
+          name: ${{ needs.setup.outputs.tag }}
+          # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
+          prerelease: ${{ contains(needs.setup.outputs.tag, '-') || contains(needs.setup.outputs.tag, '+') || contains(needs.setup.outputs.tag, 'alpha') || contains(needs.setup.outputs.tag, 'beta') || contains(needs.setup.outputs.tag, 'rc') }}
+          draft: true
+          files: |
+            ${{ needs.bundle.outputs.artifact_name }}
+          gzip: false
+          allow_override: true
