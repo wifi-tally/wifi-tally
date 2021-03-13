@@ -13,14 +13,23 @@ describe('Smoke Test', () => {
 
     cy.contains("Configuration").click()
     cy.getTestId("page-config")
+    
+    cy.contains("Flash").click()
+    cy.getTestId("page-flasher")
 
     cy.contains("Tallies").click()
     cy.getTestId("page-index")
+
   })
 
   it('allows deep links into /config', () => {
     cy.visit('/config')
     cy.getTestId("page-config")
+  })
+
+  it('allows deep links into /flasher', () => {
+    cy.visit('/flasher')
+    cy.getTestId("page-flasher")
   })
 
   it.skip('should not rely on resources from the internet')
