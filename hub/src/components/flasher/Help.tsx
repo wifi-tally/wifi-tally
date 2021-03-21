@@ -66,7 +66,8 @@ function Help({tallyDevice, onReload}: Props) {
         <AlertTitle>Possible fixes</AlertTitle>
         <ul>
           <li>This happens sporadically. It could be fixed by trying again.</li>
-          <li>Make sure a firmware is flashed.</li>
+          <li>Make sure a firmware is flashed. For example with esptool.</li>
+          <li>Sometimes fault code on the Tally makes the firmware crash. Pushing the reset button might help.</li>
         </ul>
       </Alert>
     </>

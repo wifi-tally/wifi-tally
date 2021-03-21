@@ -15,6 +15,32 @@
 
 The latest version of vTally is [v{{ latest_version }}]({{ github_link }}/releases/tag/v{{ latest_version }}).
 
+## Windows
+
+### 1. Install Node.js ≥{{ hub_nodejs_version }}
+
+[Install Node.js](https://nodejs.org/en/download/package-manager/).
+
+Verify your installation
+
+    $ node -v
+    v14.15.4
+    
+    $ npm -v
+    6.14.10
+
+### 2. Install vTally
+
+This command will install vTally globally for all users. Run
+
+    npm install -g vtally:{{ latest_version }}
+
+### 3. Run vTally
+
+vTally is installed. Run it by calling
+
+    C:\Users\account_name\AppData\Roaming\npm\node_modules\vtally
+
 ## Linux
 
 ### 1. Install Node.js ≥{{ hub_nodejs_version }}
