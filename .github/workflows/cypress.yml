@@ -31,12 +31,12 @@ jobs:
           - os: macos-latest
             node: 14
             browser: chrome
-          #- os: windows-latest
-          #  node: 12
-          #  browser: edge
-          #- os: windows-latest
-          #  node: 14
-          #  browser: edge
+          - os: windows-latest
+            node: 12
+            browser: edge
+          - os: windows-latest
+            node: 14
+            browser: edge
     runs-on: "${{ matrix.os }}"
     steps:
       - # the source code is ONLY used to to get the cypress tests
