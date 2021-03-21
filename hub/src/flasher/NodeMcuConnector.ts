@@ -306,6 +306,7 @@ class NodeMcuConnector {
   private async hardReset(path: string) {
     await this.nodemcu.hardreset()
     await this.nodemcu.disconnect()
+    await new Promise(resolve => { setTimeout(resolve, 1000) }) // sleep
     await this.connect(path)
 
     await new Promise(resolve => { setTimeout(resolve, 3000) }) // sleep
