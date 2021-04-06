@@ -5,6 +5,7 @@ import MixerSelection from '../components/config/MixerSelection'
 import NullSettings from '../mixer/null/react/NullSettings'
 import MockSettings from '../mixer/mock/react/MockSettings'
 import ObsSettings from '../mixer/obs/react/ObsSettings'
+import RolandV8HDSettings from '../mixer/rolandV8HD/react/RolandV8HDSettings'
 import TestSettings from '../mixer/test/react/TestSettings'
 import VmixSettings from '../mixer/vmix/react/VmixSettings'
 import TallySettings from '../components/config/TallySettings'
@@ -17,6 +18,7 @@ const ConfigPage = () => {
         <AtemSettings />
         <MockSettings />
         <ObsSettings />
+        <RolandV8HDSettings />
         <TestSettings />
         <VmixSettings />
       </MixerSelection>
