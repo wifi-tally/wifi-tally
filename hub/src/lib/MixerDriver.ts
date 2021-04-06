@@ -4,6 +4,7 @@ import MockConnector from '../mixer/mock/MockConnector'
 import NullConnector from '../mixer/null/NullConnector'
 import ObsConnector from '../mixer/obs/ObsConnector'
 import RolandV8HDConnector from '../mixer/rolandV8HD/RolandV8HDConnector'
+import RolandV60HDConnector from '../mixer/rolandV60HD/RolandV60HDConnector'
 import { MixerCommunicator } from './MixerCommunicator'
 import Channel from '../domain/Channel'
 import type { AppConfiguration } from './AppConfiguration'
@@ -91,6 +92,9 @@ export class MixerDriver {
             } else if(newMixerId === RolandV8HDConnector.ID) {
                 MixerClass = RolandV8HDConnector
                 this.getCurrentMixerSettings = this.configuration.getRolandV8HDConfiguration.bind(this.configuration)
+            } else if(newMixerId === RolandV60HDConnector.ID) {
+                MixerClass = RolandV60HDConnector
+                this.getCurrentMixerSettings = this.configuration.getRolandV60HDConfiguration.bind(this.configuration)
             } else if(newMixerId === MockConnector.ID) {
                 MixerClass = MockConnector
                 this.getCurrentMixerSettings = this.configuration.getMockConfiguration.bind(this.configuration)
@@ -135,6 +139,7 @@ export class MixerDriver {
             AtemConnector.ID,
             ObsConnector.ID,
             RolandV8HDConnector.ID,
+            RolandV60HDConnector.ID,
             VmixConnector.ID,
         ]
 

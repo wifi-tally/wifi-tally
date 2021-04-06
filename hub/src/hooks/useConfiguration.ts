@@ -4,6 +4,7 @@ import ConfigTracker from './tracker/config'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration';
 import ObsConfiguration from '../mixer/obs/ObsConfiguration';
 import RolandV8HDConfiguration from '../mixer/rolandV8HD/RolandV8HDConfiguration';
+import RolandV60HDConfiguration from '../mixer/rolandV60HD/RolandV60HDConfiguration';
 import MockConfiguration from '../mixer/mock/MockConfiguration';
 import AtemConfiguration from '../mixer/atem/AtemConfiguration';
 import { DefaultTallyConfiguration } from '../tally/TallyConfiguration';
@@ -110,7 +111,7 @@ export function useRolandV8HDConfiguration() {
   }
 
   useEffect(() => {
-    configTracker.on("obs", onChange)
+    configTracker.on("rolandV8HD", onChange)
     setRolandV8HDConfiguration(configTracker.rolandV8HDConfiguration)
     return () => {
       // cleanup
@@ -119,6 +120,25 @@ export function useRolandV8HDConfiguration() {
   }, [])
 
   return rolandV8HDConfiguration
+}
+
+export function useRolandV60HDConfiguration() {
+  const [rolandV60HDConfiguration, setRolandV60HDConfiguration] = useState<RolandV60HDConfiguration|undefined>(undefined)
+
+  const onChange = newConf => {
+    setRolandV60HDConfiguration(newConf)
+  }
+
+  useEffect(() => {
+    configTracker.on("rolandV60HD", onChange)
+    setRolandV60HDConfiguration(configTracker.rolandV60HDConfiguration)
+    return () => {
+      // cleanup
+      configTracker.off("rolandV60HD", onChange)
+    }
+  }, [])
+
+  return rolandV60HDConfiguration
 }
 
 export function useVmixConfiguration() {

@@ -18,6 +18,7 @@ import AtemConfiguration from './mixer/atem/AtemConfiguration'
 import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import RolandV8HDConfiguration from './mixer/rolandV8HD/RolandV8HDConfiguration'
+import RolandV60HDConfiguration from './mixer/rolandV60HD/RolandV60HDConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
@@ -145,6 +146,7 @@ io.on('connection', (socket: ServerSideSocket) => {
     socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
     socket.emit('config.state.rolandV8HD', myConfiguration.getRolandV8HDConfiguration().toJson())
+    socket.emit('config.state.rolandV60HD', myConfiguration.getRolandV60HDConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
     socket.emit('config.state.tallyconfig', myConfiguration.getTallyConfiguration().toJson())
   })
@@ -265,6 +267,15 @@ io.on('connection', (socket: ServerSideSocket) => {
     const rolandV8HD = new RolandV8HDConfiguration()
     rolandV8HD.fromJson(newRolandV8HDConfiguration)
     myConfiguration.setRolandV8HDConfiguration(rolandV8HD)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.rolandV60HD', (newRolandV60HDConfiguration, newMixerName) => {
+    const rolandV60HD = new RolandV60HDConfiguration()
+    rolandV60HD.fromJson(newRolandV60HDConfiguration)
+    myConfiguration.setRolandV60HDConfiguration(rolandV60HD)
 
     if (newMixerName) {
       myConfiguration.setMixerSelection(newMixerName)
