@@ -17,6 +17,7 @@ import AppConfigurationPersistence from './lib/AppConfigurationPersistence'
 import AtemConfiguration from './mixer/atem/AtemConfiguration'
 import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
+import RolandV8HDConfiguration from './mixer/rolandV8HD/RolandV8HDConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
@@ -143,6 +144,7 @@ io.on('connection', (socket: ServerSideSocket) => {
     socket.emit('config.state.mixer', {mixerName: myConfiguration.getMixerSelection() || "", allowedMixers: MixerDriver.getAllowedMixers(myConfiguration.isDev(), myConfiguration.isTest())})
     socket.emit('config.state.mock', myConfiguration.getMockConfiguration().toJson())
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
+    socket.emit('config.state.rolandV8HD', myConfiguration.getRolandV8HDConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
     socket.emit('config.state.tallyconfig', myConfiguration.getTallyConfiguration().toJson())
   })
@@ -254,6 +256,15 @@ io.on('connection', (socket: ServerSideSocket) => {
     const obs = new ObsConfiguration()
     obs.fromJson(newObsConfiguration)
     myConfiguration.setObsConfiguration(obs)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.rolandV8HD', (newRolandV8HDConfiguration, newMixerName) => {
+    const rolandV8HD = new RolandV8HDConfiguration()
+    rolandV8HD.fromJson(newRolandV8HDConfiguration)
+    myConfiguration.setRolandV8HDConfiguration(rolandV8HD)
 
     if (newMixerName) {
       myConfiguration.setMixerSelection(newMixerName)

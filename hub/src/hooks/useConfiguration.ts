@@ -3,6 +3,7 @@ import {socket} from './useSocket'
 import ConfigTracker from './tracker/config'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration';
 import ObsConfiguration from '../mixer/obs/ObsConfiguration';
+import RolandV8HDConfiguration from '../mixer/rolandV8HD/RolandV8HDConfiguration';
 import MockConfiguration from '../mixer/mock/MockConfiguration';
 import AtemConfiguration from '../mixer/atem/AtemConfiguration';
 import { DefaultTallyConfiguration } from '../tally/TallyConfiguration';
@@ -99,6 +100,25 @@ export function useObsConfiguration() {
   }, [])
 
   return obsConfiguration
+}
+
+export function useRolandV8HDConfiguration() {
+  const [rolandV8HDConfiguration, setRolandV8HDConfiguration] = useState<RolandV8HDConfiguration|undefined>(undefined)
+
+  const onChange = newConf => {
+    setRolandV8HDConfiguration(newConf)
+  }
+
+  useEffect(() => {
+    configTracker.on("obs", onChange)
+    setRolandV8HDConfiguration(configTracker.rolandV8HDConfiguration)
+    return () => {
+      // cleanup
+      configTracker.off("rolandV8HD", onChange)
+    }
+  }, [])
+
+  return rolandV8HDConfiguration
 }
 
 export function useVmixConfiguration() {

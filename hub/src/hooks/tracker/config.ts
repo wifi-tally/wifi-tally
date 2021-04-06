@@ -4,6 +4,7 @@ import AtemConfiguration from '../../mixer/atem/AtemConfiguration'
 import MockConfiguration from '../../mixer/mock/MockConfiguration'
 import NullConfiguration from '../../mixer/null/NullConfiguration'
 import ObsConfiguration from '../../mixer/obs/ObsConfiguration'
+import RolandV8HDConfiguration from '../../mixer/rolandV8HD/RolandV8HDConfiguration'
 import VmixConfiguration from '../../mixer/vmix/VmixConfiguration'
 import { DefaultTallyConfiguration } from '../../tally/TallyConfiguration'
 
@@ -15,12 +16,13 @@ class ConfigTracker extends EventEmitter{
     // @TODO: not needed when not in dev
     mockConfiguration?: MockConfiguration
     obsConfiguration?: ObsConfiguration
+    rolandV8HDConfiguration?: RolandV8HDConfiguration
     vmixConfiguration?: VmixConfiguration
     defaultTallyConfiguration?: DefaultTallyConfiguration
 
     constructor(socket: ClientSideSocket) {
         super()
-        
+
         socket.on('config.state.mixer', ({mixerName, allowedMixers}) => {
             this.mixerName = mixerName
             this.allowedMixers = allowedMixers
@@ -41,6 +43,11 @@ class ConfigTracker extends EventEmitter{
             this.obsConfiguration = new ObsConfiguration()
             this.obsConfiguration.fromJson(obs)
             this.emit('obs', this.obsConfiguration)
+        })
+        socket.on('config.state.rolandV8HD', (rolandV8HD) => {
+            this.rolandV8HDConfiguration = new RolandV8HDConfiguration()
+            this.rolandV8HDConfiguration.fromJson(rolandV8HD)
+            this.emit('rolandV8HD', this.rolandV8HDConfiguration)
         })
         socket.on('config.state.vmix', (vmix) => {
             this.vmixConfiguration = new VmixConfiguration()

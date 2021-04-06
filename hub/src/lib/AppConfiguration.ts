@@ -4,6 +4,7 @@ import ServerEventEmitter from './ServerEventEmitter'
 import AtemConfiguration from '../mixer/atem/AtemConfiguration'
 import MockConfiguration from '../mixer/mock/MockConfiguration'
 import ObsConfiguration from '../mixer/obs/ObsConfiguration'
+import RolandV8HDConfiguration from '../mixer/rolandV8HD/RolandV8HDConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
 import NullConfiguration from '../mixer/null/NullConfiguration'
 import { Configuration } from '../mixer/interfaces'
@@ -17,6 +18,7 @@ export class AppConfiguration extends Configuration {
     mockConfiguration: MockConfiguration
     nullConfiguration: NullConfiguration
     obsConfiguration: ObsConfiguration
+    rolandV8HDConfiguration: RolandV8HDConfiguration
     testConfiguration: TestConfiguration
     vmixConfiguration: VmixConfiguration
     tallyConfiguration: DefaultTallyConfiguration
@@ -28,7 +30,7 @@ export class AppConfiguration extends Configuration {
     tallyKeepAlivesPerSecond: number
     tallyTimeoutDisconnected: number
     tallyTimeoutMissing: number
-    
+
     constructor(emitter: ServerEventEmitter) {
         super()
         this.emitter = emitter
@@ -36,6 +38,7 @@ export class AppConfiguration extends Configuration {
         this.mockConfiguration = new MockConfiguration()
         this.nullConfiguration = new NullConfiguration()
         this.obsConfiguration = new ObsConfiguration()
+        this.rolandV8HDConfiguration = new RolandV8HDConfiguration()
         this.testConfiguration = new TestConfiguration()
         this.vmixConfiguration = new VmixConfiguration()
         this.tallyConfiguration = new DefaultTallyConfiguration()
@@ -96,6 +99,9 @@ export class AppConfiguration extends Configuration {
         if (data.obs) {
             this.obsConfiguration.fromJson(data.obs)
         }
+        if (data.rolandV8HD) {
+            this.rolandV8HDConfiguration.fromJson(data.rolandV8HD)
+        }
         if (data.test) {
             this.testConfiguration.fromJson(data.test)
         }
@@ -116,6 +122,7 @@ export class AppConfiguration extends Configuration {
             mock: this.mockConfiguration.toJson(),
             "null": this.nullConfiguration.toJson(),
             obs: this.obsConfiguration.toJson(),
+            rolandV8HD: this.rolandV8HDConfiguration.toJson(),
             test: this.testConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
             tallyDefaults: this.tallyConfiguration.toJson(),
@@ -169,6 +176,16 @@ export class AppConfiguration extends Configuration {
         this.emitter.emit("config.changed.obs", this.obsConfiguration)
     }
 
+    getRolandV8HDConfiguration() {
+        return this.rolandV8HDConfiguration.clone()
+    }
+
+    setRolandV8HDConfiguration(rolandV8HDConfiguration: RolandV8HDConfiguration) {
+        this.rolandV8HDConfiguration = rolandV8HDConfiguration.clone()
+        this.emitter.emit("config.changed", this)
+        this.emitter.emit("config.changed.rolandV8HD", this.rolandV8HDConfiguration)
+    }
+
     getTestConfiguration() {
         return this.testConfiguration.clone()
     }
@@ -204,7 +221,7 @@ export class AppConfiguration extends Configuration {
         this.emitter.emit('config.changed', this)
         this.emitter.emit('config.changed.channels', this.channels)
     }
-    
+
     getChannels() {
         return this.channels
     }
