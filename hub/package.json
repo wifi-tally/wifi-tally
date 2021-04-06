@@ -4,13 +4,15 @@
   "private": true,
   "dependencies": {
     "atem-connection": "^2.0.0",
+    "axios": "^0.21.1",
     "express": "^4.15.2",
     "http-proxy-middleware": "^1.0.6",
     "obs-websocket-js": "^4.0.2",
     "socket.io": "^2.4.1",
     "socket.io-client": "^2.4.0",
     "xml2js": "^0.4.23",
-    "yargs": "^15.4.1"
+    "yargs": "^15.4.1",
+    "midi": "^1.0.3"
   },
   "scripts": {
     "start:frontend": "cross-env PORT=3001 BROWSER=none react-scripts start",
