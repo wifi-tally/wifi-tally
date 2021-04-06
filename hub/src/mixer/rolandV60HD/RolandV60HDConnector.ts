@@ -18,6 +18,10 @@ class RolandV60HDConnector implements Connector {
         this.communicator = communicator
         this.sourceConnections = []
         this.connected = false
+        //input status array.
+        // 0 = off
+        // 1 = program
+        // 2 = preview
         this.input_status = [0,0,0,0,0,0,0,0]
     }
     connect() {
@@ -35,6 +39,7 @@ class RolandV60HDConnector implements Connector {
     }
 
     private processResponse(response: string, address: number){
+      // if we get response, reconnect mixer in hub
       if(!this.connected){
         this.connected = true
       }
@@ -66,6 +71,7 @@ class RolandV60HDConnector implements Connector {
     }
 
     private processResponseError(error: any){
+      // set mixer as disconnected
       console.log(`RolandV60HD Smart Tally Error: ${error}`)
       this.connected = false
     }
