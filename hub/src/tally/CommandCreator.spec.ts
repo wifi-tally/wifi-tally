@@ -53,6 +53,9 @@ describe("stageLightBrightness()", () => {
         test('for PROGRAM', () => {
             expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S128/000/000")
         })
+        test('for RELEASE', () => {
+            expect(CommandCreator.createStateCommand(tally, [], [], defaultConfig)).toEqual("O000/001/000 S000/000/000")
+        })
     })
     describe('it can be overridden by a tally configuration', () => {
         const tally = new UdpTally("test", "channel")
@@ -166,6 +169,31 @@ describe("stageShowPreview()", () => {
         })
         test('for PROGRAM', () => {
             expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+    })
+})
+describe("operatorShowsIdle()", () => {
+    describe('it uses the default', () => {
+        const defaultConfig = new DefaultTallyConfiguration()
+        defaultConfig.setOperatorShowsIdle(false)
+        const tally = new UdpTally("test", "channel")
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+        test('for RELEASE', () => {
+            expect(CommandCreator.createStateCommand(tally, [], [], defaultConfig)).toEqual("O000/000/000 S000/000/000")
+        })
+    })
+    describe('it can be overridden by a tally configuration', () => {
+        const defaultConfig = new DefaultTallyConfiguration()
+        defaultConfig.setOperatorShowsIdle(true)
+        const tally = new UdpTally("test", "channel")
+        tally.configuration.setOperatorShowsIdle(false)
+        test('for PROGRAM', () => {
+            expect(CommandCreator.createStateCommand(tally, ["channel"], [], defaultConfig)).toEqual("O255/000/000 S255/000/000")
+        })
+        test('for RELEASE', () => {
+            expect(CommandCreator.createStateCommand(tally, [], [], defaultConfig)).toEqual("O000/000/000 S000/000/000")
         })
     })
 })

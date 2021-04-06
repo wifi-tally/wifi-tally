@@ -1,6 +1,6 @@
 {
   "name": "wifi-tally",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "dependencies": {
     "atem-connection": "^2.0.0",
@@ -42,7 +42,7 @@
     "@types/socket.io": "^2.1.13",
     "@types/socket.io-client": "^1.4.35",
     "cross-env": "^7.0.3",
-    "cypress": "^6.4.0",
+    "cypress": "^6.8.0",
     "eslint-plugin-cypress": "^2.11.2",
     "jest-extended": "^0.11.5",
     "lato-font": "^3.0.0",
