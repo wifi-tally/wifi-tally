@@ -5,7 +5,8 @@ import { Link as RouterLink } from 'react-router-dom'
 const useStyles = makeStyles(theme => {
   return {
     logo: {
-      marginRight: theme.spacing(2),
+      height: theme.typography.h2.fontSize,
+      margin: theme.spacing(1, 2, 2, 0)
     },
     contentContainer: {
       marginTop: theme.spacing(2),
@@ -24,7 +25,7 @@ const Layout = ({testId: cypressId, children}: LayoutProps) => {
   return (<div data-testid={`page-${cypressId}`}>
     <AppBar position="static">
       <Toolbar>
-        <Typography className={classes.logo} variant="h2">Tally Hub</Typography>
+        <img width="106" height="40" className={classes.logo} src="/logo-with-text.svg" alt="vTally" />
         <Button component={RouterLink} to="/">Tallies</Button>
         <Button component={RouterLink} to="/config">Configuration</Button>
         <Button component={RouterLink} to="/flasher">Flash</Button>

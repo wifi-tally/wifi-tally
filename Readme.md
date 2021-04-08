@@ -1,6 +1,6 @@
 # Open Source Tally Light
 
-Wifi Tally is an Open Source Wifi Tally Light based on the ESP8266.
+vTally is an Open Source Wifi Tally Light based on the ESP8266.
 
 It aims to be affordable without sacrificing reliability and works with most
 common video mixers.

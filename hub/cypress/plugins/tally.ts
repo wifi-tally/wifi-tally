@@ -6,7 +6,7 @@ const tallies = function(config: Cypress.PluginConfigOptions) {
   const socket : ClientSideSocket = io(config.baseUrl)
   let mockTallies: MockUdpTally[] = []
 
-  // spawns a new wifi tally
+  // spawns a new hardware tally
   function tally(name: string) {
     const tally = new MockUdpTally(name)
     mockTallies.push(tally)

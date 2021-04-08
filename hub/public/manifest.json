@@ -1,12 +1,7 @@
 {
-  "short_name": "WifiTallyHub",
-  "name": "Wifi Tally Hub",
+  "short_name": "vTallyHub",
+  "name": "vTally Hub",
   "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
     {
       "src": "logo192.png",
       "type": "image/png",
@@ -20,6 +15,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#375a7f",
-  "background_color": "#222"
+  "theme_color": "#fff",
+  "background_color": "#375a7f"
 }

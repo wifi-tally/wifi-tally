@@ -1,4 +1,4 @@
-# WiFi Tally Light
+# vTally Light
 
 This is the code that is uploaded to the Tally Light.
 

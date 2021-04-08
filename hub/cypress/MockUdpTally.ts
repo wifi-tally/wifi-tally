@@ -1,6 +1,6 @@
 import dgram from 'dgram'
 
-// a mock to be used in tests. It generates network traffic like a wifi tally would do
+// a mock to be used in tests. It generates network traffic like a hardware tally would do
 class MockUdpTally {
   name: string
   io?: dgram.Socket
