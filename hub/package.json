@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
-  "name": "wifi-tally",
-  "version": "0.4.2",
-=======
   "name": "vtally",
-  "version": "0.4.1",
->>>>>>> a92bdca (enable Github Actions to do releases again)
+  "version": "0.4.2",
   "private": true,
   "dependencies": {
     "atem-connection": "^2.2.2",
@@ -18,7 +13,6 @@
     "obs-websocket-js": "^4.0.2",
     "socket.io": "^2.4.1",
     "socket.io-client": "^2.4.0",
-    "@types/node": "^14.14.31",
     "tmp-promise": "^3.0.2",
     "xml2js": "^0.4.23",
     "yargs": "^15.4.1"

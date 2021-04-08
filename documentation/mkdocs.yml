@@ -1,4 +1,4 @@
-site_name: WiFi Tally Light
+site_name: vTally – Open Source Tally Light
 site_url: https://wifi-tally.github.io/
 repo_url: https://github.com/wifi-tally/wifi-tally
 edit_uri: edit/master/documentation/docs/
@@ -23,6 +23,8 @@ extra:
 theme:
   name: material
   font: false
+  logo: images/logo.png
+  favicon: images/favicon.png
 markdown_extensions:
   - admonition
   - toc:
