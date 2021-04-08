@@ -34,8 +34,8 @@ describe('DefaultTallyConfiguration', () => {
   
   describe('getOperatorLightBrightness', () => {
     const testData: [number, number][] = [
-      [0, 20], // it should not be possible to turn of the operator light. Prevent a Tally looks "broken" because of misconfiguration.
-      [19, 20],
+      [0, 1], // it should not be possible to turn of the operator light. Prevent a Tally looks "broken" because of misconfiguration.
+      [1, 1],
       [20, 20],
       [42, 42],
       [100, 100],
@@ -136,8 +136,8 @@ describe('TallyConfiguration', () => {
 
   describe('getOperatorLightBrightness', () => {
     const testData: [number, number][] = [
-      [0, 20], // it should not be possible to turn of the operator light. Prevent a Tally looks "broken" because of misconfiguration.
-      [19, 20],
+      [0, 1], // it should not be possible to turn of the operator light. Prevent a Tally looks "broken" because of misconfiguration.
+      [1, 1],
       [20, 20],
       [42, 42],
       [100, 100],
