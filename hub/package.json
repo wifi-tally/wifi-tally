@@ -1,6 +1,6 @@
 {
   "name": "wifi-tally",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "dependencies": {
     "atem-connection": "^2.2.2",
