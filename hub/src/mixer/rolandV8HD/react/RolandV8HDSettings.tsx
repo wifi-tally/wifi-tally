@@ -40,7 +40,7 @@ function RolandV8HDSettings(props: RolandV8HDSettingsProps) {
             onSave={handleSave}
         >
         { configuration && (<>
-            <ValidatingInput label="Request Interval" testId="request-interval" object={configuration} propertyName="requestInterval" onValid={(newRequestInterval) => { setRequestInterval(newRequestInterval); setRequestIntervalValid(true) }} onInvalid={() => setRequestIntervalValid(false)} />
+            <ValidatingInput label="Request Interval" testId="rolandV8HD-request-interval" object={configuration} propertyName="requestInterval" onValid={(newRequestInterval) => { setRequestInterval(newRequestInterval); setRequestIntervalValid(true) }} onInvalid={() => setRequestIntervalValid(false)} />
             </>)}
         </MixerSettingsWrapper>
     )
