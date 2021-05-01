@@ -5,7 +5,7 @@ import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
 import RolandV60HDConfiguration from './RolandV60HDConfiguration'
 
-// @see https://www.vmix.com/help20/index.htm?TCPAPI.html
+// @see https://static.roland.com/assets/media/pdf/V-60HD_smart_tally_eng02_W.pdf
 class RolandV60HDConnector implements Connector {
     configuration: RolandV60HDConfiguration
     communicator: MixerCommunicator
