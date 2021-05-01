@@ -1,5 +1,6 @@
 import net from 'net'
 import xml2js from 'xml2js'
+import midi from 'midi'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
 import RolandV8HDConfiguration from './RolandV8HDConfiguration'
@@ -21,7 +22,7 @@ class RolandV8HDConnector implements Connector {
         this.communicator = communicator
         this.connected = false
         this.interval = null
-        this.midi = require('midi')
+        this.midi = midi
         this.input_status = [0,0,0,0,0,0,0,0]
     }
 
