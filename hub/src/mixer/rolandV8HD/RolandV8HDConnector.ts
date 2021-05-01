@@ -76,6 +76,7 @@ class RolandV8HDConnector implements Connector {
 
         if(this.midi_input.isPortOpen() && this.midi_output.isPortOpen()){
           this.connected = true
+          this.communicator.notifyMixerIsConnected()
         }else{
           console.log(`Cannot connect with RolandV8HD V-8HD. Please check connection and try again.`)
         }
@@ -120,8 +121,10 @@ class RolandV8HDConnector implements Connector {
       this.midi_output.closePort()
       this.midi_input.closePort()
       this.connected = false
+      this.communicator.notifyMixerIsDisonnected()
       return true
     }
+
     isConnected() {
         return this.connected
     }
