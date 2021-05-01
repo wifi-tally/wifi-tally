@@ -1,5 +1,5 @@
 import net from 'net'
-import axios from 'axios'
+import http from 'http'
 import xml2js from 'xml2js'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
@@ -33,9 +33,10 @@ class RolandV60HDConnector implements Connector {
     }
 
     private checkRolandV60HDStatus(communicator: MixerCommunicator, ip: string, address: number){
-      axios.get(`http://${ip}/tally/${address.toString()}/status`)
-        .then((response) => this.processResponse(response.data, address))
-  		  .catch((error) => this.processResponseError(error));
+      http.get(`http://${ip}/tally/${address.toString()}/status`, res => {
+        res.setEncoding('utf8');
+        res.on('data', data => this.processResponse(data, address))
+      }).on('error', error => this.processResponseError(error));
     }
 
     private processResponse(response: string, address: number){
@@ -73,7 +74,7 @@ class RolandV60HDConnector implements Connector {
     private processResponseError(error: any){
       // set mixer as disconnected
       console.log(`RolandV60HD Smart Tally Error: ${error}`)
-      this.connected = false
+      this.connected? this.connected = false : null
     }
 
     private processInputStatus(communicator: MixerCommunicator){
