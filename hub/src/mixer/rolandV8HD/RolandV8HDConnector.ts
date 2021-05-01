@@ -121,7 +121,7 @@ class RolandV8HDConnector implements Connector {
       this.midi_output.closePort()
       this.midi_input.closePort()
       this.connected = false
-      this.communicator.notifyMixerIsDisonnected()
+      this.communicator.notifyMixerIsDisconnected()
       return true
     }
 
