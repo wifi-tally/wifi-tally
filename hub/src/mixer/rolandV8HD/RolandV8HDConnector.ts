@@ -1,5 +1,4 @@
 import net from 'net'
-import axios from 'axios'
 import xml2js from 'xml2js'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
