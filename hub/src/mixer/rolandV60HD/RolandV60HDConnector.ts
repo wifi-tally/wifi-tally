@@ -30,6 +30,7 @@ class RolandV60HDConnector implements Connector {
           this.sourceConnections[i] = setInterval(function() {this.checkRolandV60HDStatus(this.communicator, this.configuration.getIp().toString(), i + 1)}.bind(this), this.configuration.getRequestInterval())
         }
         this.connected = true
+        this.communicator.notifyMixerIsConnected()
     }
 
     private checkRolandV60HDStatus(communicator: MixerCommunicator, ip: string, address: number){
@@ -43,6 +44,7 @@ class RolandV60HDConnector implements Connector {
       // if we get response, reconnect mixer in hub
       if(!this.connected){
         this.connected = true
+        this.communicator.notifyMixerIsConnected()
       }
 
       // RolandV60HD encodes tally states as words
@@ -74,6 +76,7 @@ class RolandV60HDConnector implements Connector {
     private processResponseError(error: any){
       // set mixer as disconnected
       console.log(`RolandV60HD Smart Tally Error: ${error}`)
+      this.communicator.notifyMixerIsDisconnected()
       this.connected? this.connected = false : null
     }
 
@@ -101,6 +104,7 @@ class RolandV60HDConnector implements Connector {
       }
       console.log(`RolandV60HD Smart Tally connection closed`);
       this.connected = false
+      this.communicator.notifyMixerIsDisconnected()
       return true
     }
 
