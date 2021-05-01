@@ -33,14 +33,11 @@ describe('Check Default Tally Configuration', () => {
     })
   })
 
-  it('can not select a value below 20 for operator light', () => {
-    setSliderValue("*[data-testid=tally-defaults-ob]", 20)
-    validateSliderValue("*[data-testid=tally-defaults-ob]", 20).then(() => {
-      setSliderValue("*[data-testid=tally-defaults-ob]", 15)
-      validateSliderValue("*[data-testid=tally-defaults-ob]", 20).then(() => {
-        setSliderValue("*[data-testid=tally-defaults-ob]", 0)
-        validateSliderValue("*[data-testid=tally-defaults-ob]", 20)
-      })
+  it('can not select a value below 1 for operator light', () => {
+    setSliderValue("*[data-testid=tally-defaults-ob]", 1)
+    validateSliderValue("*[data-testid=tally-defaults-ob]", 1).then(() => {
+      setSliderValue("*[data-testid=tally-defaults-ob]", 0)
+      validateSliderValue("*[data-testid=tally-defaults-ob]", 1)
     })
   })
 

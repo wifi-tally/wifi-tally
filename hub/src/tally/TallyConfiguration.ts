@@ -21,7 +21,7 @@ export class DefaultTallyConfiguration {
   private _operatorShowsIdle: boolean = true
 
   static readonly defaultColorScheme : ColorSchemeId = DefaultColorScheme.id
-  static readonly minOperatorLightBrightness = 20
+  static readonly minOperatorLightBrightness = 1
   static readonly defaultBrightness = 100
 
   getStageLightBrightness() { return this._stageLightBrightness }

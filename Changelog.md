@@ -1,3 +1,12 @@
+# v0.4.2
+
+A minor feature and maintanance release.
+
+Code on the Tally did not change from `v0.4.1`.
+
+* [ADDED] allow to dim operator light to 1% brightness #57
+* [CHANGED] npm dependencies of the hub updated
+
 # v0.4.1
 
 A minor feature and bugfix release.
