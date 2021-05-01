@@ -30,6 +30,7 @@ class RolandV8HDConnector implements Connector {
         console.log(`Connecting to RolandV8HD V-8HD via MIDI`)
         this.midi_input = new this.midi.Input()
         let inputPortCount = this.midi_input.getPortCount()
+        // select correct port
         for(let i = 0; i < inputPortCount; i++){
           let name = this.midi_input.getPortName(i)
           if (name.includes("V-8HD")){
@@ -41,6 +42,7 @@ class RolandV8HDConnector implements Connector {
 
         this.midi_output = new this.midi.Output()
         let outputPortCount = this.midi_output.getPortCount()
+        // select correct port
         for(let i = 0; i < outputPortCount; i++){
           let name = this.midi_output.getPortName(i)
           if (name.includes("V-8HD")){
@@ -103,7 +105,9 @@ class RolandV8HDConnector implements Connector {
     	for (let i = 0; i < 8; i++){
         if (midi_out){
           midi_out.sendMessage(sysex_msg)
+          // increment input channel address
       		sysex_msg[10] += 1
+          // decrement checksum by 1
       		sysex_msg[14] -= 1
         }
       }
