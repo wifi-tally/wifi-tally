@@ -25,16 +25,16 @@ class RolandV60HDConnector implements Connector {
         this.input_status = [0,0,0,0,0,0,0,0]
     }
     connect() {
-        console.log(`Connecting to RolandV60HD at ${this.configuration.getIp().toString()}`)
+        console.log(`Connecting to RolandV60HD at ${this.configuration.getIp().toString()}:${this.configuration.getPort().toString()}`)
         for(let i = 0; i < 8; i++){
-          this.sourceConnections[i] = setInterval(function() {this.checkRolandV60HDStatus(this.communicator, this.configuration.getIp().toString(), i + 1)}.bind(this), this.configuration.getRequestInterval())
+          this.sourceConnections[i] = setInterval(function() {this.checkRolandV60HDStatus(this.communicator, this.configuration.getIp().toString(), this.configuration.getPort().toString(), i + 1)}.bind(this), this.configuration.getRequestInterval())
         }
         this.connected = true
         this.communicator.notifyMixerIsConnected()
     }
 
-    private checkRolandV60HDStatus(communicator: MixerCommunicator, ip: string, address: number){
-      http.get(`http://${ip}/tally/${address.toString()}/status`, res => {
+    private checkRolandV60HDStatus(communicator: MixerCommunicator, ip: string, port: string, address: number){
+      http.get(`http://${ip}:${port}/tally/${address.toString()}/status`, res => {
         res.setEncoding('utf8');
         res.on('data', data => this.processResponse(data, address))
       }).on('error', error => this.processResponseError(error));

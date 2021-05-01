@@ -7,7 +7,7 @@ import { useRolandV60HDConfiguration } from '../../../hooks/useConfiguration'
 import RolandV60HDConfiguration from '../RolandV60HDConfiguration'
 
 type RolandV60HDSettingsProps = {
-    id: "rolandV60HD", // @TODO use Vmix.ID
+    id: "rolandV60HD",
     label: string,
 }
 
@@ -15,10 +15,12 @@ function RolandV60HDSettings(props: RolandV60HDSettingsProps) {
     const configuration = useRolandV60HDConfiguration()
     const [ip, setIp] = useState<string|null>(null)
     const [ipValid, setIpValid] = useState(true)
+    const [port, setPort] = useState<string|null>(null)
+    const [portValid, setPortValid] = useState(true)
     const [requestInterval, setRequestInterval] = useState<number|string|null>(null)
     const [requestIntervalValid, setRequestIntervalValid] = useState(true)
     const isLoading = !configuration
-    const isValid = ipValid && requestIntervalValid
+    const isValid = ipValid && portValid && requestIntervalValid
 
     const handleSave = () => {
         if (configuration === undefined) {
@@ -28,6 +30,7 @@ function RolandV60HDSettings(props: RolandV60HDSettingsProps) {
         } else {
             const config = configuration.clone()
             config.setIp(ip)
+            config.setPort(port)
             config.setRequestInterval(requestInterval)
 
             socket.emit('config.change.rolandV60HD', config.toJson(), props.id)
@@ -45,6 +48,7 @@ function RolandV60HDSettings(props: RolandV60HDSettingsProps) {
         >
         { configuration && (<>
             <ValidatingInput label="IP" testId="rolandV60HD-ip" object={configuration} propertyName="ip" onValid={(newIp) => { setIp(newIp); setIpValid(true) }} onInvalid={() => setIpValid(false)} />
+            <ValidatingInput label="Port" testId="rolandV60HD-port" object={configuration} propertyName="port" onValid={(newPort) => { setPort(newPort); setPortValid(true) }} onInvalid={() => setPortValid(false)} />
             <ValidatingInput label="Request Interval" testId="rolandV60HD-requestInterval" object={configuration} propertyName="requestInterval" onValid={(newRequestInterval) => { setRequestInterval(newRequestInterval); setRequestIntervalValid(true) }} onInvalid={() => setRequestIntervalValid(false)} />
         </>)}
         </MixerSettingsWrapper>
