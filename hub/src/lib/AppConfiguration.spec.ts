@@ -5,6 +5,7 @@ import AtemConfiguration from '../mixer/atem/AtemConfiguration'
 import MockConfiguration from '../mixer/mock/MockConfiguration'
 import ObsConfiguration from '../mixer/obs/ObsConfiguration'
 import RolandV8HDConfiguration from '../mixer/rolandV8HD/RolandV8HDConfiguration'
+import RolandV60HDConfiguration from '../mixer/rolandV60HD/RolandV60HDConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
 import {UdpTally, WebTally} from '../domain/Tally'
 import { DefaultTallyConfiguration } from '../tally/TallyConfiguration'
@@ -60,6 +61,32 @@ describe("toJson/fromJson", () => {
         otherConfig.fromJson(config.toJson())
 
         expect(otherConfig.getVmixConfiguration().getIp().toString()).toEqual("10.1.1.44")
+
+    })
+    test('it can persist rolandV8HD configuration', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+        const rolandV8HDConfig = new RolandV8HDConfiguration()
+        rolandV8HDConfig.setRequestInterval(500)
+        config.setRolandV8HDConfiguration(rolandV8HDConfig)
+
+        const otherConfig = new AppConfiguration(emitter)
+        otherConfig.fromJson(config.toJson())
+
+        expect(otherConfig.getRolandV8HDConfiguration().getRequestInterval()).toEqual(500)
+
+    })
+    test('it can persist rolandV60HD configuration', () => {
+        const emitter = new EventEmitter()
+        const config = new AppConfiguration(emitter)
+        const rolandV60HDConfig = new RolandV60HDConfiguration()
+        rolandV60HDConfig.setIp("10.1.1.44")
+        config.setRolandV60HDConfiguration(rolandV60HDConfig)
+
+        const otherConfig = new AppConfiguration(emitter)
+        otherConfig.fromJson(config.toJson())
+
+        expect(otherConfig.getRolandV60HDConfiguration().getIp().toString()).toEqual("10.1.1.44")
 
     })
     test('it can persist mixer selection', () => {
