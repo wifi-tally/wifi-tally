@@ -51,7 +51,10 @@ class RolandV60HDConfiguration extends Configuration {
       if(requestInterval === null){
         requestInterval = RolandV60HDConfiguration.defaultRequestInterval
       }else if(typeof requestInterval === "string"){
-        requestInterval = Number(requestInterval)
+        requestInterval = parseInt(requestInterval, 10)
+        if(!Number.isFinite(requestInterval)) {
+            throw `Could not parse "${requestInterval}" into a number.`
+        }
       }
       this.requestInterval = requestInterval
     }
