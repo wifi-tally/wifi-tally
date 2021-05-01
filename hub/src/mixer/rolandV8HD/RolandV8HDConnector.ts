@@ -5,7 +5,7 @@ import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
 import RolandV8HDConfiguration from './RolandV8HDConfiguration'
 
-// @see https://www.vmix.com/help20/index.htm?TCPAPI.html
+// @see https://static.roland.com/assets/media/pdf/V-8HD_reference_eng03_W.pdf
 class RolandV8HDConnector implements Connector {
     configuration: RolandV8HDConfiguration
     communicator: MixerCommunicator
