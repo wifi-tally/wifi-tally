@@ -1,6 +1,12 @@
+# Upcoming
+
+Code on the Tally did not change.
+
+* [ADDED] support for Roland V-8HD and V-60HD. Thanks @JWandscheer #58
+
 # v0.4.2
 
-A minor feature and maintanance release.
+A minor feature and maintenance release.
 
 Code on the Tally did not change from `v0.4.1`.
 

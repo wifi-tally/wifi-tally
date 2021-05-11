@@ -34,6 +34,7 @@ allows easy configuration and monitoring.
 
 * [Blackmagic Design ATEM](https://www.blackmagicdesign.com/products)
 * [OBS Studio](https://obsproject.com/)
+* [Roland V-8HD](https://proav.roland.com/de/products/v-8hd/), [Roland V-60HD](https://proav.roland.com/de/products/v-60hd/), and maybe others
 * [vMix](https://www.vmix.com/software/)
 
 !!! info
