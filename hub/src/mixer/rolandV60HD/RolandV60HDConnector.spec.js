@@ -76,7 +76,7 @@ describe('RolandV60HDConnector', () => {
 
             const promise = new Promise((resolve, reject) => {
                 server.listen({
-                    port: 3001,
+                    port: 0,
                     host: '127.0.0.1',
                 }, (error) => {
                     if (error) {
