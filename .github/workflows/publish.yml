@@ -1,0 +1,34 @@
+# publishes a release to nmpjs.com
+
+name: publish
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Source *.tgz (from S3 or releases)'
+        required: true
+      version:
+        description: 'Version'
+        required: false
+        default: ''
+env:
+  NODEJS_VERSION: 12
+  NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Use node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - run: |
+          npm set //registry.npmjs.org/:_authToken=${{ env.NPM_AUTH_TOKEN }}
+          if [ -z "${{ github.event.inputs.version }}" ]; then
+            NPM_ARGS=""
+          else
+            NPM_ARGS="--tag ${{ github.event.inputs.version }}"
+          fi
+          npm publish $NPM_ARGS "${{ github.event.inputs.source }}"
