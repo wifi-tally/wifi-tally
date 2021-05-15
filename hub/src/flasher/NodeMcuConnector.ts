@@ -72,8 +72,14 @@ class NodeMcuConnector {
   }
 
   private static async getLocalFiles() {
-    const dirName = __dirname + "/../../../tally/out" // @TODO: location is different on prod
-    const files = await fs.readdir(dirName)
+    let dirName = __dirname + "/../../esp8266" // path in release package
+    const files = await fs.readdir(dirName).catch(e => {
+      dirName = __dirname + "/../../../tally/out" // path during development
+      return fs.readdir(dirName)
+    })
+
+    console.debug(`Files from ${dirName} will be flashed.`)
+
     const filteredFiles = files.filter(file => file.endsWith(".lc") || file.endsWith(".lua"))
     return Promise.all(filteredFiles.map(async file => {
       const stats = await fs.stat(dirName + "/" + file)
