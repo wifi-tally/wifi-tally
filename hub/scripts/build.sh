@@ -42,6 +42,15 @@ rm -rf "$RELEASE_DIR" "$REACT_DIR"
 mkdir "$RELEASE_DIR"
 
 # ###
+#
+# BUILD BACKEND / SERVER
+#
+# ###
+
+mkdir "$RELEASE_DIR/src"
+npm run build:backend -- --outDir "$RELEASE_DIR/src"
+
+# ###
 # 
 # BUILD FRONTEND / CLIENT
 # 
@@ -52,15 +61,7 @@ mkdir "$RELEASE_DIR"
 # @see https://github.com/facebook/create-react-app/issues/3657#issuecomment-354797029
 CI=false npm run build:frontend
 # react-scripts has the "build" directory hard-coded. So we need to move it
-cp -r "$REACT_DIR" "$RELEASE_DIR/frontend-static"
-
-# ###
-#
-# BUILD BACKEND / SERVER
-#
-# ###
-
-npm run build:backend
+cp -r "$REACT_DIR" "$RELEASE_DIR/src/frontend"
 
 # ###
 #

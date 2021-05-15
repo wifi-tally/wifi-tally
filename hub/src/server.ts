@@ -349,7 +349,7 @@ if (myConfiguration.isDev()) {
     },
   }))
 } else {
-  const publicDirName = "frontend-static"
+  const publicDirName = "frontend"
   console.info(`Serving frontend from directory ${publicDirName}`)
   app.use('/', express.static(`${__dirname}/${publicDirName}/`))
 

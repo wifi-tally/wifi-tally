@@ -76,10 +76,10 @@ jobs:
 
   # ###
   # 
-  # Building the Javascript hub
+  # run Unit Tests for Hub
   # 
   # ###
-  hub-build: 
+  hub-test:
     needs: setup
     env:
       BUILD_NAME: ${{ needs.setup.outputs.build_name }}
@@ -107,18 +107,6 @@ jobs:
             ${{ runner.OS }}-
       - run: npm ci
       - run: npm run test:ci
-      - run: ./scripts/build.sh
-      # upload-artifact is obviously not build to upload 20.000 files - it takes AGES
-      # so we zip it
-      - name: Tar the build
-        run: tar -czf "./hub-dist.tar.gz" -C dist/ .
-      - name: Archive artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: hub-dist
-          path: "./hub/hub-dist.tar.gz"
-          if-no-files-found: error
-          retention-days: 1
 
   # ###
   #
@@ -440,7 +428,6 @@ jobs:
   # ###
   bundle:
     needs: 
-      - hub-build
       - documentation
       - tally-build
       - tally-firmware
@@ -449,54 +436,64 @@ jobs:
     outputs:
       artifact: ${{ steps.aws.outputs.artifact }}
       artifact_name: ${{ steps.aws.outputs.artifact_name }}
+    env:
+      BUILD_NAME: ${{ needs.setup.outputs.build_name }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v2
-      - run: |
-          mkdir ${GITHUB_WORKSPACE}/dist
-          mkdir ${GITHUB_WORKSPACE}/dist/docs
-          mkdir ${GITHUB_WORKSPACE}/dist/esp8266
-      - name: Get Hub
-        uses: actions/download-artifact@v2
+      - run: sudo apt-get -y update
+      - run: sudo apt-get install -y libasound2-dev
+      - name: Use node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v1
         with:
-          name: hub-dist
-          path: ${{ github.workspace }}/dist
-      - name: extract hub
-        run: |
-          tar -xzf hub-dist.tar.gz .
-          rm hub-dist.tar.gz
-        working-directory: ${{ github.workspace }}/dist
+          node-version: ${{ env.NODEJS_VERSION }}
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - run: npm ci
+        working-directory: ${{ github.workspace }}/hub
+      - run: |
+          mkdir ${GITHUB_WORKSPACE}/hub/dist
+          mkdir ${GITHUB_WORKSPACE}/hub/dist/docs
+          mkdir ${GITHUB_WORKSPACE}/hub/dist/esp8266
+      - run: ./scripts/build.sh
+        working-directory: ${{ github.workspace }}/hub
       - name: Get HTML documentation
         uses: actions/download-artifact@v2
         with:
           name: documentation-html
-          path: ${{ github.workspace }}/dist/docs/html
+          path: ${{ github.workspace }}/hub/dist/docs/html
       - name: Get Markdown documentation
         uses: actions/download-artifact@v2
         with:
           name: documentation-markdown
-          path: ${{ github.workspace }}/dist/docs/markdown
+          path: ${{ github.workspace }}/hub/dist/docs/markdown
       - name: Get Firmware
         uses: actions/download-artifact@v2
         with:
           name: nodemcu-firmware
-          path: ${{ github.workspace }}/dist/esp8266
+          path: ${{ github.workspace }}/hub/dist/esp8266
       - name: Get Tally
         uses: actions/download-artifact@v2
         with:
           name: tally-dist
-          path: ${{ github.workspace }}/dist/esp8266
-
+          path: ${{ github.workspace }}/hub/dist/esp8266
       - name: Copy static files
         run: |
-          cp "${GITHUB_WORKSPACE}/Readme.md" "${GITHUB_WORKSPACE}/dist"
-          cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/dist"
-          cp "${GITHUB_WORKSPACE}/Changelog.md" "${GITHUB_WORKSPACE}/dist"
+          cp "${GITHUB_WORKSPACE}/Readme.md" "${GITHUB_WORKSPACE}/hub/dist"
+          cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/hub/dist"
+          cp "${GITHUB_WORKSPACE}/Changelog.md" "${GITHUB_WORKSPACE}/hub/dist"
       - name: npm pack
         run: |
           npm shrinkwrap
           npm pack
-        working-directory: ${{ github.workspace }}/dist
+        working-directory: ${{ github.workspace }}/hub/dist
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -507,14 +504,13 @@ jobs:
         id: aws
         run: |
           # strip the "v" in front of the version
-          BUILD_NAME="${{ needs.setup.outputs.build_name }}"
           BUILD_NAME=${BUILD_NAME/#v/}
           ARTIFACT_FILENAME="vtally-${BUILD_NAME}.tgz"
           aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${ARTIFACT_NAME}" --acl public-read
           echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME} for the next days."
           echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${ARTIFACT_FILENAME}"
           echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
-        working-directory: ${{ github.workspace }}/dist
+        working-directory: ${{ github.workspace }}/hub/dist
 
   # ###
   #

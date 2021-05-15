@@ -2,7 +2,7 @@
 
 var forever = require('forever-monitor');
 
-var child = new (forever.Monitor)(module.path + '/../server.js', {
+var child = new (forever.Monitor)(module.path + '/../src/server.js', {
   args: [...process.argv, '--env=production'],  // pass-through args
 
   watch: false,
