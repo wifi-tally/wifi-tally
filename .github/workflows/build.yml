@@ -526,7 +526,7 @@ jobs:
     steps:
       - run: |
           wget "${{ needs.bundle.outputs.artifact }}"
-      - uses: meeDamian/ease@github-rel2.0
+      - uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ needs.setup.outputs.tag }}
