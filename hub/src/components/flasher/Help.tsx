@@ -45,8 +45,9 @@ function Help({tallyDevice, onReload}: Props) {
       <Alert variant="outlined" className={classes.info} severity="info">
         <AlertTitle>Possible fixes</AlertTitle>
         <ul>
+          <li>Plug the Tally to the computer that runs the hub via USB.</li>
           { !isLocalhost() && <li>The Tally has to be connected to the computer that <em>runs</em> the hub. It does not work on <em>remote machines</em>.</li> }
-          <li>Some USB cables can just be used for charging. Make sure you use a <em>USB data cable</em>.</li>
+          <li>Some USB cables can just be used for charging. Make sure you use an <em>USB data cable</em>.</li>
           <li>If this has never worked from this computer ever, you might be missing the correct <ExternalLink href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">USB drivers</ExternalLink>.</li>
         </ul>
       </Alert>

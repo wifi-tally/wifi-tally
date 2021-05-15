@@ -1,6 +1,6 @@
-# tests the hub on a variety of operating systems, NodeJS versions and browsers
+# publishes a release to nmpjs.com
 
-name: cypress
+name: publish
 on:
   workflow_dispatch:
     inputs:
