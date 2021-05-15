@@ -13,13 +13,13 @@
       that they might be improved, but in a backward compatible way
 
 
-The latest version of vTally is [v{{ latest_version }}]({{ github_link }}/releases/tag/v{{ latest_version }}).
+The latest version of vTally is [{{ latest_version }}]({{ github_link }}/releases/tag/{{ latest_version }}).
 
 ## Windows
 
 ### 1. Install Node.js ≥{{ hub_nodejs_version }}
 
-[Install Node.js](https://nodejs.org/en/download/package-manager/).
+[Install Node.js](https://nodejs.org/en/download/package-manager/#windows).
 
 Verify your installation
 
