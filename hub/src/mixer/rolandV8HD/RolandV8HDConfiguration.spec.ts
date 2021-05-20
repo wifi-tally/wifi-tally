@@ -12,12 +12,12 @@ describe('getRequestInterval/setRequestInterval', () => {
     it("allows to set String", () => {
         const conf = createDefaultRolandV8HDConfiguration()
         conf.setRequestInterval("300")
-        expect(conf.getRequestInterval() == 300)
+        expect(conf.getRequestInterval()).toEqual(300)
     })
     it("allows to restore the default", () => {
         const conf = createDefaultRolandV8HDConfiguration()
         conf.setRequestInterval(300)
-        expect(conf.getRequestInterval() == 300)
+        expect(conf.getRequestInterval()).toEqual(300)
         conf.setRequestInterval(null)
         expect(conf.getRequestInterval()).toBeTruthy()
     })

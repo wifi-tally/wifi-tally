@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Button, Container, makeStyles, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Button, Container, makeStyles, Toolbar } from '@material-ui/core'
 import { Link as RouterLink } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => {

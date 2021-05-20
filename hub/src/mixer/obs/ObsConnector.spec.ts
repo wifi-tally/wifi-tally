@@ -221,7 +221,7 @@ describe('ObsConnector', () => {
                                 }
                             }
                         default: 
-                            throw `Request "${requestType}" not implemented in mock.`
+                            throw new Error(`Request "${requestType}" not implemented in mock.`)
                     }
                 }
             }

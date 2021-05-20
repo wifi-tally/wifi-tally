@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io'
 import ServerEventEmitter, { EventHandlersDataMap } from './ServerEventEmitter'
 import { ServerSideSocket } from './SocketEvents'
 

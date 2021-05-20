@@ -12,7 +12,6 @@ import { TestConfigurationSaveType } from "../mixer/test/TestConfiguration";
 import { StateCommand } from "../tally/CommandCreator";
 import { TallyConfigurationObjectType } from "../tally/TallyConfiguration";
 import { TallyDeviceObjectType } from "../flasher/TallyDevice";
-import TallySettingsIni from "../flasher/TallySettingsIni";
 import { TallyProgramProgressType, TallySettingsIniProgressType } from "../flasher/NodeMcuConnector";
 
 // events the server sends to the client

@@ -292,7 +292,7 @@ export class AppConfiguration extends Configuration {
     }
 
     setTallyTimeoutDisconnected(timeout: number) {
-        if (timeout < 1000) { throw `timeout too small: ${timeout}ms` }
+        if (timeout < 1000) { throw new Error(`timeout too small: ${timeout}ms`) }
         this.tallyTimeoutDisconnected = timeout
     }
 
@@ -301,7 +301,7 @@ export class AppConfiguration extends Configuration {
     }
 
     setTallyTimeoutMissing(timeout: number) {
-        if (timeout < 1000) { throw `timeout too small: ${timeout}ms` }
+        if (timeout < 1000) { throw new Error(`timeout too small: ${timeout}ms`) }
         this.tallyTimeoutMissing = timeout
     }
 

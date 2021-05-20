@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
 import { socket } from '../../../hooks/useSocket'
 import { SettingsProps } from '../../interfaces'

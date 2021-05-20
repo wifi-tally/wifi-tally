@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ChannelSelector from '../components/ChannelSelector'
 import { Tally as TallyType } from '../domain/Tally'
 import useChannels from '../hooks/useChannels'

@@ -1,5 +1,5 @@
 import { makeStyles, Select } from "@material-ui/core";
-import React, { useState } from "react";
+import React from "react";
 import Channel from '../domain/Channel'
 
 const useStyles = makeStyles(theme => ({

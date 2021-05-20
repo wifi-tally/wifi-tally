@@ -10,7 +10,7 @@ export class IpPort {
             port = parseInt(port, 10)
         }
         if (!isValidPort(port)) {
-            throw `Invalid Port: ${port}`
+            throw new Error(`Invalid Port: ${port}`)
         } else {
             this.port = port
         }

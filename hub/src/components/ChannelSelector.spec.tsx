@@ -97,7 +97,7 @@ test('it selects (unpatched) by default', () => {
         new Channel("2", "Channel Two"),
         new Channel("3", "Channel Three"),
     ]
-    const { getByText, getByRole } = render(<ChannelSelector channels={channels} />, {
+    const { getByRole } = render(<ChannelSelector channels={channels} />, {
         container: document.body.appendChild(root)
     })
 

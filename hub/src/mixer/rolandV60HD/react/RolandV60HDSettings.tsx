@@ -2,9 +2,7 @@ import React, { useState } from 'react'
 import MixerSettingsWrapper from '../../../components/config/MixerSettingsWrapper'
 import ValidatingInput from '../../../components/config/ValidatingInput'
 import { socket } from '../../../hooks/useSocket'
-import { SettingsProps } from '../../interfaces'
 import { useRolandV60HDConfiguration } from '../../../hooks/useConfiguration'
-import RolandV60HDConfiguration from '../RolandV60HDConfiguration'
 
 type RolandV60HDSettingsProps = {
     id: "rolandV60HD",

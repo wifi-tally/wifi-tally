@@ -1,4 +1,4 @@
-import {UdpTally, WebTally} from '../domain/Tally'
+import {UdpTally} from '../domain/Tally'
 import CommandCreator from './CommandCreator'
 import { DefaultTallyConfiguration } from './TallyConfiguration'
 import 'jest-extended'

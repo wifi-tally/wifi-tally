@@ -5,7 +5,7 @@ import Layout from '../components/layout/Layout'
 import Tally from '../domain/Tally'
 import useTallies from '../hooks/useTallies'
 import TallyComponent from '../components/Tally'
-import { Box, Button, ButtonGroup, Container, makeStyles, Tooltip, Typography } from '@material-ui/core'
+import { Box, Button, ButtonGroup, makeStyles, Tooltip, Typography } from '@material-ui/core'
 import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows'
 import WifiIcon from '@material-ui/icons/Wifi'
 import ServerIcon from '@material-ui/icons/Dns';
@@ -70,11 +70,6 @@ const IndexPage = () => {
   }
 
   const nrConnectedTallies = countConnectedTallies(tallies)
-
-  function refreshPage() {
-    window.location.reload(false)
-    return false
-  }
 
   return (
     <Layout testId="index">

@@ -7,7 +7,7 @@ describe('it parses valid ip addresses', () => {
         "10.10.1.1",
         "localhost",
     ].forEach((address) => {
-        it(address, () => {
+        it(`${address}`, () => {
             const ip = IpAddress(address)
             expect(ip.toString()).toEqual(address)
         })

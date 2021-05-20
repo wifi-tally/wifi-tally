@@ -14,17 +14,17 @@ describe('getRequestInterval/setRequestInterval', () => {
     it("allows to set String", () => {
         const conf = createDefaultRolandV60HDConfiguration()
         conf.setRequestInterval("300")
-        expect(conf.getRequestInterval() == 300)
+        expect(conf.getRequestInterval()).toEqual(300)
     })
     it("allows to set number", () => {
         const conf = createDefaultRolandV60HDConfiguration()
         conf.setRequestInterval(300)
-        expect(conf.getRequestInterval() == 300)
+        expect(conf.getRequestInterval()).toEqual(300)
     })
     it("allows to restore the default", () => {
         const conf = createDefaultRolandV60HDConfiguration()
         conf.setRequestInterval(300)
-        expect(conf.getRequestInterval() == 300)
+        expect(conf.getRequestInterval()).toEqual(300)
         conf.setRequestInterval(null)
         expect(conf.getRequestInterval()).toBeTruthy()
     })
@@ -89,7 +89,7 @@ describe('fromJson/toJson', () => {
 
         expect(loadedConf.getIp().toString()).toEqual("1.2.3.4")
         expect(loadedConf.getPort().toNumber()).toEqual(1234)
-        expect(loadedConf.getRequestInterval() == 300)
+        expect(loadedConf.getRequestInterval()).toEqual(300)
     })
 })
 
@@ -104,6 +104,6 @@ describe('clone', () => {
 
         expect(clone.getIp().toString()).toEqual("1.2.3.4")
         expect(clone.getPort().toNumber()).toEqual(1234)
-        expect(clone.getRequestInterval() == 300)
+        expect(clone.getRequestInterval()).toEqual(300)
     })
 })

@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControl, FormControlLabel, FormLabel, makeStyles, Typography } from '@material-ui/core'
+import { Button, Checkbox, FormControlLabel, makeStyles, Typography } from '@material-ui/core'
 import React, { useMemo, useState } from 'react'
 import { useDefaultTallyConfiguration } from '../../hooks/useConfiguration'
 import { socket } from '../../hooks/useSocket'

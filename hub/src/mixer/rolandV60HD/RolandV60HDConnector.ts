@@ -1,6 +1,4 @@
-import net from 'net'
 import http from 'http'
-import xml2js from 'xml2js'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
 import RolandV60HDConfiguration from './RolandV60HDConfiguration'
@@ -11,7 +9,7 @@ class RolandV60HDConnector implements Connector {
     communicator: MixerCommunicator
     sourceConnections: any
     connected: boolean
-    input_status: any
+    input_status: number[]
 
     constructor(configuration: RolandV60HDConfiguration, communicator: MixerCommunicator) {
         this.configuration = configuration
@@ -68,7 +66,7 @@ class RolandV60HDConnector implements Connector {
           break;
       }
       // Only Process Tally Information after full iteration
-      if(address == 8){
+      if(address === 8){
         this.processInputStatus(this.communicator)
       }
     }
@@ -77,7 +75,9 @@ class RolandV60HDConnector implements Connector {
       // set mixer as disconnected
       console.log(`RolandV60HD Smart Tally Error: ${error}`)
       this.communicator.notifyMixerIsDisconnected()
-      this.connected? this.connected = false : null
+      if (this.connected) {
+        this.connected = false
+      }
     }
 
     private processInputStatus(communicator: MixerCommunicator){
@@ -86,11 +86,11 @@ class RolandV60HDConnector implements Connector {
       // iterate through input status array
       for(let i = 0; i < 8; i++){
         // process program
-        if(this.input_status[i] == 1){
+        if(this.input_status[i] === 1){
           programs.push(`${i + 1}`)
         }
         // process preview
-        if(this.input_status[i] == 2){
+        if(this.input_status[i] === 2){
           previews.push(`${i + 1}`)
         }
       }
