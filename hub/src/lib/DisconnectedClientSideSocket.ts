@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { ClientSideSocket, ServerSentEvents, ServerSideSocket } from "./SocketEvents";
+import { ClientSideSocket } from "./SocketEvents";
 
 // used for tests only
 class DisconnectedClientSideSocket implements ClientSideSocket {

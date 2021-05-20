@@ -33,7 +33,7 @@ class RolandV8HDConfiguration extends Configuration {
         }else if(typeof requestInterval === "string"){
             requestInterval = parseInt(requestInterval, 10)
             if(!Number.isFinite(requestInterval)) {
-                throw `Could not parse "${requestInterval}" into a number.`
+                throw new Error(`Could not parse "${requestInterval}" into a number.`)
             }
         }
         this.requestInterval = requestInterval

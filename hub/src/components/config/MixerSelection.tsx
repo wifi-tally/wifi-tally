@@ -48,7 +48,7 @@ function MixerSelection({children}: MixerSelectionProps) {
 
     const availableChildren = children?.filter((child) => {
         if (!isValidChild(child)) {
-            throw `Expected all nodes of MixerSelection to be ReactNodes implementing SettingProps, but got ${child?.constructor?.name || typeof child}`
+            throw new Error(`Expected all nodes of MixerSelection to be ReactNodes implementing SettingProps, but got ${child?.constructor?.name || typeof child}`)
         }
 
         return allowedMixers?.includes(child.props.id)

@@ -1,9 +1,5 @@
-import { CircularProgress, fade, makeStyles, Step, StepLabel, Stepper } from '@material-ui/core'
 import React from 'react'
 import { TallySettingsIniProgressType } from '../../flasher/NodeMcuConnector'
-import CancelIcon from '@material-ui/icons/Cancel'
-import CheckCircleIcon from '@material-ui/icons/CheckCircle'
-import PauseCircleFilledRoundedIcon from '@material-ui/icons/PauseCircleFilledRounded'
 import useTallies from '../../hooks/useTallies'
 import StepDisplay, { StepType } from './StepDisplay'
 

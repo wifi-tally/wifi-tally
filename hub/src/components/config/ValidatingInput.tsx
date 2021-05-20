@@ -29,8 +29,8 @@ const upperCaseFirst = (value: string) => `${value.substr(0, 1).toUpperCase()}${
 function ValidatingInput({label, testId, object, propertyName, errorMessage, onValid, onInvalid}: ValidatingInputProps) {
     const getterName = `get${upperCaseFirst(propertyName)}`
     const setterName = `set${upperCaseFirst(propertyName)}`
-    if (typeof object[getterName] !== "function") { throw `${getterName} is not a function` }
-    if (typeof object[setterName] !== "function") { throw `${setterName} is not a function` }
+    if (typeof object[getterName] !== "function") { throw new Error(`${getterName} is not a function`) }
+    if (typeof object[setterName] !== "function") { throw new Error(`${setterName} is not a function`) }
 
     const theObjectValue = object[getterName]().toString()
     const [oldValue, setOldValue] = useState<string|null>(null)

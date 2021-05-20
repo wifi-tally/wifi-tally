@@ -15,10 +15,6 @@ const waitUntil = (fn) => {
 class MockCommunicator {
     constructor(configuration, emitter) {
         this.isConnected = false
-        this.channelCount
-        this.channelNames
-        this.programs
-        this.previews
     }
 
     notifyProgramPreviewChanged(programs, previews) {
@@ -115,7 +111,7 @@ describe('VmixConnector', () => {
         })
         test('recognizes VERSION OK', async () => {
             const server = global.vMixServerConfig
-            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
+            const [vmix] = createVmixCommunicator(server.serverIp, server.serverPort)
             try {
                 expect(vmix.wasHelloReceived).toBe(false)
                 vmix.connect()
@@ -128,7 +124,7 @@ describe('VmixConnector', () => {
         })
         test('recognizes SUBSCRIBE OK TALLY', async () => {
             const server = global.vMixServerConfig
-            const [vmix, communicator] = createVmixCommunicator(server.serverIp, server.serverPort)
+            const [vmix] = createVmixCommunicator(server.serverIp, server.serverPort)
             try {
                 expect(vmix.wasSubcribeOkReceived).toBe(false)
                 vmix.connect()

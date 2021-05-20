@@ -1,5 +1,3 @@
-import net from 'net'
-import xml2js from 'xml2js'
 import midi from 'midi'
 import { MixerCommunicator } from '../../lib/MixerCommunicator'
 import { Connector } from '../interfaces'
@@ -15,7 +13,7 @@ class RolandV8HDConnector implements Connector {
     midi: any
     midi_input: any
     midi_output: any
-    input_status: any
+    input_status: number[]
 
     constructor(configuration: RolandV8HDConfiguration, communicator: MixerCommunicator) {
         this.configuration = configuration
@@ -58,7 +56,7 @@ class RolandV8HDConnector implements Connector {
         // Callback Method for Midi Input
         this.midi_input.on('message', (deltaTime, message) => {
           //Check tally parameter area
-          if(message[8] == 12){
+          if(message[8] === 12){
         		// hdmi input id in byte 11
         		let channel_idx = message[10]
         		// tally information in byte 12
@@ -66,7 +64,7 @@ class RolandV8HDConnector implements Connector {
             this.input_status[channel_idx] = input_status
 
             // only notify program status change after full iteration (8 chans)
-            if(channel_idx == 7){
+            if(channel_idx === 7){
               this.processInputStatus(this.communicator)
             }
           }
@@ -88,11 +86,11 @@ class RolandV8HDConnector implements Connector {
       // iterate through input status array
       for(let i = 0; i < 8; i++){
         // process program
-        if(this.input_status[i] == 1){
+        if(this.input_status[i] === 1){
           programs.push(`${i + 1}`)
         }
         // process preview
-        if(this.input_status[i] == 2){
+        if(this.input_status[i] === 2){
           previews.push(`${i + 1}`)
         }
       }

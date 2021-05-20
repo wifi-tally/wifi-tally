@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles, FormLabel, Switch, FormControlLabel, fade, Typography, Checkbox } from '@material-ui/core';
+import { makeStyles, FormControlLabel, Checkbox } from '@material-ui/core';
 import React, { useMemo, useState } from 'react'
 import Tally from '../domain/Tally';
 import { useDefaultTallyConfiguration } from '../hooks/useConfiguration';
@@ -57,7 +57,7 @@ function TallySettings({ tally, open, onClose }: TallySettingsProps) {
       if (isSpDefault) { setSp(defaultSettings.getStageShowsPreview()) }
       if (isOiDefault) { setOi(defaultSettings.getOperatorShowsIdle()) }
     }
-  }, [defaultSettings])
+  }, [defaultSettings, isObDefault, isSbDefault, isOcDefault, isScDefault, isSpDefault, isOiDefault])
   useMemo(() => {
     // when settings are changed
     if (settings) {

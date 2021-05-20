@@ -1,4 +1,3 @@
-import { string } from 'yargs'
 import ipAddress, {IpAddress} from '../../domain/IpAddress'
 import ipPort, {IpPort} from '../../domain/IpPort'
 import {Configuration} from '../interfaces'

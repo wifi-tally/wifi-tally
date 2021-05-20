@@ -1,5 +1,3 @@
-import { string } from "yargs"
-
 export type ChannelSaveObject = {
     id: string
     name?: string

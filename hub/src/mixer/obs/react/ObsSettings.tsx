@@ -4,7 +4,7 @@ import ValidatingInput from '../../../components/config/ValidatingInput'
 import ExternalLink from '../../../components/ExternalLink'
 import { useObsConfiguration } from '../../../hooks/useConfiguration'
 import { socket } from '../../../hooks/useSocket'
-import ObsConfiguration, { ObsConfigurationLiveMode } from '../ObsConfiguration'
+import { ObsConfigurationLiveMode } from '../ObsConfiguration'
 import ObsConnector from '../ObsConnector'
 import ObsLiveModeSelect from './ObsLiveModeSelect'
 

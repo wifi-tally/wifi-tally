@@ -1,6 +1,5 @@
 import RolandV60HDConnector from './RolandV60HDConnector'
 import RolandV60HDConfiguration from './RolandV60HDConfiguration'
-import { Server } from 'net'
 import http from 'http'
 
 const waitUntil = (fn) => {
@@ -16,8 +15,6 @@ const waitUntil = (fn) => {
 class MockCommunicator {
     constructor(configuration, emitter) {
         this.isConnected = false
-        this.programs
-        this.previews
     }
 
     notifyProgramPreviewChanged(programs, previews) {
@@ -68,6 +65,8 @@ describe('RolandV60HDConnector', () => {
                   case 0:
                     res.write("unselected")
                     break
+                  default:
+                      throw new Error("Unimplemented")
                 }
                 res.end()
               }

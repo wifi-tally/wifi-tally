@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {socket} from './useSocket'
 import ConfigTracker from './tracker/config'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration';

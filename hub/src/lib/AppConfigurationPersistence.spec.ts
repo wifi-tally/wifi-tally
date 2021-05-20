@@ -1,12 +1,10 @@
 import tmp from 'tmp'
-tmp.setGracefulCleanup()
 import fs from 'fs'
-
 import { AppConfiguration } from './AppConfiguration'
 import { EventEmitter } from 'events'
 import AppConfigurationPersistence from './AppConfigurationPersistence'
-import { emit } from 'process'
 
+tmp.setGracefulCleanup()
 
 describe('load()', () => {
     test('issues a warning if file does not exist and uses defaults', () => {
@@ -164,7 +162,7 @@ test('save/load persists data', (done) => {
 
         const otherEmitter = new EventEmitter()
         const otherConfig = new AppConfiguration(otherEmitter)
-        const otherPersistence = new AppConfigurationPersistence(otherConfig, otherEmitter, path)
+        new AppConfigurationPersistence(otherConfig, otherEmitter, path)
         
         // the data should be loaded
         expect(otherConfig.getMockConfiguration().getChannelCount()).toEqual(42)

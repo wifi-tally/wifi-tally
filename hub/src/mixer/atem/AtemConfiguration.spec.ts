@@ -1,4 +1,3 @@
-import { config } from 'yargs'
 import AtemConfiguration from './AtemConfiguration'
 import ipPort from '../../domain/IpPort'
 import ipAddress from '../../domain/IpAddress'

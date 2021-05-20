@@ -5,7 +5,6 @@ import randomTallyName from '../browserlib/randomTallyName'
 import { socket } from '../../src/hooks/useSocket'
 import { DefaultTallyConfiguration, TallyConfiguration } from '../../src/tally/TallyConfiguration'
 import { setSliderValue, validateSliderValue } from '../browserlib/sliderTestTool'
-import TestConfiguration from '../../src/mixer/test/TestConfiguration'
 
 describe('Tally Settings', () => {
 

@@ -15,7 +15,7 @@ export class IpAddress {
     address: string
     constructor(address: string) {
         if (!isValidIp(address)) {
-            throw `Invalid IP address: ${address}`
+            throw new Error(`Invalid IP address: ${address}`)
         } else {
             this.address = address
         }

@@ -1,6 +1,5 @@
 import ipAddress, {IpAddress} from "../domain/IpAddress"
 import ipPort, { IpPort } from "../domain/IpPort"
-import { MixerCommunicator } from "../lib/MixerCommunicator"
 
 export type SettingsProps = {
     id: string

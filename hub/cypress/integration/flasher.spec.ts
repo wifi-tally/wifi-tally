@@ -1,10 +1,6 @@
 /// <reference types="Cypress" />
 /// <reference types="../support" />
 
-import randomTallyName from '../browserlib/randomTallyName'
-import TestConfiguration from '../../src/mixer/test/TestConfiguration'
-import { socket } from '../../src/hooks/useSocket'
-
 describe('Tally display', () => {
   beforeEach(() => {
     cy.visit('/flasher')

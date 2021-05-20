@@ -65,7 +65,7 @@ class MockConfiguration extends Configuration {
         if (typeof time === "string") {
             time = parseInt(time, 10)
             if(!Number.isFinite(time)) {
-                throw `Could not parse "${time}" into a number.`
+                throw new Error(`Could not parse "${time}" into a number.`)
             }
         }
         if (typeof time === "number") {
@@ -74,7 +74,7 @@ class MockConfiguration extends Configuration {
             theTime = MockConfiguration.defaultTickTime
         }
         if (theTime <= 0) {
-            throw `tickTime needs to be a positive number, but got ${theTime}`
+            throw new Error(`tickTime needs to be a positive number, but got ${theTime}`)
         }
 
         this.tickTime = theTime
@@ -89,15 +89,15 @@ class MockConfiguration extends Configuration {
         if (typeof count === "string") {
             count = parseInt(count, 10)
             if(!Number.isFinite(count)) {
-                throw `Could not parse "${count}" into a number.`
+                throw new Error(`Could not parse "${count}" into a number.`)
             }
         }
         if (typeof count === "number") {
             if (count < 0) {
-                throw `channel count needs to be a positive integer, but got ${count}`
+                throw new Error(`channel count needs to be a positive integer, but got ${count}`)
             }
             if (!Number.isInteger(count)) {
-                throw `channel count needs to be an integer, but got ${count}`
+                throw new Error(`channel count needs to be an integer, but got ${count}`)
             }
             this.channelCount = count
         } else if (count === null) {
