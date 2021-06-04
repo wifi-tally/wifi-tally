@@ -423,11 +423,63 @@ jobs:
 
   # ###
   # 
-  # Bundle it all together
+  # Upload firmware and code
   # 
   # ###
-  bundle:
+  tally-upload:
     needs: 
+      - tally-build
+      - tally-firmware
+      - setup
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.aws.outputs.artifact }}
+      artifact_name: ${{ steps.aws.outputs.artifact_name }}
+    env:
+      BUILD_NAME: ${{ needs.setup.outputs.build_name }}
+    steps:
+      - name: Get Firmware
+        uses: actions/download-artifact@v2
+        with:
+          name: nodemcu-firmware
+          path: ${{ github.workspace }}/esp8266
+      - name: Get Tally
+        uses: actions/download-artifact@v2
+        with:
+          name: tally-dist
+          path: ${{ github.workspace }}/esp8266
+      - name: Copy static files
+        run: |
+          cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/esp8266"
+      - name: Zip it
+        run: |
+          zip -Jrq "${GITHUB_WORKSPACE}/vtally-${{ needs.setup.outputs.build_name }}-esp8266.zip" *
+        working-directory: ${{ github.workspace }}/esp8266
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
+          aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
+      - name: Push artifact to AWS S3
+        id: aws
+        run: |
+          # strip the "v" in front of the version
+          BUILD_NAME=${BUILD_NAME/#v/}
+          S3_PREFIX="vtally-${BUILD_NAME}"
+          ARTIFACT_FILENAME="vtally-${{ needs.setup.outputs.build_name }}-esp8266.zip"
+          aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${S3_PREFIX}/${ARTIFACT_NAME}" --acl public-read
+          echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${S3_PREFIX}/${ARTIFACT_FILENAME} for the next days."
+          echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${S3_PREFIX}/${ARTIFACT_FILENAME}"
+          echo "::set-output name=artifact_name::${ARTIFACT_FILENAME}"
+
+  # ###
+  #
+  # Bundle it all together
+  #
+  # ###
+  bundle-and-upload:
+    needs:
       - documentation
       - tally-build
       - tally-firmware
