@@ -185,7 +185,7 @@ describe('Tally Settings', () => {
       // it should show the default value
       validateSliderValue("*[data-testid=tally-settings-ob]", 100)
       validateSliderValue("*[data-testid=tally-settings-sb]", 100)
-      cy.getTestId("tally-settings-oc").should('have.attr', 'data-value', 'yellow-pink')
+      cy.getTestId("tally-settings-oc").should('have.attr', 'data-value', 'default')
       cy.getTestId("tally-settings-sc").should('have.attr', 'data-value', 'default')
       cy.getTestId("tally-settings-sp").should('have.attr', 'data-value', 'true')
       cy.getTestId("tally-settings-oi").should('have.attr', 'data-value', 'true')
