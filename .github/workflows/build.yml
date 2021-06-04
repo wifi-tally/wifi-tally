@@ -465,7 +465,7 @@ jobs:
           # strip the "v" in front of the version
           BUILD_NAME=${BUILD_NAME/#v/}
           S3_PREFIX="vtally-${BUILD_NAME}"
-          ARTIFACT_FILENAME="vtally-${{ needs.setup.outputs.build_name }}-esp8266.zip"
+          ARTIFACT_FILENAME="vtally-${BUILD_NAME}-esp8266.zip"
           aws s3 cp "${ARTIFACT_FILENAME}" "s3://${AWS_S3_NIGHTLY_BUCKET}/${S3_PREFIX}/${ARTIFACT_NAME}" --acl public-read
           echo "::warning ::Artifact is available at ${AWS_S3_NIGHTLY_BASEURI}/${S3_PREFIX}/${ARTIFACT_FILENAME} for the next days."
           echo "::set-output name=artifact::${AWS_S3_NIGHTLY_BASEURI}/${S3_PREFIX}/${ARTIFACT_FILENAME}"
