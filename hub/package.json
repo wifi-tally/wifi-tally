@@ -70,7 +70,8 @@
     "darwin"
   ],
   "cpu": [
-    "x64"
+    "x64",
+    "arm"
   ],
   "browserslist": {
     "production": [
