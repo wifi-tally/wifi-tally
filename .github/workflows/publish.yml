@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version. A version that is present in the S3 bucket. (like 0.5.0-alpha1'
+        description: 'Version. A version that is present in the S3 bucket. (like 0.5.0-alpha1)'
         required: true
         default: ''
 env:
