@@ -4,17 +4,17 @@ name: publish
 on:
   workflow_dispatch:
     inputs:
-      source:
-        description: 'Source *.tgz (from S3 or releases)'
-        required: true
       version:
-        description: 'Version'
+        description: 'Version. A version that is present in the S3 bucket.'
         required: false
         default: ''
 env:
   NODEJS_VERSION: 12
   NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  AWS_S3_NIGHTLY_BASEURI: https://wifi-tally-nightly.s3.eu-central-1.amazonaws.com
+  AWS_S3_NIGHTLY_BUCKET: wifi-tally-nightly
+  AWS_S3_NIGHTLY_REGION: eu-central-1
 
 jobs:
   publish:
