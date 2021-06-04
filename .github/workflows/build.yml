@@ -448,9 +448,6 @@ jobs:
         with:
           name: tally-dist
           path: ${{ github.workspace }}/esp8266
-      - name: Copy static files
-        run: |
-          cp "${GITHUB_WORKSPACE}/LICENSE" "${GITHUB_WORKSPACE}/esp8266"
       - name: Zip it
         run: |
           zip -Jrq "${GITHUB_WORKSPACE}/vtally-${{ needs.setup.outputs.build_name }}-esp8266.zip" *
