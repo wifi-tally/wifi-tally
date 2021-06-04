@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version. A version that is present in the S3 bucket.'
+        description: 'Version. A version that is present in the S3 bucket. (like 0.5.0-alpha1'
         required: false
         default: ''
 env:
@@ -17,7 +17,7 @@ env:
   AWS_S3_NIGHTLY_REGION: eu-central-1
 
 jobs:
-  publish:
+  publish-npm:
     runs-on: "ubuntu-latest"
     steps:
       - name: Use node.js ${{ env.NODEJS_VERSION }}
@@ -26,9 +26,39 @@ jobs:
           node-version: ${{ env.NODEJS_VERSION }}
       - run: |
           npm set //registry.npmjs.org/:_authToken=${{ env.NPM_AUTH_TOKEN }}
-          if [ -z "${{ github.event.inputs.version }}" ]; then
-            NPM_ARGS=""
-          else
-            NPM_ARGS="--tag ${{ github.event.inputs.version }}"
-          fi
-          npm publish $NPM_ARGS "${{ github.event.inputs.source }}"
+
+          SOURCE="${AWS_S3_NIGHTLY_BASEURI}/vtally-${{ github.event.inputs.version }}/vtally-${{ github.event.inputs.version }}.tgz"
+
+          echo "releasing $SOURCE to npm"
+          npm publish "${SOURCE}"
+
+  # ###
+  #
+  # Create a Github Release and upload artifacts
+  #
+  # ###
+  release-github:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.version != '' }}
+    needs:
+      - setup
+      - bundle
+    steps:
+      - name: Get from S3
+        id: s3
+        run: |
+          # strip the "v" in front of the version
+          ARTIFACT_FILENAME="vtally-${BUILD_NAME}.tgz"
+          aws s3 sync "s3://${AWS_S3_NIGHTLY_BUCKET}/vtally-${{ github.event.inputs.version }}/" .
+
+      - uses: meeDamian/github-release@2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.event.inputs.version }}
+          name: "v${{ github.event.inputs.version }}"
+          # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
+          prerelease: ${{ contains(github.event.inputs.version, '-') || contains(github.event.inputs.version, '+') || contains(github.event.inputs.version, 'alpha') || contains(github.event.inputs.version, 'beta') || contains(github.event.inputs.version, 'rc') }}
+          draft: true
+          files: .
+          gzip: false
+          allow_override: true
