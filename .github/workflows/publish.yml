@@ -6,7 +6,7 @@ on:
     inputs:
       version:
         description: 'Version. A version that is present in the S3 bucket. (like 0.5.0-alpha1'
-        required: false
+        required: true
         default: ''
 env:
   NODEJS_VERSION: 12

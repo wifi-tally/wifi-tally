@@ -450,7 +450,8 @@ jobs:
           path: ${{ github.workspace }}/esp8266
       - name: Zip it
         run: |
-          zip -Jrq "${GITHUB_WORKSPACE}/vtally-${{ needs.setup.outputs.build_name }}-esp8266.zip" *
+          BUILD_NAME=${BUILD_NAME/#v/}
+          zip -Jrq "${GITHUB_WORKSPACE}/vtally-${BUILD_NAME}-esp8266.zip" *
         working-directory: ${{ github.workspace }}/esp8266
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
