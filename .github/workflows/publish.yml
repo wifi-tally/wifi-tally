@@ -40,9 +40,6 @@ jobs:
   release-github:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.version != '' }}
-    needs:
-      - setup
-      - bundle
     steps:
       - name: Get from S3
         id: s3
