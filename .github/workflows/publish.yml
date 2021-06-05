@@ -44,10 +44,8 @@ jobs:
       - name: Get from S3
         id: s3
         run: |
-          # strip the "v" in front of the version
           ARTIFACT_FILENAME="vtally-${BUILD_NAME}.tgz"
-          aws s3 sync "s3://${AWS_S3_NIGHTLY_BUCKET}/vtally-${{ github.event.inputs.version }}/" .
-
+          aws s3 sync s3://${AWS_S3_NIGHTLY_BUCKET}/ . --exclude "*" --include "vtally-${{ github.event.inputs.version }}/*"
       - uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
