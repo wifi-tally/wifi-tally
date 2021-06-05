@@ -25,17 +25,18 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - name: Check if already uploaded
+        id: preflight
         run: |
           if curl -L -f "https://npmjs.com/package/vtally/v/${{ github.event.inputs.version }}" -o /dev/null; then
             # package already uploaded
-            echo "::set-output name=preflight::err"
+            echo "::set-output name=check::err"
           else
             # package not yet uploaded
-            echo "::set-output name=preflight::ok"
+            echo "::set-output name=check::ok"
           fi
 
       - name: Upload to npm
-        if: "${{ steps.s3.outputs.files == 'ok' }}"
+        if: "${{ steps.preflight.outputs.check == 'ok' }}"
         run: |
           npm set //registry.npmjs.org/:_authToken=${{ env.NPM_AUTH_TOKEN }}
 
