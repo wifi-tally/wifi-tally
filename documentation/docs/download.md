@@ -17,22 +17,58 @@ The latest version of vTally is [{{ latest_version }}]({{ github_link }}/release
 
 ## Windows
 
-@TODO: exe installation
+Download [vtally-{{ latest_version }}-win-portable.exe]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-win-portable.exe).
+
+Windows Defender might complain multiple times, that it can not verify the source. Just be stubborn.
+
+It does not require installation. Just double-click, and a tray icon should pop up. Right click and select
+"Open in Browser", and you see the hub.
+
+To exit vTally, right click the tray icon, click "Exit" and confirm.
 
 ### Autostart
 
-Hit `WIN` + `R` on your keyboard and type `shell:Startup`. Move the exe file, you downloaded into this directory.
+Hit `WIN` + `R` on your keyboard and type `shell:Startup`. Move the exe file, you downloaded, into this directory.
 
 When you restart your PC and log in again, vTally should automatically start.
 
-## Linux
+## MacOS (x86_64)
+
+Download [vtally-{{ latest_version }}-mac.dmg]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-mac.dmg).
+
+To start the app, right click and select `open`.
+
+A tray icon should pop up. Right click and select "Open in Browser", and you see the hub.
+
+To exit vTally, right click the tray icon, click "Exit" and confirm.
+
+## Linux (x86_64), Ubuntu, Debian, Fedora, etc.
+
+Download [vtally-{{ latest_version }}-linux-x86_64.AppImage]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-linux-x86_64.AppImage),
+open a terminal and make it executable:
+
+````bash
+chmod a+x vtally-{{ latest_version }}-linux-x86_64.AppImage
+````
+
+To start, run
+````bash
+./vtally-{{ latest_version }}-linux-x86_64.AppImage
+````
+
+Point your browser to <http://localhost:3000> to show the Hub.
+
+Quit by tapping `CTRL` + `c` on your keyboard in the terminal window.
+
+
+## Run from npm
 
 ### 1. Install Node.js ≥{{ hub_nodejs_version }}
 
-[Install Node.js](https://nodejs.org/en/download/package-manager/) via your distribution's package manager.
-It is likely you already have it installed.
+[Install Node.js](https://nodejs.org/en/download/package-manager/).
 
-Verify your installation
+Verify your installation. NodeJS should at least be at version {{ hub_nodejs_version }}. If this is not the
+case, [check their website](https://nodejs.org/en/download/) for alternative ways of installation.
 
     $ node -v
     v14.15.4
@@ -42,13 +78,14 @@ Verify your installation
 
 ### 2. Install vTally
 
-This command will install vTally globally for all users. Run
+This command will install vTally for the logged-in user and does not require `sudo` rights. Run
 
-    sudo npm install -g vtally:{{ latest_version }} --unsafe-perm
-
-!!! info
-    The words `sudo` or `--unsafe-perm` might concern you. The line above is the typical way to install global npm
-    packages with precompiled node extensions. You can read below for an alternative installation for one user.
+````bash
+npm config set prefix '~/.local/'
+echo 'export PATH=~/.local/bin/:$PATH' >> ~/.bashrc
+source ~/.bashrc
+npm install -g vtally:{{ latest_version }}
+````
 
 ### 3. Run vTally
 
@@ -56,11 +93,4 @@ vTally is installed. Run it by calling
 
     vtally
 
-### Alternative installation for one user
-
-You can install vTally – for one user only – through the following steps:
-
-    npm config set prefix '~/.local/'
-    echo 'export PATH=~/.local/bin/:$PATH' >> ~/.bashrc
-    source ~/.bashrc
-    npm install -g vtally:{{ latest_version }}
+This version does not come with the tray icon. Point your browser to <http://localhost:3000> to see the hub.

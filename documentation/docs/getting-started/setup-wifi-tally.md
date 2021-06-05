@@ -107,15 +107,20 @@ and follow their installation instruction. Similarly select [ESPlorer](https://n
 or [NodeMCU Tool](https://nodemcu.readthedocs.io/en/master/getting-started/#nodemcu-tool) to upload code and follow
 their installation instruction.
 
+Download [vtally-{{ latest_version }}-esp8266.zip]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-esp8266.zip)
+for the latest files for the ESP8266.
+
 ## Flash the firmware
 
 When everything is set up flash the firmware with the tool selected in the previous step.
 
-The firmware is the `.bin` file in the `firmware` folder.
+The firmware is the `.bin` file in [vtally-{{ latest_version }}-esp8266.zip]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-esp8266.zip).
 
 ## Upload Code
 
-Use the tool you have selected to upload the following files from the `tally` folder to the NodeMCU board:
+Use the tool you have selected to upload the following files from
+[vtally-{{ latest_version }}-esp8266.zip]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-esp8266.zip)
+to the NodeMCU board:
 
 * every file ending in `.lc`
 * `init.lua`

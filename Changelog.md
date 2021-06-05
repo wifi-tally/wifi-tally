@@ -1,12 +1,15 @@
-# Upcoming
+# v0.5.0
 
 Code on the Tally did not change.
 
-* [BREAKING] way of installation has changed
-* [ADDED] support for Roland V-8HD and V-60HD. Thanks @JWandscheer #58
+* [BREAKING] way of installation has changed. We ship platform specific executables now.
+  See [Download Instructions](https://wifi-tally.github.io/download.html) for details.
+* [FEATURE] support for Roland V-8HD and V-60HD. Thanks @JWandscheer #58
+* [FEATURE] The project got a new name and a logo. Say hello to `vTally` and enjoy the new logo in the GUI.
 * [FEATURE] experimental support to edit `tally-settings.ini` and flash the code from the Hub via USB
 * [FEATURE] The hub automatically tries to restart in case it crashes. Consider this a safety net: It should never be necessary
   – if it is, please file an issue – but there might be cases where it helps.
+* [FEATURE] All releases are published to [npmjs.com](https://www.npmjs.com/package/vtally)
 
 # v0.4.2
 
