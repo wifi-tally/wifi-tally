@@ -41,10 +41,16 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.version != '' }}
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_S3_NIGHTLY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_NIGHTLY_KEY }}
+          aws-region: ${{ env.AWS_S3_NIGHTLY_REGION }}
       - name: Get from S3
         id: s3
         run: |
-          aws s3 sync s3://${AWS_S3_NIGHTLY_BUCKET}/ . --exclude "*" --include "vtally-${{ github.event.inputs.version }}/*" --debug
+          aws s3 sync s3://${AWS_S3_NIGHTLY_BUCKET}/ . --exclude "*" --include "vtally-${{ github.event.inputs.version }}/*"
       - uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
