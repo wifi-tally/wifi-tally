@@ -24,7 +24,19 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - run: |
+      - name: Check if already uploaded
+        run: |
+          if curl -L -f "https://npmjs.com/package/vtally/v/${{ github.event.inputs.version }}" -o /dev/null; then
+            # package already uploaded
+            echo "::set-output name=preflight::err"
+          else
+            # package not yet uploaded
+            echo "::set-output name=preflight::ok"
+          fi
+
+      - name: Upload to npm
+        if: "${{ steps.s3.outputs.files == 'ok' }}"
+        run: |
           npm set //registry.npmjs.org/:_authToken=${{ env.NPM_AUTH_TOKEN }}
 
           SOURCE="${AWS_S3_NIGHTLY_BASEURI}/vtally-${{ github.event.inputs.version }}/vtally-${{ github.event.inputs.version }}.tgz"
@@ -51,6 +63,14 @@ jobs:
         id: s3
         run: |
           aws s3 sync s3://${AWS_S3_NIGHTLY_BUCKET}/ . --exclude "*" --include "vtally-${{ github.event.inputs.version }}/*"
+          ALL_OBJECTS=$(find . -type f -name "vtally-*")
+
+          # outputting multiline string
+          # see https://trstringer.com/github-actions-multiline-strings/
+          ALL_OBJECTS="${ALL_OBJECTS//'%'/'%25'}"
+          ALL_OBJECTS="${ALL_OBJECTS//$'\n'/'%0A'}"
+          ALL_OBJECTS="${ALL_OBJECTS//$'\r'/'%0D'}"
+          echo "::set-output name=files::$ALL_OBJECTS"
       - uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,6 +79,6 @@ jobs:
           # no regex possible, so we test for the most likely cases that deviate from the "va.b.c" pattern
           prerelease: ${{ contains(github.event.inputs.version, '-') || contains(github.event.inputs.version, '+') || contains(github.event.inputs.version, 'alpha') || contains(github.event.inputs.version, 'beta') || contains(github.event.inputs.version, 'rc') }}
           draft: true
-          files: .
+          files: "${{ steps.s3.outputs.files }}"
           gzip: false
           allow_override: true
