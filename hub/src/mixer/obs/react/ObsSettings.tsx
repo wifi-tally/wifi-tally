@@ -50,7 +50,7 @@ function ObsSettings(props: ObsSettingsProps) {
         <MixerSettingsWrapper 
             title="OBS Studio Configuration"
             testId="obs"
-            description={<>Connects to OBS Studio over network. The <ExternalLink href="https://github.com/Palakis/obs-websocket">obs-websocket plugin</ExternalLink> has to be installed.</>}
+            description={<>Connects to OBS Studio over network. The <ExternalLink href="https://github.com/Palakis/obs-websocket">obs-websocket plugin version 4.x.x</ExternalLink> has to be installed. Version 5 of the plugin is not yet supported.</>}
             canBeSaved={isValid}
             isLoading={isLoading}
             onSave={handleSave}
