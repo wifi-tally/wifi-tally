@@ -1,3 +1,10 @@
+# Upcoming
+
+* [FEATURE] Logs are written to a file:
+  * **on Linux**: ~/.config/vtally-electron/logs/main.log
+  * **on macOS**: ~/Library/Logs/vtally-electron/main.log
+  * **on Windows**: %USERPROFILE%\AppData\Roaming\vtally-electron\logs\main.log
+
 # v0.5.0
 
 Code on the Tally did not change.
