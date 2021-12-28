@@ -1,6 +1,7 @@
-# Upcoming
+# v0.5.1
 
-* [FEATURE] Logs are written to a file:
+* [BUGFIX] Atem did not work when using the Electron distribution #78
+* [FEATURE] When using the Electron distribution, logs are written to a file:
   * **on Linux**: ~/.config/vtally-electron/logs/main.log
   * **on macOS**: ~/Library/Logs/vtally-electron/main.log
   * **on Windows**: %USERPROFILE%\AppData\Roaming\vtally-electron\logs\main.log

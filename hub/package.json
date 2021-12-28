@@ -1,6 +1,6 @@
 {
   "name": "vtally",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "dependencies": {
     "atem-connection": "^3.0.0-nightly-latest-20211125-222857-2b30eea.0",
