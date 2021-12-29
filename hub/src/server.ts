@@ -19,6 +19,7 @@ import VmixConfiguration from './mixer/vmix/VmixConfiguration'
 import ObsConfiguration from './mixer/obs/ObsConfiguration'
 import RolandV8HDConfiguration from './mixer/rolandV8HD/RolandV8HDConfiguration'
 import RolandV60HDConfiguration from './mixer/rolandV60HD/RolandV60HDConfiguration'
+import RolandVR50HDConfiguration from './mixer/rolandVR50HD/RolandVR50HDConfiguration'
 import MockConfiguration from './mixer/mock/MockConfiguration'
 import TestConnector from './mixer/test/TestConnector'
 import TestConfiguration from './mixer/test/TestConfiguration'
@@ -134,6 +135,15 @@ io.on('connection', (socket: ServerSideSocket) => {
     new SocketAwareEvent(myEmitter, 'config.changed.vmix', socket, (socket, vmixConfiguration) => {
       socket.emit('config.state.vmix', vmixConfiguration.toJson())
     }),
+    new SocketAwareEvent(myEmitter, 'config.changed.rolandV8HD', socket, (socket, rolandConfiguration) => {
+      socket.emit('config.state.rolandV8HD', rolandConfiguration.toJson())
+    }),
+    new SocketAwareEvent(myEmitter, 'config.changed.rolandV60HD', socket, (socket, rolandConfiguration) => {
+      socket.emit('config.state.rolandV60HD', rolandConfiguration.toJson())
+    }),
+    new SocketAwareEvent(myEmitter, 'config.changed.rolandVR50HD', socket, (socket, rolandConfiguration) => {
+      socket.emit('config.state.rolandVR50HD', rolandConfiguration.toJson())
+    }),
     new SocketAwareEvent(myEmitter, 'config.changed.tallyconfig', socket, (socket, tallyConfiguration) => {
       socket.emit('config.state.tallyconfig', tallyConfiguration.toJson())
     }),
@@ -150,6 +160,7 @@ io.on('connection', (socket: ServerSideSocket) => {
     socket.emit('config.state.obs', myConfiguration.getObsConfiguration().toJson())
     socket.emit('config.state.rolandV8HD', myConfiguration.getRolandV8HDConfiguration().toJson())
     socket.emit('config.state.rolandV60HD', myConfiguration.getRolandV60HDConfiguration().toJson())
+    socket.emit('config.state.rolandVR50HD', myConfiguration.getRolandVR50HDConfiguration().toJson())
     socket.emit('config.state.vmix', myConfiguration.getVmixConfiguration().toJson())
     socket.emit('config.state.tallyconfig', myConfiguration.getTallyConfiguration().toJson())
   })
@@ -279,6 +290,15 @@ io.on('connection', (socket: ServerSideSocket) => {
     const rolandV60HD = new RolandV60HDConfiguration()
     rolandV60HD.fromJson(newRolandV60HDConfiguration)
     myConfiguration.setRolandV60HDConfiguration(rolandV60HD)
+
+    if (newMixerName) {
+      myConfiguration.setMixerSelection(newMixerName)
+    }
+  })
+  socket.on('config.change.rolandVR50HD', (newRolandVR50HDConfiguration, newMixerName) => {
+    const rolandVR50HD = new RolandVR50HDConfiguration()
+    rolandVR50HD.fromJson(newRolandVR50HDConfiguration)
+    myConfiguration.setRolandVR50HDConfiguration(rolandVR50HD)
 
     if (newMixerName) {
       myConfiguration.setMixerSelection(newMixerName)

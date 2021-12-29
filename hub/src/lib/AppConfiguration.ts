@@ -6,6 +6,7 @@ import MockConfiguration from '../mixer/mock/MockConfiguration'
 import ObsConfiguration from '../mixer/obs/ObsConfiguration'
 import RolandV8HDConfiguration from '../mixer/rolandV8HD/RolandV8HDConfiguration'
 import RolandV60HDConfiguration from '../mixer/rolandV60HD/RolandV60HDConfiguration'
+import RolandVR50HDConfiguration from '../mixer/rolandVR50HD/RolandVR50HDConfiguration'
 import VmixConfiguration from '../mixer/vmix/VmixConfiguration'
 import NullConfiguration from '../mixer/null/NullConfiguration'
 import { Configuration } from '../mixer/interfaces'
@@ -21,6 +22,7 @@ export class AppConfiguration extends Configuration {
     obsConfiguration: ObsConfiguration
     rolandV8HDConfiguration: RolandV8HDConfiguration
     rolandV60HDConfiguration: RolandV60HDConfiguration
+    rolandVR50HDConfiguration: RolandVR50HDConfiguration
     testConfiguration: TestConfiguration
     vmixConfiguration: VmixConfiguration
     tallyConfiguration: DefaultTallyConfiguration
@@ -42,6 +44,7 @@ export class AppConfiguration extends Configuration {
         this.obsConfiguration = new ObsConfiguration()
         this.rolandV8HDConfiguration = new RolandV8HDConfiguration()
         this.rolandV60HDConfiguration = new RolandV60HDConfiguration()
+        this.rolandVR50HDConfiguration = new RolandVR50HDConfiguration()
         this.testConfiguration = new TestConfiguration()
         this.vmixConfiguration = new VmixConfiguration()
         this.tallyConfiguration = new DefaultTallyConfiguration()
@@ -108,6 +111,9 @@ export class AppConfiguration extends Configuration {
         if (data.rolandV60HD) {
             this.rolandV60HDConfiguration.fromJson(data.rolandV60HD)
         }
+        if (data.rolandVR50HD) {
+            this.rolandVR50HDConfiguration.fromJson(data.rolandVR50HD)
+        }
         if (data.test) {
             this.testConfiguration.fromJson(data.test)
         }
@@ -130,6 +136,7 @@ export class AppConfiguration extends Configuration {
             obs: this.obsConfiguration.toJson(),
             rolandV8HD: this.rolandV8HDConfiguration.toJson(),
             rolandV60HD: this.rolandV60HDConfiguration.toJson(),
+            rolandVR50HD: this.rolandVR50HDConfiguration.toJson(),
             test: this.testConfiguration.toJson(),
             vmix: this.vmixConfiguration.toJson(),
             tallyDefaults: this.tallyConfiguration.toJson(),
@@ -201,6 +208,16 @@ export class AppConfiguration extends Configuration {
         this.rolandV60HDConfiguration = rolandV60HDConfiguration.clone()
         this.emitter.emit("config.changed", this)
         this.emitter.emit("config.changed.rolandV60HD", this.rolandV60HDConfiguration)
+    }
+
+    getRolandVR50HDConfiguration() {
+        return this.rolandVR50HDConfiguration.clone()
+    }
+
+    setRolandVR50HDConfiguration(rolandVR50HDConfiguration: RolandVR50HDConfiguration) {
+        this.rolandVR50HDConfiguration = rolandVR50HDConfiguration.clone()
+        this.emitter.emit("config.changed", this)
+        this.emitter.emit("config.changed.rolandVR50HD", this.rolandVR50HDConfiguration)
     }
 
     getTestConfiguration() {

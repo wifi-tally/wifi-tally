@@ -8,6 +8,7 @@ import NullConfiguration from "../mixer/null/NullConfiguration";
 import ObsConfiguration from "../mixer/obs/ObsConfiguration";
 import RolandV8HDConfiguration from "../mixer/rolandV8HD/RolandV8HDConfiguration"
 import RolandV60HDConfiguration from "../mixer/rolandV60HD/RolandV60HDConfiguration"
+import RolandVR50HDConfiguration from "../mixer/rolandVR50HD/RolandVR50HDConfiguration"
 import TestConfiguration from "../mixer/test/TestConfiguration";
 import VmixConfiguration from "../mixer/vmix/VmixConfiguration";
 import { DefaultTallyConfiguration } from "../tally/TallyConfiguration";
@@ -24,6 +25,7 @@ export interface EventHandlersDataMap {
     'config.changed.obs': (obsConfiguration: ObsConfiguration) => void
     'config.changed.rolandV8HD': (rolandV8HDConfiguration: RolandV8HDConfiguration) => void
     'config.changed.rolandV60HD': (rolandV60HDConfiguration: RolandV60HDConfiguration) => void
+    'config.changed.rolandVR50HD': (rolandVR50HDConfiguration: RolandVR50HDConfiguration) => void
     'config.changed.test': (testConfiguration: TestConfiguration) => void
     'config.changed.vmix': (vmixConfiguration: VmixConfiguration) => void
     'config.changed.tallyconfig': (tallyConfiguration: DefaultTallyConfiguration) => void
