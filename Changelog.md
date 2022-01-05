@@ -1,6 +1,7 @@
 # v0.5.1
 
 * [BUGFIX] Atem did not work when using the Electron distribution #78
+* [FEATURE] Improved support when editing scenes in OBS #87 (Thanks, @Fuechschen)
 * [FEATURE] When using the Electron distribution, logs are written to a file:
   * **on Linux**: ~/.config/vtally-electron/logs/main.log
   * **on macOS**: ~/Library/Logs/vtally-electron/main.log
