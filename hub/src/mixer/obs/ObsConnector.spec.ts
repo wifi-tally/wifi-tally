@@ -353,10 +353,17 @@ describe('ObsConnector', () => {
                     {
                         name: "Cam 1",
                         type: "scene",
+                        render: true
                     },
                     {
                         name: "Cam 2",
                         type: "scene",
+                        render: true
+                    },
+                    {
+                        name: "Cam 3",
+                        type: "scene",
+                        render: false
                     }
                 ] },
             ]
