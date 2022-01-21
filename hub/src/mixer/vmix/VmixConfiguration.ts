@@ -61,8 +61,8 @@ class VmixConfiguration extends Configuration {
         return this.port
     }
 
-    private static readonly defaultIp = ipAddress("127.0.0.1")
-    private static readonly defaultPort = ipPort(8099)
+    public static readonly defaultIp = ipAddress("127.0.0.1")
+    public static readonly defaultPort = ipPort(8099)
 }
 
 export default VmixConfiguration

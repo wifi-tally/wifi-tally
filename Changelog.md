@@ -1,3 +1,7 @@
+# Upcoming
+
+* [BUGFIX] Don't suggest vMix is connected until a hello message is received and tally subscription was acknowledged #85
+
 # v0.5.1
 
 * [BUGFIX] Atem did not work when using the Electron distribution #78

@@ -13,7 +13,9 @@ class VmixConnector implements Connector {
     wasSubcribeOkReceived: boolean
     intervalHandle: any
     xmlQueryInterval: number
+    waitForHelloPeriod: number
     reconnectTimeout?: NodeJS.Timeout
+    waitForHelloTimeout?: NodeJS.Timeout
 
     constructor(configuration: VmixConfiguration, communicator: MixerCommunicator) {
         this.configuration = configuration
@@ -21,6 +23,7 @@ class VmixConnector implements Connector {
         this.wasHelloReceived = false
         this.wasSubcribeOkReceived = false
         this.xmlQueryInterval = 5000
+        this.waitForHelloPeriod = 5000
     }
     connect() {
         const client = new net.Socket()
@@ -33,6 +36,17 @@ class VmixConnector implements Connector {
             client.connect(this.configuration.getPort().toNumber(), this.configuration.getIp().toString())
         }
 
+        const reconnectClient = () => {
+            this.disconnect().then(() =>
+                this.reconnectTimeout = setTimeout(() => {
+                    if (this.reconnectTimeout) {
+                        clearTimeout(this.reconnectTimeout)
+                    }
+                    client.connect(this.configuration.getPort().toNumber(), this.configuration.getIp().toString())
+                }, 200)
+            )
+        }
+
         const queryXml = () => {
             if(!client.connecting && !client.destroyed) {
                 client.write("XML\r\n")
@@ -42,8 +56,17 @@ class VmixConnector implements Connector {
         connectClient()
 
         client.on("connect", () => {
-            console.log('Connected to vMix')
-            this.communicator.notifyMixerIsConnected()
+            console.debug(`TCP connection to ${this.configuration.getIp().toString()}:${this.configuration.getPort().toNumber()} established`)
+            this.waitForHelloTimeout = setTimeout(() => {
+                if (this.waitForHelloTimeout) {
+                    clearTimeout(this.waitForHelloTimeout)
+                }
+                
+                if (!this.wasHelloReceived || !this.wasSubcribeOkReceived) {
+                    reconnectClient()
+                    console.error(`The remote at ${this.configuration.getIp().toString()}:${this.configuration.getPort().toNumber()} did not identify as vMix TCPAPI. Is this the correct port for the TCPAPI? (default ${VmixConfiguration.defaultPort})`)
+                }
+            }, this.waitForHelloPeriod)
         })
 
         client.on("ready", () => {
@@ -74,23 +97,26 @@ class VmixConnector implements Connector {
 
             if (hadError) {
                 console.debug("Connection to vMix is reconnected after an error")
-                this.reconnectTimeout = setTimeout(() => {
-                    if (this.reconnectTimeout) {
-                        clearTimeout(this.reconnectTimeout)
-                    }
-                    client.connect(this.configuration.getPort().toNumber(), this.configuration.getIp().toString())
-                }, 200)
+                reconnectClient()
             }
         })
 
+    }
+    private onConnectionComplete() {
+        console.log("Connection to vMix complete")
+        this.communicator.notifyMixerIsConnected()
     }
     private onData(data: Buffer) {
         data.toString().replace(/[\r\n]*$/, "").split("\r\n").forEach(command => {
             console.debug(`> ${command}`)
             if (command.startsWith("VERSION OK")) {
                 this.wasHelloReceived = true
+                console.debug("Connection to vMix established")
+                if (this.wasHelloReceived && this.wasSubcribeOkReceived) { this.onConnectionComplete() }
             } else if (command.startsWith("SUBSCRIBE OK TALLY")) {
                 this.wasSubcribeOkReceived = true
+                console.debug("Successfully subscribed to tally updates from vMix")
+                if (this.wasHelloReceived && this.wasSubcribeOkReceived) { this.onConnectionComplete() }
             } else if (command.startsWith("TALLY OK")) {
                 this.handleTallyCommand(command)
             } else if (command.startsWith("XML ")) {
@@ -157,6 +183,10 @@ class VmixConnector implements Connector {
             if (this.reconnectTimeout) {
                 clearTimeout(this.reconnectTimeout)
                 this.reconnectTimeout = undefined;
+            }
+            if (this.waitForHelloTimeout) {
+                clearTimeout(this.waitForHelloTimeout)
+                this.waitForHelloTimeout = undefined;
             }
             if (this.client && ! this.client.destroyed) {
                 // @TODO: check if client is still connected and disconnect gracefully
