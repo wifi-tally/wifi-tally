@@ -8,6 +8,7 @@ type ValidatingInputProps = {
     object: Configuration
     propertyName: string
     errorMessage?: string
+    warningMessage?: string
     onValid?: (value: string|null) => void
     onInvalid?: () => void
 }
@@ -26,7 +27,7 @@ const upperCaseFirst = (value: string) => `${value.substr(0, 1).toUpperCase()}${
  * It validates values by trying to call the setter on the object. If it does not throw an error
  * the value is assumed to be valid.
  */
-function ValidatingInput({label, testId, object, propertyName, errorMessage, onValid, onInvalid}: ValidatingInputProps) {
+function ValidatingInput({label, testId, object, propertyName, errorMessage, warningMessage, onValid, onInvalid}: ValidatingInputProps) {
     const getterName = `get${upperCaseFirst(propertyName)}`
     const setterName = `set${upperCaseFirst(propertyName)}`
     if (typeof object[getterName] !== "function") { throw new Error(`${getterName} is not a function`) }
@@ -67,7 +68,7 @@ function ValidatingInput({label, testId, object, propertyName, errorMessage, onV
             value={value} 
             onChange={handleChange}
             error={!isValid}
-            helperText={!isValid ? (errorMessage || "invalid") : ""}
+            helperText={!isValid ? (errorMessage || "invalid") : (warningMessage || "")}
             className={classes.input}
         />
     )
