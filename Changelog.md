@@ -1,4 +1,4 @@
-# Upcoming
+# v0.5.2
 
 * [BUGFIX] Don't suggest vMix is connected until a hello message is received and tally subscription was acknowledged #85
 * [BUGFIX] The logs where written with the path segment `vally-electron`, missing a `t` that is essential to our name. It is now fixed an the files are now:
