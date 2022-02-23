@@ -39,6 +39,18 @@ class ObsConnector implements Connector{
             // console.debug('ScenesChanged', data)
             this.updateScenes()
         })
+        this.obs.on('SceneItemRemoved', data => {
+            // console.debug('ScenesChanged', data)
+            this.updateScenes()
+        })
+        this.obs.on('SceneItemAdded', data => {
+            // console.debug('ScenesChanged', data)
+            this.updateScenes()
+        })
+        this.obs.on('SceneItemVisibilityChanged', data => {
+            // console.debug('ScenesChanged', data)
+            this.updateScenes()
+        })
         this.obs.on('SceneCollectionChanged', data => {
             // console.debug('SceneCollectionChanged', data)
             this.updateScenes()
@@ -166,7 +178,7 @@ class ObsConnector implements Connector{
     private updateEmbeddedScenes(scenes: OBSWebSocket.Scene[]) {
         this.embeddedScenes = {}
         scenes.forEach(scene => {
-            this.embeddedScenes[scene.name] = scene.sources.filter(source => source.type === "scene").map(source => source.name)
+            this.embeddedScenes[scene.name] = scene.sources.filter(source => source.type === "scene" && source.render === true).map(source => source.name)
         })
     }
     private notifyProgramChanged(scenes: string[]) {

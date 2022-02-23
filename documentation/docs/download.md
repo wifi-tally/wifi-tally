@@ -17,7 +17,7 @@ The latest version of vTally is [{{ latest_version }}]({{ github_link }}/release
 
 ## Windows
 
-Download [vtally-{{ latest_version }}-win-portable.exe]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-win-portable.exe).
+Download [vtally-{{ latest_version }}-win-x64-portable.exe]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-win-x64-portable.exe).
 
 Windows Defender might complain multiple times, that it can not verify the source. Just be stubborn.
 
@@ -34,7 +34,7 @@ When you restart your PC and log in again, vTally should automatically start.
 
 ## MacOS (x86_64)
 
-Download [vtally-{{ latest_version }}-mac.dmg]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-mac.dmg).
+Download [vtally-{{ latest_version }}-mac-x64.dmg]({{ github_link }}/releases/download/{{ latest_version }}/vtally-{{ latest_version }}-mac-x64.dmg).
 
 To start the app, right click and select `open`.
 
