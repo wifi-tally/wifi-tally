@@ -47,7 +47,7 @@ export const DefaultColorScheme: ColorScheme = {
   preview: new Color(0, 255, 0),
   highlight: new Color(255, 255, 255),
   unknown: new Color(0, 0, 255),
-  idle: new Color(0, 1, 0),
+  idle: new Color(0, 0, 1),
 }
 export const YellowPinkColorScheme: ColorScheme = {
   id: "yellow-pink",
@@ -57,7 +57,7 @@ export const YellowPinkColorScheme: ColorScheme = {
   preview: new Color(255, 0, 255),
   highlight: new Color(255, 255, 255),
   unknown: new Color(0, 0, 255),
-  idle: new Color(0, 1, 0),
+  idle: new Color(0, 0, 1),
 }
 
 const ColorSchemes = {
