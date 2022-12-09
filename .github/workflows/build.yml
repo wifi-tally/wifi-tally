@@ -11,9 +11,9 @@ env:
   NODEMCU_REPO: nodemcu/nodemcu-firmware
   NODEMCU_FIRMWARE: 3.0-master_20200610
   NODEMCU_MODULES: encoder,file,gpio,net,node,pwm2,struct,tmr,uart,wifi,ws2812
-  AWS_S3_NIGHTLY_BASEURI: https://wifiy-tally-builds.fra1.digitaloceanspaces.com/
-  AWS_S3_NIGHTLY_BUCKET: wifiy-tally-builds
-  AWS_S3_NIGHTLY_REGION: fra1
+  AWS_S3_NIGHTLY_BASEURI: https://wify-tally-build.s3.eu-central-1.amazonaws.com
+  AWS_S3_NIGHTLY_BUCKET: wify-tally-build
+  AWS_S3_NIGHTLY_REGION: eu-central-1
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 defaults:
