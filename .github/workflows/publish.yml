@@ -27,7 +27,7 @@ jobs:
       - name: Check if already uploaded
         id: preflight
         run: |
-          if curl -L -f "https://npmjs.com/package/vtally/v/${{ github.event.inputs.version }}" -o /dev/null; then
+          if curl -L -f "https://npmjs.com/package/wifi-tally/v/${{ github.event.inputs.version }}" -o /dev/null; then
             # package already uploaded
             echo "::set-output name=check::err"
           else
@@ -40,7 +40,7 @@ jobs:
         run: |
           npm set //registry.npmjs.org/:_authToken=${{ env.NPM_AUTH_TOKEN }}
 
-          SOURCE="${AWS_S3_NIGHTLY_BASEURI}/vtally-${{ github.event.inputs.version }}/vtally-${{ github.event.inputs.version }}.tgz"
+          SOURCE="${AWS_S3_NIGHTLY_BASEURI}/wifi-tally-${{ github.event.inputs.version }}/wifi-tally-${{ github.event.inputs.version }}.tgz"
 
           echo "releasing $SOURCE to npm"
           npm publish "${SOURCE}"
@@ -63,8 +63,8 @@ jobs:
       - name: Get from S3
         id: s3
         run: |
-          aws s3 sync s3://${AWS_S3_NIGHTLY_BUCKET}/ . --exclude "*" --include "vtally-${{ github.event.inputs.version }}/*"
-          ALL_OBJECTS=$(find . -type f -name "vtally-*")
+          aws s3 sync s3://${AWS_S3_NIGHTLY_BUCKET}/ . --exclude "*" --include "wifi-tally-${{ github.event.inputs.version }}/*"
+          ALL_OBJECTS=$(find . -type f -name "wifi-tally-*")
 
           # outputting multiline string
           # see https://trstringer.com/github-actions-multiline-strings/
