@@ -1,3 +1,5 @@
+This is a fork from [wifi-tally/wifi-tally](https://github.com/wifi-tally/wifi-tally). The only purpose of this repo is to fix an issue with reconnecting to vmix after the application has closed and started again.
+
 # Open Source Tally Light
 
 vTally is an Open Source Wifi Tally Light based on the ESP8266.
