@@ -95,10 +95,8 @@ class VmixConnector implements Connector {
                 this.intervalHandle = undefined;
             }
 
-            if (hadError) {
-                console.debug("Connection to vMix is reconnected after an error")
-                reconnectClient()
-            }
+            console.debug("Connection to vMix is reconnected after a discronnect")
+            reconnectClient()
         })
 
     }
