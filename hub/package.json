@@ -1,5 +1,5 @@
 {
-  "name": "vtally",
+  "name": "wifi-tally",
   "version": "0.5.1",
   "private": true,
   "dependencies": {
@@ -71,7 +71,8 @@
   ],
   "cpu": [
     "x64",
-    "arm"
+    "arm",
+    "arm64"
   ],
   "browserslist": {
     "production": [

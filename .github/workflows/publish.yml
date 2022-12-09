@@ -12,8 +12,8 @@ env:
   NODEJS_VERSION: 12
   NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  AWS_S3_NIGHTLY_BASEURI: https://wifi-tally-nightly.s3.eu-central-1.amazonaws.com
-  AWS_S3_NIGHTLY_BUCKET: wifi-tally-nightly
+  AWS_S3_NIGHTLY_BASEURI: https://wify-tally-build.s3.eu-central-1.amazonaws.com
+  AWS_S3_NIGHTLY_BUCKET: wify-tally-build
   AWS_S3_NIGHTLY_REGION: eu-central-1
 
 jobs:
