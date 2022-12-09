@@ -97,6 +97,7 @@ class VmixConnector implements Connector {
 
             console.debug("Connection to vMix is reconnected after a discronnect")
             reconnectClient()
+            
         })
 
     }
